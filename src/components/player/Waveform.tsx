@@ -17,6 +17,9 @@ interface WaveformProps {
   isPlaying?: boolean;
 }
 
+// How far ahead to preload waveforms (affects when they initialize before entering viewport)
+const WAVEFORM_PRELOAD_MARGIN = '300px 0px';
+
 export default function Waveform({
   url,
   currentTime = 0,
@@ -51,7 +54,7 @@ export default function Waveform({
           }
         });
       },
-      { rootMargin: '300px 0px', threshold: 0 }
+      { rootMargin: WAVEFORM_PRELOAD_MARGIN, threshold: 0 }
     );
 
     observer.observe(containerRef.current);

@@ -27,6 +27,8 @@ function getSharedAudioContext(): AudioContext | null {
   
   try {
     // Try to get Howler's context first for consistency
+    // WARNING: Accessing private Howler API (_audioContext) - tested with howler@2.2.x
+    // This may break in future versions. If access fails, we create our own context.
     const howlerCtx = (Howl as unknown as { _audioContext?: AudioContext })._audioContext;
     if (howlerCtx && howlerCtx instanceof AudioContext && howlerCtx.state !== 'closed') {
       sharedAudioContext = howlerCtx;
@@ -86,6 +88,8 @@ export class AudioAnalyser {
       this.dataArray = new Uint8Array(bufferLength);
 
       // Try to connect to Howler's master gain node
+      // WARNING: Accessing private Howler API (_masterGain) - tested with howler@2.2.x
+      // If unavailable, we fall back to MediaElement bridge on demand.
       const masterGain = (Howl as unknown as { _masterGain?: GainNode })._masterGain;
       
       if (masterGain) {
