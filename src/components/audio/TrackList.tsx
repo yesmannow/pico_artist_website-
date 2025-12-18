@@ -13,6 +13,8 @@ interface TrackCardProps {
 }
 
 function TrackCard({ track, isPlaying, onPlay }: TrackCardProps) {
+  const PREVIEW_DURATION_MS = 5000;
+  const PREVIEW_FALLBACK_SRC = '/lofi-teaser.wav';
   const waveformRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(track.likes);
@@ -81,7 +83,7 @@ function TrackCard({ track, isPlaying, onPlay }: TrackCardProps) {
   const startPreview = () => {
     if (previewRef.current) return;
 
-    const src = track.audio_url || '/lofi-teaser.wav';
+    const src = track.audio_url || PREVIEW_FALLBACK_SRC;
     const howl = new Howl({
       src: [src],
       volume: 0.35,
@@ -92,7 +94,7 @@ function TrackCard({ track, isPlaying, onPlay }: TrackCardProps) {
     howl.play();
     previewTimeout.current = setTimeout(() => {
       stopPreview();
-    }, 5000);
+    }, PREVIEW_DURATION_MS);
   };
 
   const handleActionClick = async (e: React.MouseEvent, action: 'like' | 'share') => {

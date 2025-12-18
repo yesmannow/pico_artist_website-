@@ -59,6 +59,9 @@ const NeonHomeIcon = ({ className, ...props }: IconProps) => (
   </svg>
 );
 
+const SLIDE_OUT_THRESHOLD = 5;
+const HERO_ROOT_MARGIN = '-72px 0px 0px 0px';
+
 const menuItems = [
   {
     title: 'Home',
@@ -115,7 +118,7 @@ export default function Navbar() {
   const [pastHero, setPastHero] = useState(true);
 
   const toggleMenu = () => setIsOpen(!isOpen);
-  const isSlideOut = menuItems.length > 5;
+  const isSlideOut = menuItems.length > SLIDE_OUT_THRESHOLD;
 
   useEffect(() => {
     const hero = document.querySelector('[data-hero]');
@@ -125,7 +128,7 @@ export default function Navbar() {
       ([entry]) => {
         setPastHero(!entry.isIntersecting);
       },
-      { rootMargin: '-72px 0px 0px 0px' }
+      { rootMargin: HERO_ROOT_MARGIN }
     );
 
     observer.observe(hero);
