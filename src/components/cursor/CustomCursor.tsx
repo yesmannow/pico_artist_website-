@@ -8,6 +8,7 @@ export default function CustomCursor() {
   const [isClicking, setIsClicking] = useState(false);
   const [trails, setTrails] = useState<Array<{ x: number; y: number; id: number }>>([]);
   const [isEnabled, setIsEnabled] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   // Device capability detection
   useEffect(() => {
@@ -34,6 +35,7 @@ export default function CustomCursor() {
 
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
+      setIsVisible(true);
     };
 
     const handleMouseDown = () => {
@@ -49,14 +51,21 @@ export default function CustomCursor() {
       setIsClicking(false);
     };
 
+    const handleMouseLeave = () => setIsVisible(false);
+    const handleMouseEnter = () => setIsVisible(true);
+
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mousedown', handleMouseDown);
     window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('mouseleave', handleMouseLeave);
+    window.addEventListener('mouseenter', handleMouseEnter);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('mouseenter', handleMouseEnter);
     };
   }, [mousePosition, isEnabled]);
 
@@ -86,6 +95,7 @@ export default function CustomCursor() {
         input, textarea, select, button, a, [role="button"], [contenteditable="true"] {
           cursor: auto !important;
         }
+        button, a, [role="button"] { cursor: pointer !important; }
       `;
       document.head.appendChild(style);
     }
@@ -109,13 +119,16 @@ export default function CustomCursor() {
     <>
       {/* Custom Cursor Ring */}
       <motion.div
+        aria-hidden
         className="fixed top-0 left-0 pointer-events-none z-[9999] mix-blend-difference"
         style={{
           x: mousePosition.x - 12,
           y: mousePosition.y - 12,
+          pointerEvents: 'none',
         }}
         animate={{
           scale: isClicking ? 0.8 : 1,
+          opacity: isVisible ? 1 : 0,
         }}
         transition={{ type: 'spring', stiffness: 500, damping: 28 }}
       >
@@ -126,10 +139,12 @@ export default function CustomCursor() {
       {trails.map((trail) => (
         <motion.div
           key={trail.id}
+          aria-hidden
           className="fixed top-0 left-0 pointer-events-none z-[9998]"
           style={{
             x: trail.x - 20,
             y: trail.y - 20,
+            pointerEvents: 'none',
           }}
           initial={{ opacity: 0.8, scale: 0 }}
           animate={{ opacity: 0, scale: 2 }}
@@ -141,4 +156,3 @@ export default function CustomCursor() {
     </>
   );
 }
-

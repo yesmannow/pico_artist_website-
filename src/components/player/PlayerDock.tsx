@@ -6,7 +6,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { usePlayerStore } from '@/store/playerStore';
 import { howlerEngine } from '@/lib/player/howlerEngine';
 import Play from 'lucide-react/dist/esm/icons/play';
@@ -47,6 +47,8 @@ export default function PlayerDock() {
   } = usePlayerStore();
 
   const timeUpdateRef = useRef<number | null>(null);
+  const prefersReducedMotion = useReducedMotion();
+  const safeProgress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   // Initialize and sync with howler engine
   useEffect(() => {
@@ -150,17 +152,35 @@ export default function PlayerDock() {
         <div className="max-w-7xl mx-auto px-4 py-3">
           {/* Progress bar */}
           <div className="mb-2">
-            <input
-              type="range"
-              min="0"
-              max={duration || 100}
-              value={currentTime}
-              onChange={handleSeek}
-              className="w-full h-1 bg-zinc-800 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-piko-teal [&::-webkit-slider-thumb]:cursor-pointer"
-              style={{
-                background: `linear-gradient(to right, rgb(255, 0, 110) 0%, rgb(255, 0, 110) ${(currentTime / duration) * 100}%, rgb(39, 39, 42) ${(currentTime / duration) * 100}%, rgb(39, 39, 42) 100%)`,
-              }}
-            />
+            <motion.div
+              className="relative"
+              animate={
+                isPlaying && !prefersReducedMotion
+                  ? { scaleY: [1, 1.02, 1], opacity: [0.95, 1, 0.95] }
+                  : { scaleY: 1, opacity: 1 }
+              }
+              transition={{ repeat: isPlaying && !prefersReducedMotion ? Infinity : 0, duration: 2.4 }}
+            >
+              <input
+                type="range"
+                min="0"
+                max={duration || 100}
+                value={currentTime}
+                onChange={handleSeek}
+                className="w-full h-1 bg-zinc-800 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-piko-teal [&::-webkit-slider-thumb]:cursor-pointer"
+                style={{
+                  background: `linear-gradient(to right, rgb(255, 0, 110) 0%, rgb(255, 0, 110) ${safeProgress}%, rgb(39, 39, 42) ${safeProgress}%, rgb(39, 39, 42) 100%)`,
+                }}
+              />
+              <div
+                className="pointer-events-none absolute inset-0 rounded-full blur-md"
+                style={{
+                  background: `linear-gradient(to right, rgba(0,245,212,0.2) 0%, rgba(255,0,110,0.3) ${safeProgress}%, rgba(39,39,42,0) ${safeProgress}%, rgba(39,39,42,0) 100%)`,
+                  opacity: isPlaying ? 0.6 : 0.3,
+                  transition: 'opacity 200ms ease',
+                }}
+              />
+            </motion.div>
             <div className="flex justify-between text-xs text-zinc-400 mt-1">
               <span>{formatTime(currentTime)}</span>
               <span>{formatTime(duration)}</span>
@@ -178,6 +198,27 @@ export default function PlayerDock() {
                 </p>
                 <p className="text-xs text-zinc-400 truncate">{current.artist}</p>
               </div>
+              <motion.div
+                aria-hidden
+                className="hidden sm:flex items-end gap-1"
+                animate={
+                  isPlaying && !prefersReducedMotion
+                    ? { scaleY: [0.6, 1, 0.6] }
+                    : { scaleY: 0.4 }
+                }
+                transition={{ repeat: isPlaying && !prefersReducedMotion ? Infinity : 0, duration: 1.2, ease: 'easeInOut' }}
+              >
+                {[1, 2, 3, 4].map((bar) => (
+                  <div
+                    key={bar}
+                    className="w-[3px] rounded-full bg-gradient-to-b from-piko-teal via-piko-pink to-piko-orange"
+                    style={{
+                      height: `${10 + bar * 4}px`,
+                      opacity: 0.8,
+                    }}
+                  />
+                ))}
+              </motion.div>
             </div>
 
             {/* Playback controls */}

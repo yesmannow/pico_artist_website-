@@ -12,6 +12,7 @@ import type { Video } from '@/data/videos';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
 import Play from 'lucide-react/dist/esm/icons/play';
+import CinematicHero from '@/components/media/CinematicHero';
 
 export default function VideosPage() {
   const videos = getVideos();
@@ -29,24 +30,15 @@ export default function VideosPage() {
   ).sort();
 
   return (
-    <div className="min-h-screen px-4 py-16">
+    <div className="min-h-screen px-4 pb-16">
       <div className="max-w-7xl mx-auto space-y-12">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center space-y-3"
-        >
-          <p className="text-xs uppercase tracking-[0.3em] text-piko-teal">Videos</p>
-          <h1 className="text-4xl md:text-6xl font-bold text-zinc-100">
-            Visual Gallery
-          </h1>
-          <p className="text-zinc-400 max-w-3xl mx-auto">
-            Watch the latest music videos, behind-the-scenes, and more from Piko FG
-          </p>
-        </motion.div>
-
+        <CinematicHero
+          title="Visual Gallery"
+          subtitle="Watch the latest music videos, behind-the-scenes, and more from Piko FG"
+          backgroundImageUrl="/images%20design%20assets/header%20with%20logo.jpg"
+          align="center"
+          variant="videos"
+        />
         {/* Filter */}
         {allTags.length > 0 && (
           <div className="flex justify-center gap-2 flex-wrap">
