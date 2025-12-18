@@ -90,6 +90,10 @@ export default function CustomCursor() {
           cursor: auto !important;
         }
         button, a, [role="button"] { cursor: pointer !important; }
+        /* Ensure studio elements are interactive */
+        [data-studio-interactive], [data-studio-interactive] * {
+          cursor: auto !important;
+        }
       `;
       document.head.appendChild(style);
     }

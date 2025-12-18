@@ -116,7 +116,15 @@ export default function StudioRecorder({ backingTracks = [] }: StudioRecorderPro
       // Create object URL for the audio blob
       const audioUrl = URL.createObjectURL(audioBlob);
 
-      // Add track to local store
+      // Create a new clip
+      const newClip = {
+        startTime: 0,
+        duration: recordingTime,
+        gain: 1.0,
+        isMuted: false,
+      };
+
+      // Add track to local store with clip
       addTrack({
         name: trackTitle,
         audioUrl: audioUrl,
@@ -125,6 +133,7 @@ export default function StudioRecorder({ backingTracks = [] }: StudioRecorderPro
         volume: 1.0,
         muted: false,
         solo: false,
+        clips: [newClip],
       });
 
       alert('Track added to timeline!');
