@@ -54,6 +54,14 @@ const SignatureIcon = ({ className, ...props }: IconProps) => (
   </svg>
 );
 
+const VideoIcon = ({ className, ...props }: IconProps) => (
+  <svg viewBox="0 0 64 64" fill="none" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`h-7 w-7 ${className ?? ''}`} {...props}>
+    <rect x="8" y="14" width="40" height="36" rx="4" stroke="currentColor" />
+    <path d="M48 24 56 18v28l-8-6" stroke="currentColor" />
+    <path d="M24 28 32 32l-8 4V28Z" fill="currentColor" />
+  </svg>
+);
+
 const NeonHomeIcon = ({ className, ...props }: IconProps) => (
   <svg viewBox="0 0 64 64" fill="none" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`h-7 w-7 ${className ?? ''}`} {...props}>
     <path d="M12 30 32 14l20 16v18a4 4 0 0 1-4 4H16a4 4 0 0 1-4-4V30Z" stroke="currentColor" />
@@ -101,6 +109,13 @@ const menuItems = [
     icon: RecordIcon,
     gradient: 'from-piko-pink to-piko-orange',
     blurb: 'Discography & albums',
+  },
+  {
+    title: 'Videos',
+    href: '/videos',
+    icon: VideoIcon,
+    gradient: 'from-piko-teal to-piko-pink',
+    blurb: 'Music videos & visuals',
   },
   {
     title: 'Tour',
