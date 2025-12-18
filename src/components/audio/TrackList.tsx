@@ -3,14 +3,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Play, Pause, Heart, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  duration: string;
-  coverArt?: string;
-}
+import { getTracks, likeTrack, type Track } from '@/lib/supabase';
 
 interface TrackCardProps {
   track: Track;
@@ -21,6 +14,7 @@ interface TrackCardProps {
 function TrackCard({ track, isPlaying, onPlay }: TrackCardProps) {
   const waveformRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = useState(false);
+  const [likes, setLikes] = useState(track.likes);
   const [showSplatter, setShowSplatter] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
@@ -60,7 +54,7 @@ function TrackCard({ track, isPlaying, onPlay }: TrackCardProps) {
     }
   }, []);
 
-  const handleActionClick = (e: React.MouseEvent, action: 'like' | 'share') => {
+  const handleActionClick = async (e: React.MouseEvent, action: 'like' | 'share') => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -68,8 +62,20 @@ function TrackCard({ track, isPlaying, onPlay }: TrackCardProps) {
     setShowSplatter({ x, y });
     setTimeout(() => setShowSplatter(null), 600);
     
-    if (action === 'like') {
-      setLiked(!liked);
+    if (action === 'like' && !liked) {
+      // Optimistic update
+      setLiked(true);
+      setLikes((prev) => prev + 1);
+      
+      // Update in database
+      try {
+        await likeTrack(track.id);
+      } catch (error) {
+        // Rollback on error
+        setLiked(false);
+        setLikes((prev) => prev - 1);
+        console.error('Failed to like track:', error);
+      }
     }
   };
 
@@ -109,10 +115,11 @@ function TrackCard({ track, isPlaying, onPlay }: TrackCardProps) {
       <div className="flex items-center gap-2">
         <button
           onClick={(e) => handleActionClick(e, 'like')}
-          className="relative flex items-center gap-1 px-3 py-1.5 rounded-full border border-zinc-700 bg-zinc-800/50 text-xs text-zinc-300 transition-all hover:border-piko-pink hover:text-piko-pink overflow-hidden"
+          disabled={liked}
+          className="relative flex items-center gap-1 px-3 py-1.5 rounded-full border border-zinc-700 bg-zinc-800/50 text-xs text-zinc-300 transition-all hover:border-piko-pink hover:text-piko-pink overflow-hidden disabled:cursor-not-allowed"
         >
           <Heart className={`h-4 w-4 ${liked ? 'fill-piko-pink text-piko-pink' : ''}`} />
-          <span>Like</span>
+          <span>{likes}</span>
           
           {/* Paint Splatter Animation */}
           <AnimatePresence>
@@ -157,41 +164,73 @@ function TrackCard({ track, isPlaying, onPlay }: TrackCardProps) {
 
 export default function TrackList() {
   const [playingId, setPlayingId] = useState<string | null>(null);
+  const [tracks, setTracks] = useState<Track[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    async function loadTracks() {
+      try {
+        const fetchedTracks = await getTracks();
+        setTracks(fetchedTracks);
+      } catch (error) {
+        console.error('Error loading tracks:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    loadTracks();
+  }, []);
+
+  // Fallback mock tracks if no tracks in database
   const mockTracks: Track[] = [
     {
       id: '1',
       title: 'Digital Dreams',
       artist: 'Piko FG',
       duration: '3:42',
+      likes: 0,
+      created_at: new Date().toISOString(),
     },
     {
       id: '2',
       title: 'Neon Nights',
       artist: 'Piko FG',
       duration: '4:15',
+      likes: 0,
+      created_at: new Date().toISOString(),
     },
     {
       id: '3',
       title: 'Cyber Soul',
       artist: 'Piko FG',
       duration: '3:28',
+      likes: 0,
+      created_at: new Date().toISOString(),
     },
   ];
 
+  const displayTracks = tracks.length > 0 ? tracks : mockTracks;
+
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 py-8">
+    <div className="w-full max-w-4xl mx-auto px-4 py-8" id="tracks">
       <h2 className="text-2xl font-bold text-zinc-100 mb-6">Featured Tracks</h2>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {mockTracks.map((track) => (
-          <TrackCard
-            key={track.id}
-            track={track}
-            isPlaying={playingId === track.id}
-            onPlay={() => setPlayingId(playingId === track.id ? null : track.id)}
-          />
-        ))}
-      </div>
+      {loading ? (
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-piko-teal"></div>
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {displayTracks.map((track) => (
+            <TrackCard
+              key={track.id}
+              track={track}
+              isPlaying={playingId === track.id}
+              onPlay={() => setPlayingId(playingId === track.id ? null : track.id)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
