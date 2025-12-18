@@ -66,6 +66,24 @@ async function getFileCount(dirPath) {
   }
 }
 
+async function getFilesRecursive(dirPath, extension = null) {
+  try {
+    const entries = await fs.readdir(dirPath, { withFileTypes: true });
+    const files = await Promise.all(entries.map(async (entry) => {
+      const fullPath = path.join(dirPath, entry.name);
+      if (entry.isDirectory()) {
+        return getFilesRecursive(fullPath, extension);
+      } else if (!extension || entry.name.endsWith(extension)) {
+        return fullPath;
+      }
+      return [];
+    }));
+    return files.flat();
+  } catch {
+    return [];
+  }
+}
+
 async function verifyFile(filePath, description) {
   const fullPath = path.join(OUTPUT_DIR, filePath);
   if (await exists(fullPath)) {
@@ -168,6 +186,25 @@ async function main() {
   log(`${colors.bold}Static Assets:${colors.reset}`);
   allPassed = await verifyDirectory('_next/static', 'Next.js Static', true) && allPassed;
   allPassed = await verifyDirectory('_next/static/chunks', 'JS Chunks', true) && allPassed;
+  
+  // Verify critical static files exist
+  const staticDir = path.join(OUTPUT_DIR, '_next/static');
+  const jsFiles = await getFilesRecursive(staticDir, '.js');
+  const cssFiles = await getFilesRecursive(staticDir, '.css');
+  
+  if (jsFiles.length === 0) {
+    logError('No .js files found in _next/static (CRITICAL)');
+    allPassed = false;
+  } else {
+    logSuccess(`Found ${jsFiles.length} JS files in static output`);
+  }
+  
+  if (cssFiles.length === 0) {
+    logError('No .css files found in _next/static (CRITICAL)');
+    allPassed = false;
+  } else {
+    logSuccess(`Found ${cssFiles.length} CSS files in static output`);
+  }
   console.log();
 
   // Public assets
@@ -182,6 +219,18 @@ async function main() {
   allPassed = await verifyDirectory('cloudflare', 'Cloudflare Runtime', false) && allPassed;
   allPassed = await verifyDirectory('middleware', 'Middleware', false) && allPassed;
   allPassed = await verifyDirectory('server-functions', 'Server Functions', false) && allPassed;
+  
+  // Verify API routes are included in build
+  const serverFunctionsDir = path.join(OUTPUT_DIR, 'server-functions');
+  if (await exists(serverFunctionsDir)) {
+    const allFiles = await getFilesRecursive(serverFunctionsDir);
+    const hasGalleryRoute = allFiles.some(f => f.includes('gallery') || f.includes('api'));
+    if (hasGalleryRoute) {
+      logSuccess('API routes included in server functions');
+    } else {
+      logWarning('API routes may be missing from server functions');
+    }
+  }
   console.log();
 
   // Summary
