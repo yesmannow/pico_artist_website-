@@ -1,12 +1,13 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
 
-export default function GalleryLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+type GalleryLayoutProps = {
+  children: ReactNode;
+};
+
+export default function GalleryLayout({ children }: GalleryLayoutProps) {
   const { scrollYProgress } = useScroll();
   
   // Smooth spring animation for scroll progress

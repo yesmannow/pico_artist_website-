@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import "./globals.css";
 import PlayerDock from "@/components/player/PlayerDock";
 import Navbar from "@/components/navigation/Navbar";
@@ -53,11 +54,9 @@ export const viewport = {
   appleMobileWebAppStatusBarStyle: "black-translucent",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+type RootLayoutProps = Readonly<{ children: ReactNode }>;
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className="dark">
       <body className="antialiased bg-zinc-950 text-zinc-100">
