@@ -61,7 +61,7 @@ export default function TrackDetailPage({ params }: TrackDetailPageProps) {
 
   const handlePlayFull = () => {
     if (!track.fullUrl) return;
-    
+
     if (isCurrentTrack && source === 'full') {
       togglePlay();
     } else {
@@ -86,9 +86,18 @@ export default function TrackDetailPage({ params }: TrackDetailPageProps) {
 
   // Get related tracks (other tracks excluding current one, limited to 5)
   const relatedTracks = useMemo(() => {
-    return getTracks()
-      .filter((t) => t.id !== track.id)
-      .slice(0, 5);
+    try {
+      const tracks = getTracks();
+      if (!tracks || !Array.isArray(tracks)) {
+        return [];
+      }
+      return tracks
+        .filter((t) => t && t.id !== track.id)
+        .slice(0, 5);
+    } catch (error) {
+      console.error('Error loading related tracks:', error);
+      return [];
+    }
   }, [track.id]);
 
   const dimUI = isIdle && isCurrentPlaying;

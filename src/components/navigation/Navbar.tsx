@@ -6,6 +6,7 @@ import Menu from 'lucide-react/dist/esm/icons/menu';
 import X from 'lucide-react/dist/esm/icons/x';
 import Link from 'next/link';
 import Image from 'next/image';
+import HyperText from '@/components/ui/HyperText';
 // AUTHENTICATION DISABLED - supabase import no longer needed
 // import { supabase } from '@/lib/supabase';
 
@@ -230,9 +231,11 @@ export default function Navbar() {
                   className="object-contain rounded-md transition-transform group-hover:scale-110"
                 />
               </div>
-              <span className="text-xl font-bold text-zinc-100 hidden sm:block">
-                Piko FG
-              </span>
+              <HyperText
+                text="PIKO FG"
+                as="span"
+                className="text-xl font-bold text-zinc-100 hidden sm:block"
+              />
             </Link>
 
             {/* Hamburger Menu Button */}

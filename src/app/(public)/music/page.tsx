@@ -8,6 +8,7 @@ import CinematicHero from '@/components/media/CinematicHero';
 import { usePlayerStore } from '@/store/playerStore';
 import { useIdle } from '@/hooks/useIdle';
 import BackgroundTexture from '@/components/ui/BackgroundTexture';
+import HyperText from '@/components/ui/HyperText';
 
 const featuredShots = [
   { src: '/assets/images/artist/on_the_mic.jpg', caption: 'On the Mic' },

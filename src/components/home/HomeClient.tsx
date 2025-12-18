@@ -16,6 +16,7 @@ import { usePlayerStore } from "@/store/playerStore";
 import BackgroundTexture from "@/components/ui/BackgroundTexture";
 import TrackCard from "@/components/player/TrackCard";
 import MarqueeHeader from "@/components/ui/MarqueeHeader";
+import HyperText from "@/components/ui/HyperText";
 import { getSocialLinks } from "@/data/socials";
 
 const FilmGrain = dynamic(
@@ -92,9 +93,9 @@ export default function HomeClient() {
   return (
     <>
       {isLoading && (
-        <GraffitiPreloader 
-          minDuration={1200} 
-          onComplete={() => setIsLoading(false)} 
+        <GraffitiPreloader
+          minDuration={1200}
+          onComplete={() => setIsLoading(false)}
         />
       )}
       <FilmGrain />
@@ -132,7 +133,7 @@ export default function HomeClient() {
                 smoky verses. The cinematic dark palette was born from street murals that glowed under
                 sodium lights.
               </p>
-              
+
               {/* Social Pill Row */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
@@ -201,7 +202,11 @@ export default function HomeClient() {
               transition={{ duration: 0.8 }}
               className="text-center mb-12"
             >
-              <p className="text-xs uppercase tracking-[0.3em] text-piko-pink mb-4">Latest Release</p>
+              <HyperText
+                text="Latest Release"
+                as="p"
+                className="text-xs uppercase tracking-[0.3em] text-piko-pink mb-4"
+              />
               <h2 className="text-4xl md:text-5xl font-bold text-zinc-100 mb-4">
                 Featured <span className="bg-gradient-to-r from-piko-pink to-piko-orange bg-clip-text text-transparent">Music Video</span>
               </h2>
@@ -209,7 +214,7 @@ export default function HomeClient() {
                 Experience the latest visual masterpiece
               </p>
             </motion.div>
-            
+
             {/* Large Video Player */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
