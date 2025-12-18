@@ -5,6 +5,7 @@
 
 import { slugify, filenameToTitle } from '@/lib/media/slugify';
 import { getAudioFiles, getPreviewUrl, getFullUrl } from '@/lib/media/listLocalAudio';
+import { getTrackCoverArt } from '@/lib/media/pickTrackArt';
 
 export interface Track {
   id: string;
@@ -30,7 +31,7 @@ export interface Track {
 function generateTracks(): Track[] {
   const audioFiles = getAudioFiles();
   
-  return audioFiles.map((file, index) => {
+  const tracks = audioFiles.map((file, index) => {
     const title = filenameToTitle(file.filename);
     const slug = slugify(title);
     
@@ -41,7 +42,6 @@ function generateTracks(): Track[] {
       artist: 'Piko FG',
       previewUrl: getPreviewUrl(file.filename),
       fullUrl: file.hasFullVersion ? getFullUrl(file.filename) : undefined,
-      coverArt: '/piko-logo.jpg',
       releaseYear: '2024',
       tags: ['urban', 'digital-graffiti'],
       links: {
@@ -52,6 +52,12 @@ function generateTracks(): Track[] {
       },
     };
   });
+  
+  // Apply cover art to each track
+  return tracks.map(track => ({
+    ...track,
+    coverArt: getTrackCoverArt(track),
+  }));
 }
 
 /**

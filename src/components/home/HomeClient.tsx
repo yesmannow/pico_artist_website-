@@ -13,6 +13,7 @@ import { getTracks, type Track } from "@/data/tracks";
 import { getVideos, type Video } from "@/data/videos";
 import { usePlayerStore } from "@/store/playerStore";
 import BackgroundTexture from "@/components/ui/BackgroundTexture";
+import TrackCard from "@/components/player/TrackCard";
 
 const ParticlesBackground = dynamic(
   () => import("@/components/background/ParticlesBackground"),
@@ -42,7 +43,7 @@ export default function HomeClient() {
   const { scrollYProgress } = useScroll({ container: containerRef });
   const vinylRotation = useMotionValue(0);
   const prefersReducedMotion = useReducedMotion();
-  const { playTrack } = usePlayerStore();
+  const { playTrack, setQueue } = usePlayerStore();
 
   const tracks = getTracks().slice(0, 6); // Featured tracks
   const videos = getVideos().slice(0, 6); // Featured videos
@@ -67,8 +68,9 @@ export default function HomeClient() {
   const backgroundParallax = useTransform(scrollYProgress, [0, 1], [0, -60]);
   const heroImageParallax = useTransform(scrollYProgress, [0, 1], [0, -40]);
 
-  const handleTrackPlay = (track: Track) => {
-    playTrack(track);
+  const handleTrackPlay = (track: Track, index: number) => {
+    setQueue(tracks, index);
+    playTrack(track, 'preview');
   };
 
   return (
@@ -302,35 +304,12 @@ export default function HomeClient() {
             </motion.div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {tracks.map((track, idx) => (
-                <motion.div
+                <TrackCard
                   key={track.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.1 * idx, duration: 0.6 }}
-                  onClick={() => handleTrackPlay(track)}
-                  className="group relative rounded-2xl border border-zinc-800 bg-zinc-900/50 backdrop-blur-md p-6 hover:border-piko-teal/50 transition-all cursor-pointer overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-piko-teal/10 to-piko-pink/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative z-10">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-piko-teal to-piko-pink flex items-center justify-center">
-                        <Play className="h-6 w-6 text-white" fill="currentColor" />
-                      </div>
-                    </div>
-                    <h3 className="text-xl font-semibold text-zinc-100 mb-1">{track.title}</h3>
-                    <p className="text-sm text-zinc-400 mb-2">{track.artist}</p>
-                    {track.tags && track.tags.length > 0 && (
-                      <div className="flex gap-1 flex-wrap mt-3">
-                        {track.tags.slice(0, 2).map((tag) => (
-                          <span key={tag} className="text-xs px-2 py-1 rounded-full bg-zinc-800/80 text-zinc-500">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
+                  track={track}
+                  index={idx}
+                  onPlay={() => handleTrackPlay(track, idx)}
+                />
               ))}
             </div>
             <motion.div
