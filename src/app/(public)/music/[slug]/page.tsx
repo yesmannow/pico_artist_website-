@@ -15,6 +15,7 @@ import Waveform from '@/components/player/Waveform';
 import CinematicHero from '@/components/media/CinematicHero';
 import VisualizerStage from '@/components/player/VisualizerStage';
 import TrackCard from '@/components/player/TrackCard';
+import ShareButtons from '@/components/ui/ShareButtons';
 import { useIdle } from '@/hooks/useIdle';
 import Play from 'lucide-react/dist/esm/icons/play';
 import Pause from 'lucide-react/dist/esm/icons/pause';
@@ -174,6 +175,11 @@ export default function TrackDetailPage({ params }: TrackDetailPageProps) {
             <span className="inline-block h-2 w-2 rounded-full bg-piko-teal animate-pulse" />
             Stage Mode
           </button>
+
+          <ShareButtons
+            title={`${track.title} by ${track.artist}`}
+            description={`Listen to ${track.title} by ${track.artist} on Piko FG Studio`}
+          />
 
           <Link
             href="/visualizer"
