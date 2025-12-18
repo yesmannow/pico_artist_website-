@@ -217,7 +217,7 @@ export default function Navbar() {
             {/* Hamburger Menu Button */}
             <button
               onClick={toggleMenu}
-              className="relative h-11 w-11 rounded-full bg-gradient-to-r from-piko-teal to-piko-pink p-2 shadow-lg shadow-piko-pink/20 transition-all hover:scale-110 hover:shadow-piko-pink/40 active:scale-95"
+              className="relative h-10 w-10 rounded-full bg-gradient-to-r from-piko-teal to-piko-pink p-2 shadow-lg shadow-piko-pink/20 transition-all hover:scale-110 hover:shadow-piko-pink/40 active:scale-95"
               aria-label="Toggle menu"
             >
               <motion.div

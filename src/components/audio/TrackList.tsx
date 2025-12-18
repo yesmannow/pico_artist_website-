@@ -60,12 +60,7 @@ function TrackCard({ track, isPlaying, onPlay }: TrackCardProps) {
     }
 
     return () => {
-      if (previewTimeout.current) {
-        clearTimeout(previewTimeout.current);
-      }
-      previewRef.current?.stop();
-      previewRef.current?.unload();
-      previewRef.current = null;
+      stopPreview();
     };
   }, []);
 
@@ -149,8 +144,6 @@ function TrackCard({ track, isPlaying, onPlay }: TrackCardProps) {
         <div className="flex-1 min-w-0">
           <h3
             className="text-sm font-semibold text-zinc-100 truncate"
-            onMouseEnter={startPreview}
-            onMouseLeave={stopPreview}
           >
             {track.title}
           </h3>
