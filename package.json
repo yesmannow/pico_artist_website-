@@ -5,9 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:cloudflare": "npx @opennextjs/cloudflare build",
+    "build:cloudflare": "npm run clean && npx @opennextjs/cloudflare build",
+    "clean": "npx rimraf .next .open-next .vercel",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "npx eslint . --max-warnings=0",
     "optimize-media": "node scripts/optimize-media.js"
   },
   "dependencies": {
@@ -38,6 +39,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.0.10",
+    "rimraf": "^6.1.2",
     "tailwindcss": "^4",
     "typescript": "^5",
     "wrangler": "^4.55.0"

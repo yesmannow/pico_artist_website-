@@ -8,6 +8,7 @@ import ExternalLink from 'lucide-react/dist/esm/icons/external-link';
 
 const Globe = dynamic(() => import('react-globe.gl'), { ssr: false });
 
+// keep your TourDate type for runtime use
 type TourDate = {
   lat: number;
   lng: number;
@@ -63,26 +64,21 @@ const tourDates: TourDate[] = [
   },
 ];
 
-interface GlobeControls {
-  autoRotate: boolean;
-  autoRotateSpeed: number;
-}
-
-interface GlobeInstance {
-  controls: () => GlobeControls;
-}
-
 export default function TourPage() {
-  const globeEl = useRef<GlobeInstance | null>(null);
+  // Use a MutableRefObject matching GlobeMethods signature by using any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const globeRef = useRef<any>(null);
   const [selectedEvent, setSelectedEvent] = useState<TourDate | null>(null);
 
   useEffect(() => {
-    const globe = globeEl.current;
+    const globe = globeRef.current;
     if (!globe) return;
 
     const controls = globe.controls();
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.5;
+    if (controls) {
+      controls.autoRotate = true;
+      controls.autoRotateSpeed = 0.5;
+    }
   }, []);
 
   const handlePointClick = (point: TourDate) => {
@@ -116,7 +112,7 @@ export default function TourPage() {
           className="relative h-[600px] rounded-3xl border border-zinc-800/70 bg-zinc-900/40 backdrop-blur-xl overflow-hidden shadow-[0_20px_120px_rgba(0,0,0,0.5)]"
         >
           <Globe
-            ref={globeEl}
+            ref={globeRef}
             globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
             bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
             backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
@@ -124,15 +120,28 @@ export default function TourPage() {
             pointColor={() => '#00f5d4'}
             pointAltitude={0.07}
             pointRadius={0.5}
-            pointLabel={(d: TourDate) => `
-              <div class="glassmorphism p-4 border-l-4 border-pikoTeal bg-zinc-900/90 backdrop-blur-md rounded-lg">
-                <h3 class="text-white font-bold text-lg">${d.name}</h3>
-                <p class="text-pikoPink text-sm">${d.venue}</p>
-                <p class="text-zinc-400 text-xs mt-1">${d.date}</p>
-                <span class="text-xs uppercase tracking-widest text-piko-teal">${d.status}</span>
-              </div>
-            `}
-            onPointClick={handlePointClick}
+            // cast incoming object to any then to TourDate inside
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            pointLat={(obj: any) => (obj as TourDate).lat}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            pointLng={(obj: any) => (obj as TourDate).lng}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            pointLabel={(obj: any) => {
+              const d = obj as TourDate;
+              return `
+                <div class="glassmorphism p-4 border-l-4 border-pikoTeal bg-zinc-900/90 backdrop-blur-md rounded-lg">
+                  <div class="font-bold">${d.name}</div>
+                  <div class="text-sm">${d.date}</div>
+                  ${d.venue ? `<div class="text-xs">${d.venue}</div>` : ""}
+                  ${d.status ? `<div class="text-xs">${d.status}</div>` : ""}
+                </div>
+              `;
+            }}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            onPointClick={(obj: any) => {
+              const d = obj as TourDate;
+              handlePointClick(d);
+            }}
             atmosphereColor="#ff006e"
             atmosphereAltitude={0.15}
             enablePointerInteraction={true}
@@ -192,6 +201,8 @@ export default function TourPage() {
               <button
                 onClick={() => setSelectedEvent(null)}
                 className="absolute top-4 right-4 p-2 rounded-full hover:bg-zinc-800 transition"
+                aria-label="Close event details"
+                title="Close"
               >
                 <X className="h-5 w-5 text-zinc-400" />
               </button>

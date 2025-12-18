@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Activity from 'lucide-react/dist/esm/icons/activity';
 import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down';
 import ChevronUp from 'lucide-react/dist/esm/icons/chevron-up';
-import { supabase } from '@/lib/supabase';
+import { supabase, getProjects, getTracks } from '@/lib/supabase';
 
 interface ActivityItem {
   id: string;
@@ -30,6 +30,7 @@ function formatTimeAgo(timestamp: string): string {
   return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
 }
 
+// Types for Supabase integration (used in commented code)
 type SupabaseEventType = 'INSERT' | 'UPDATE' | 'DELETE';
 
 interface SupabaseProjectRow {
@@ -76,23 +77,145 @@ export default function SharedActivityLog() {
   const [isExpanded, setIsExpanded] = useState(false);
   const activitiesEndRef = useRef<HTMLDivElement>(null);
 
+  const supabaseEnabled = Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
+
   // Fetch initial activities
   useEffect(() => {
-    async function fetchInitialActivities() {
+    const fetchActivities = async () => {
       try {
-        // Fetch last 10 projects ordered by updated_at
-        const { data: projects, error: projectsError } = await supabase
-          .from('projects')
-          .select('id, name, project_data, updated_at, created_at')
-          .order('updated_at', { ascending: false })
-          .limit(10);
+        if (!supabaseEnabled) {
+          // Use localStorage helpers when Supabase is disabled
+          const projects = await getProjects();
+          const tracks = await getTracks();
 
-        if (projectsError) {
-          console.error('Error fetching projects:', projectsError);
+          const projectActivities: ActivityItem[] = projects
+            .slice(0, 10)
+            .map((project) => {
+              const projectName = project.name || 'Untitled Project';
+              const created = project.created_at ? new Date(project.created_at).getTime() : 0;
+              const updated = project.updated_at ? new Date(project.updated_at).getTime() : 0;
+              const isNew = created && created === updated;
+
+              return {
+                id: `project-${project.id}`,
+                type: isNew ? 'project_saved' : 'project_updated',
+                message: isNew
+                  ? `New project "${projectName}" saved`
+                  : `Project "${projectName}" updated`,
+                timestamp: project.updated_at || project.created_at || new Date().toISOString(),
+                projectName,
+              };
+            });
+
+          const trackActivities: ActivityItem[] = tracks
+            .slice(0, 5)
+            .map((track) => ({
+              id: `track-${track.id}`,
+              type: 'track_updated' as const,
+              message: `Track "${track.title}" updated`,
+              timestamp: track.created_at,
+              trackTitle: track.title,
+            }));
+
+          setActivities([...projectActivities, ...trackActivities].slice(0, 20));
           return;
         }
 
-        const projectRows = (projects || []) as SupabaseProjectRow[];
+        // Supabase mode - use wildcard select to avoid column-specific errors
+        // Type assertion needed because stub supabase doesn't have proper types
+        const supabaseClient = supabase as any;
+        const { data } = await supabaseClient
+          .from('projects')
+          .select('*') // Ensure wildcard is used if specific columns fail
+          .order('updated_at', { ascending: false })
+          .limit(10);
+
+        if (data) {
+          const projectRows = (data || []) as SupabaseProjectRow[];
+          const initialActivities: ActivityItem[] = projectRows.map((project) => {
+            const projectName = resolveProjectName(project);
+            const created = project.created_at ? new Date(project.created_at).getTime() : 0;
+            const updated = project.updated_at ? new Date(project.updated_at).getTime() : 0;
+            const isNew = created && created === updated;
+
+            return {
+              id: `project-${project.id}`,
+              type: isNew ? 'project_saved' : 'project_updated',
+              message: isNew
+                ? `New project "${projectName}" saved`
+                : `Project "${projectName}" updated`,
+              timestamp: project.updated_at || new Date().toISOString(),
+              projectName,
+            };
+          });
+
+          setActivities(initialActivities);
+        }
+      } catch (error) {
+        console.error('Error fetching initial activities:', error);
+      }
+    };
+
+    fetchActivities();
+  }, [supabaseEnabled]);
+
+  // Set up real-time subscriptions
+  useEffect(() => {
+    if (!supabaseEnabled) {
+      // Local fallback: poll localStorage periodically for changes
+      const interval = setInterval(async () => {
+        const projects = await getProjects();
+        const tracks = await getTracks();
+
+        const projectActivities: ActivityItem[] = projects
+          .slice(0, 10)
+          .map((project) => {
+            const projectName = project.name || 'Untitled Project';
+            const created = project.created_at ? new Date(project.created_at).getTime() : 0;
+            const updated = project.updated_at ? new Date(project.updated_at).getTime() : 0;
+            const isNew = created && created === updated;
+
+            return {
+              id: `project-${project.id}`,
+              type: isNew ? 'project_saved' : 'project_updated',
+              message: isNew
+                ? `New project "${projectName}" saved`
+                : `Project "${projectName}" updated`,
+              timestamp: project.updated_at || project.created_at || new Date().toISOString(),
+              projectName,
+            };
+          });
+
+        const trackActivities: ActivityItem[] = tracks
+          .slice(0, 5)
+          .map((track) => ({
+            id: `track-${track.id}`,
+            type: 'track_updated' as const,
+            message: `Track "${track.title}" updated`,
+            timestamp: track.created_at,
+            trackTitle: track.title,
+          }));
+
+        setActivities([...projectActivities, ...trackActivities].slice(0, 20));
+      }, 5000); // Poll every 5 seconds
+
+      return () => clearInterval(interval);
+    }
+
+    // Supabase mode - Realtime Subscription
+    const fetchActivities = async () => {
+      // Type assertion needed because stub supabase doesn't have proper types
+      const supabaseClient = supabase as any;
+      const { data } = await supabaseClient
+        .from('projects')
+        .select('*')
+        .order('updated_at', { ascending: false })
+        .limit(10);
+
+      if (data) {
+        const projectRows = (data || []) as SupabaseProjectRow[];
         const initialActivities: ActivityItem[] = projectRows.map((project) => {
           const projectName = resolveProjectName(project);
           const created = project.created_at ? new Date(project.created_at).getTime() : 0;
@@ -111,89 +234,32 @@ export default function SharedActivityLog() {
         });
 
         setActivities(initialActivities);
-      } catch (error) {
-        console.error('Error fetching initial activities:', error);
       }
-    }
+    };
 
-    fetchInitialActivities();
-  }, []);
+    // Initial fetch
+    fetchActivities();
 
-  // Set up real-time subscriptions
-  useEffect(() => {
-    // Subscribe to projects table
-    const projectsChannel = supabase
-      .channel('projects-changes')
+    // Realtime Subscription
+    // Type assertion needed because stub supabase doesn't have proper types
+    const supabaseClient = supabase as any;
+    const channel = supabaseClient
+      .channel('public:projects')
       .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'projects',
-        },
-        (payload: SupabaseChangePayload<SupabaseProjectRow>) => {
-          if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
-            const project = payload.new;
-            if (!project) return;
-
-            const projectName = resolveProjectName(project);
-            const newActivity: ActivityItem = {
-              id: `activity-${Date.now()}-${Math.random()}`,
-              type: payload.eventType === 'INSERT' ? 'project_saved' : 'project_updated',
-              message: payload.eventType === 'INSERT'
-                ? `New project "${projectName}" saved`
-                : `Project "${projectName}" updated`,
-              timestamp: project.updated_at || new Date().toISOString(),
-              projectName,
-            };
-
-            setActivities((prev) => {
-              const filtered = prev.filter((a) => a.id !== newActivity.id);
-              return [newActivity, ...filtered].slice(0, 20);
-            });
-          }
-        }
-      )
-      .subscribe();
-
-    // Subscribe to tracks table
-    const tracksChannel = supabase
-      .channel('tracks-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'tracks',
-        },
-        (payload: SupabaseChangePayload<SupabaseTrackRow>) => {
-          if (payload.eventType === 'UPDATE') {
-            const track = payload.new;
-            if (!track) return;
-
-            const trackTitle = track.title || 'Untitled Track';
-            const newActivity: ActivityItem = {
-              id: `activity-${Date.now()}-${Math.random()}`,
-              type: 'track_updated',
-              message: `Track "${trackTitle}" updated`,
-              timestamp: track.updated_at || track.created_at || new Date().toISOString(),
-              trackTitle,
-            };
-
-            setActivities((prev) => {
-              const filtered = prev.filter((a) => a.id !== newActivity.id);
-              return [newActivity, ...filtered].slice(0, 20);
-            });
-          }
+        'postgres_changes' as any, // Cast to 'any' to fix the argument error
+        { event: '*', schema: 'public', table: 'projects' },
+        (payload: any) => {
+          console.log('Change received!', payload);
+          fetchActivities(); // Refresh list on change
         }
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(projectsChannel);
-      supabase.removeChannel(tracksChannel);
+      const supabaseClient = supabase as any;
+      supabaseClient.removeChannel(channel);
     };
-  }, []);
+  }, [supabaseEnabled]);
 
   // Auto-scroll to bottom when new activities arrive
   useEffect(() => {
