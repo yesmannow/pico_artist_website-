@@ -7,11 +7,9 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
 import { usePlayerStore } from '@/store/playerStore';
 import type { Track } from '@/data/tracks';
-import Play from 'lucide-react/dist/esm/icons/play';
-import Pause from 'lucide-react/dist/esm/icons/pause';
+import TrackCard from './TrackCard';
 import Music from 'lucide-react/dist/esm/icons/music';
 
 interface TrackListProps {
@@ -21,8 +19,7 @@ interface TrackListProps {
 
 export default function TrackList({ tracks, showFilter = false }: TrackListProps) {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const { current, isPlaying, playTrack, setQueue, togglePlay } = usePlayerStore();
-  const prefersReducedMotion = useReducedMotion();
+  const { current, playTrack, setQueue, togglePlay } = usePlayerStore();
 
   // Filter tracks by tag
   const filteredTracks = selectedTag
@@ -79,101 +76,14 @@ export default function TrackList({ tracks, showFilter = false }: TrackListProps
 
       {/* Track grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredTracks.map((track, index) => {
-          const isCurrentTrack = current?.id === track.id;
-          const isCurrentPlaying = isCurrentTrack && isPlaying;
-
-          return (
-            <motion.div
-              key={track.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className={`group relative overflow-hidden rounded-xl border bg-zinc-900/60 backdrop-blur-md p-4 transition-all duration-300 hover:-translate-y-1 hover:border-piko-teal/50 hover:shadow-[0_22px_46px_-28px_rgba(0,245,212,0.35)] ${
-                isCurrentTrack
-                  ? 'border-piko-teal/60 shadow-[0_0_0_1px_rgba(0,245,212,0.28),0_0_40px_rgba(255,0,110,0.14)]'
-                  : 'border-zinc-800/80'
-              }`}
-            >
-              {isCurrentTrack && (
-                <>
-                  <div className="absolute -inset-10 bg-[radial-gradient(circle_at_center,rgba(0,245,212,0.12),transparent_55%)] opacity-50 blur-3xl pointer-events-none" />
-                  <motion.div
-                    aria-hidden
-                    className="absolute inset-0 rounded-xl pointer-events-none"
-                    animate={
-                      isPlaying && !prefersReducedMotion
-                        ? { boxShadow: ['0 0 0 0 rgba(0,245,212,0.2)', '0 0 0 14px rgba(255,0,110,0)'] }
-                        : { boxShadow: '0 0 0 0 rgba(0,0,0,0)' }
-                    }
-                    transition={{ repeat: isPlaying && !prefersReducedMotion ? Infinity : 0, duration: 1.9, ease: 'easeOut' }}
-                  />
-                </>
-              )}
-
-              {/* Now Playing indicator */}
-              {isCurrentTrack && (
-                <div className="absolute top-2 right-2">
-                  <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-piko-teal/10 border border-piko-teal/50">
-                    <Music className="w-3 h-3 text-piko-teal" />
-                    <span className="text-xs text-piko-teal font-semibold">
-                      Now Playing
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {/* Track content */}
-              <div className="flex items-center gap-3 mb-3">
-                {/* Play button */}
-                <button
-                  onClick={() => handlePlay(track, index)}
-                  className={`w-14 h-14 rounded-md flex-shrink-0 flex items-center justify-center transition-all ${
-                    isCurrentTrack
-                      ? 'bg-gradient-to-br from-piko-teal to-piko-pink'
-                      : 'bg-zinc-800 group-hover:bg-gradient-to-br group-hover:from-piko-teal group-hover:to-piko-pink'
-                  }`}
-                >
-                  {isCurrentPlaying ? (
-                    <Pause className="w-6 h-6 text-white" fill="currentColor" />
-                  ) : (
-                    <Play className="w-6 h-6 text-white ml-0.5" fill="currentColor" />
-                  )}
-                </button>
-
-                {/* Track info */}
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-semibold text-zinc-100 truncate">
-                    {track.title}
-                  </h3>
-                  <p className="text-xs text-zinc-400 truncate">{track.artist}</p>
-                  {track.releaseYear && (
-                    <p className="text-xs text-zinc-500">{track.releaseYear}</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Tags */}
-              {track.tags && track.tags.length > 0 && (
-                <div className="flex gap-1 flex-wrap">
-                  {track.tags.slice(0, 2).map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-2 py-0.5 text-xs rounded-full bg-zinc-800/80 text-zinc-400"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* Animated border glow on hover */}
-              <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-piko-teal/20 via-piko-pink/20 to-piko-orange/20" />
-              </div>
-            </motion.div>
-          );
-        })}
+        {filteredTracks.map((track, index) => (
+          <TrackCard
+            key={track.id}
+            track={track}
+            index={index}
+            onPlay={() => handlePlay(track, index)}
+          />
+        ))}
       </div>
 
       {/* Empty state */}

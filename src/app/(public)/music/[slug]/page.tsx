@@ -8,11 +8,13 @@
 import { use, useMemo, useState } from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getTrackBySlug, getTracks } from '@/data/tracks';
 import { usePlayerStore } from '@/store/playerStore';
 import Waveform from '@/components/player/Waveform';
 import CinematicHero from '@/components/media/CinematicHero';
 import VisualizerStage from '@/components/player/VisualizerStage';
+import TrackCard from '@/components/player/TrackCard';
 import { useIdle } from '@/hooks/useIdle';
 import Play from 'lucide-react/dist/esm/icons/play';
 import Pause from 'lucide-react/dist/esm/icons/pause';
@@ -44,6 +46,7 @@ export default function TrackDetailPage({ params }: TrackDetailPageProps) {
     togglePlay,
     seek,
     queue,
+    setQueue,
   } = usePlayerStore();
   const [stageMode, setStageMode] = useState(false);
   const isIdle = useIdle();
@@ -52,14 +55,18 @@ export default function TrackDetailPage({ params }: TrackDetailPageProps) {
   const isCurrentPlaying = isCurrentTrack && isPlaying;
 
   // Constants for queue display
-  const MAX_NEXT_TRACKS = 4;
-  const FALLBACK_TRACKS_COUNT = 3;
+  const MAX_RELATED_TRACKS = 6;
 
-  // Get next tracks from queue
-  const currentIndex = queue.findIndex((t) => t.id === track.id);
-  const nextTracks = currentIndex >= 0 
-    ? queue.slice(currentIndex + 1, currentIndex + MAX_NEXT_TRACKS) 
-    : getTracks().slice(0, FALLBACK_TRACKS_COUNT);
+  // Get related tracks (all tracks except current one)
+  const allTracks = getTracks();
+  const relatedTracks = allTracks
+    .filter((t) => t.id !== track.id)
+    .slice(0, MAX_RELATED_TRACKS);
+
+  const handleRelatedTrackPlay = (relatedTrack: typeof track, index: number) => {
+    setQueue(relatedTracks, index);
+    playTrack(relatedTrack, 'preview');
+  };
 
   const handlePlay = () => {
     if (isCurrentTrack) {
@@ -90,7 +97,7 @@ export default function TrackDetailPage({ params }: TrackDetailPageProps) {
     : track.previewUrl;
 
   const heroImage = useMemo(
-    () => track.coverArt || '/assets/images/artist/on_the_mic.jpg',
+    () => track.coverArt || '/piko-logo.jpg',
     [track.coverArt]
   );
 
@@ -261,27 +268,34 @@ export default function TrackDetailPage({ params }: TrackDetailPageProps) {
             )}
           </div>
 
-          {/* Right Column - Next Up */}
+          {/* Right Column - Related Tracks */}
           <div className="space-y-4 transition-opacity duration-300" style={{ opacity: stageMode ? 0.9 : 1 }}>
-            {nextTracks.length > 0 && (
+            {relatedTracks.length > 0 && (
               <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 backdrop-blur-xl p-6">
-                <h2 className="text-lg font-semibold text-zinc-100 mb-4">Next Up</h2>
+                <h2 className="text-lg font-semibold text-zinc-100 mb-4">Related Tracks</h2>
                 <div className="space-y-3">
-                  {nextTracks.map((nextTrack) => (
+                  {relatedTracks.map((relatedTrack, index) => (
                     <Link
-                      key={nextTrack.id}
-                      href={`/music/${nextTrack.slug}`}
+                      key={relatedTrack.id}
+                      href={`/music/${relatedTrack.slug}`}
                       className="flex items-center gap-3 p-3 rounded-lg bg-zinc-800/30 hover:bg-zinc-800/60 transition group"
                     >
-                      <div className="w-10 h-10 rounded bg-gradient-to-br from-piko-teal to-piko-pink flex items-center justify-center flex-shrink-0">
-                        <Music className="w-5 h-5 text-white" />
+                      <div className="w-10 h-10 rounded bg-zinc-800 flex-shrink-0 relative overflow-hidden">
+                        <Image
+                          src={relatedTrack.coverArt || '/piko-logo.jpg'}
+                          alt={relatedTrack.title}
+                          fill
+                          className="object-cover"
+                          sizes="40px"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-piko-teal/40 to-piko-pink/40 opacity-0 group-hover:opacity-100 transition" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-zinc-100 truncate group-hover:text-piko-teal transition">
-                          {nextTrack.title}
+                          {relatedTrack.title}
                         </p>
                         <p className="text-xs text-zinc-400 truncate">
-                          {nextTrack.artist}
+                          {relatedTrack.artist}
                         </p>
                       </div>
                     </Link>

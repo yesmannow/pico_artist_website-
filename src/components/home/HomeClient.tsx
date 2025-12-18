@@ -9,10 +9,16 @@ import { useRouter } from "next/navigation";
 import Play from "lucide-react/dist/esm/icons/play";
 import ArrowRight from "lucide-react/dist/esm/icons/arrow-right";
 import Calendar from "lucide-react/dist/esm/icons/calendar";
+import Users from "lucide-react/dist/esm/icons/users";
+import Headphones from "lucide-react/dist/esm/icons/headphones";
+import TrendingUp from "lucide-react/dist/esm/icons/trending-up";
+import MapPin from "lucide-react/dist/esm/icons/map-pin";
 import { getTracks, type Track } from "@/data/tracks";
 import { getVideos, type Video } from "@/data/videos";
 import { usePlayerStore } from "@/store/playerStore";
 import BackgroundTexture from "@/components/ui/BackgroundTexture";
+import TrackCard from "@/components/player/TrackCard";
+import StatCounter from "@/components/home/StatCounter";
 
 const ParticlesBackground = dynamic(
   () => import("@/components/background/ParticlesBackground"),
@@ -42,7 +48,7 @@ export default function HomeClient() {
   const { scrollYProgress } = useScroll({ container: containerRef });
   const vinylRotation = useMotionValue(0);
   const prefersReducedMotion = useReducedMotion();
-  const { playTrack } = usePlayerStore();
+  const { playTrack, setQueue } = usePlayerStore();
 
   const tracks = getTracks().slice(0, 6); // Featured tracks
   const videos = getVideos().slice(0, 6); // Featured videos
@@ -67,8 +73,9 @@ export default function HomeClient() {
   const backgroundParallax = useTransform(scrollYProgress, [0, 1], [0, -60]);
   const heroImageParallax = useTransform(scrollYProgress, [0, 1], [0, -40]);
 
-  const handleTrackPlay = (track: Track) => {
-    playTrack(track);
+  const handleTrackPlay = (track: Track, index: number) => {
+    setQueue(tracks, index);
+    playTrack(track, 'preview');
   };
 
   return (
@@ -283,6 +290,71 @@ export default function HomeClient() {
           </div>
         </section>
 
+        {/* Featured Music Video Section */}
+        <section className="min-h-screen flex items-center justify-center px-4 py-20 relative">
+          <div className="max-w-6xl mx-auto w-full">
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8 }}
+              className="text-center mb-12"
+            >
+              <p className="text-xs uppercase tracking-[0.3em] text-piko-pink mb-4">Latest Release</p>
+              <h2 className="text-4xl md:text-5xl font-bold text-zinc-100 mb-4">
+                Featured <span className="bg-gradient-to-r from-piko-pink to-piko-orange bg-clip-text text-transparent">Music Video</span>
+              </h2>
+              <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
+                Experience the latest visual masterpiece
+              </p>
+            </motion.div>
+            
+            {/* Large Video Player */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="relative rounded-3xl border border-piko-pink/30 bg-zinc-900/60 backdrop-blur-xl overflow-hidden shadow-[0_25px_70px_rgba(255,0,110,0.2)]"
+            >
+              <BackgroundTexture
+                src="/assets/images/bg/graffiti_1874452_1280.jpg"
+                opacity={0.08}
+                blend="soft-light"
+                className="z-0"
+              />
+              <div className="relative aspect-video">
+                {/* Placeholder for video - will be replaced with actual embed */}
+                <div className="absolute inset-0 bg-gradient-to-br from-piko-pink/20 via-zinc-900/80 to-piko-teal/20 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-piko-pink to-piko-orange flex items-center justify-center mb-4 mx-auto">
+                      <Play className="w-12 h-12 text-white ml-1" fill="currentColor" />
+                    </div>
+                    <p className="text-zinc-100 text-lg font-semibold">{videos[0]?.title || 'Latest Music Video'}</p>
+                    <p className="text-zinc-400 text-sm">{videos[0]?.releaseYear || '2024'}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="relative p-6 bg-zinc-900/90 backdrop-blur-sm border-t border-zinc-800/50">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-xl font-bold text-zinc-100 mb-1">
+                      {videos[0]?.title || 'Latest Track'}
+                    </h3>
+                    <p className="text-zinc-400 text-sm">Directed by Piko FG • {videos[0]?.releaseYear || '2024'}</p>
+                  </div>
+                  <Link
+                    href="/media?tab=videos"
+                    className="px-6 py-3 rounded-full border border-piko-pink/50 bg-piko-pink/10 text-piko-pink font-semibold hover:bg-piko-pink/20 transition"
+                  >
+                    Watch More
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
         {/* Featured Tracks Section */}
         <section className="min-h-screen flex items-center justify-center px-4 py-20 relative">
           <div className="max-w-6xl mx-auto w-full">
@@ -302,35 +374,12 @@ export default function HomeClient() {
             </motion.div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {tracks.map((track, idx) => (
-                <motion.div
+                <TrackCard
                   key={track.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.1 * idx, duration: 0.6 }}
-                  onClick={() => handleTrackPlay(track)}
-                  className="group relative rounded-2xl border border-zinc-800 bg-zinc-900/50 backdrop-blur-md p-6 hover:border-piko-teal/50 transition-all cursor-pointer overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-piko-teal/10 to-piko-pink/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative z-10">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-piko-teal to-piko-pink flex items-center justify-center">
-                        <Play className="h-6 w-6 text-white" fill="currentColor" />
-                      </div>
-                    </div>
-                    <h3 className="text-xl font-semibold text-zinc-100 mb-1">{track.title}</h3>
-                    <p className="text-sm text-zinc-400 mb-2">{track.artist}</p>
-                    {track.tags && track.tags.length > 0 && (
-                      <div className="flex gap-1 flex-wrap mt-3">
-                        {track.tags.slice(0, 2).map((tag) => (
-                          <span key={tag} className="text-xs px-2 py-1 rounded-full bg-zinc-800/80 text-zinc-500">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
+                  track={track}
+                  index={idx}
+                  onPlay={() => handleTrackPlay(track, idx)}
+                />
               ))}
             </div>
             <motion.div
@@ -466,7 +515,54 @@ export default function HomeClient() {
           </motion.div>
         </section>
 
-        {/* Events Preview Section */}
+        {/* Live Stats Section */}
+        <section className="py-20 px-4 relative">
+          <div className="max-w-6xl mx-auto w-full">
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8 }}
+              className="text-center mb-12"
+            >
+              <p className="text-xs uppercase tracking-[0.3em] text-piko-teal mb-4">Digital Impact</p>
+              <h2 className="text-4xl md:text-5xl font-bold text-zinc-100 mb-4">
+                By The <span className="bg-gradient-to-r from-piko-teal to-piko-pink bg-clip-text text-transparent">Numbers</span>
+              </h2>
+              <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
+                Real-time stats from the Digital Graffiti movement
+              </p>
+            </motion.div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              <StatCounter
+                end={125000}
+                label="Total Streams"
+                suffix="+"
+                icon={<Headphones className="w-6 h-6 text-white" />}
+              />
+              <StatCounter
+                end={8500}
+                label="Followers"
+                suffix="+"
+                icon={<Users className="w-6 h-6 text-white" />}
+              />
+              <StatCounter
+                end={26}
+                label="Tracks Released"
+                icon={<Play className="w-6 h-6 text-white" fill="currentColor" />}
+              />
+              <StatCounter
+                end={94.7}
+                label="Fan Rating"
+                suffix="%"
+                decimals={1}
+                icon={<TrendingUp className="w-6 h-6 text-white" />}
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Events Preview Section with Interactive Timeline */}
         <section className="min-h-screen flex items-center justify-center px-4 py-20 relative">
           <div className="max-w-6xl mx-auto w-full">
             <motion.div
@@ -476,6 +572,7 @@ export default function HomeClient() {
               transition={{ duration: 0.8 }}
               className="text-center mb-12"
             >
+              <p className="text-xs uppercase tracking-[0.3em] text-piko-orange mb-4">Tour Dates</p>
               <h2 className="text-4xl md:text-5xl font-bold text-zinc-100 mb-4">
                 Upcoming <span className="bg-gradient-to-r from-piko-pink to-piko-orange bg-clip-text text-transparent">Events</span>
               </h2>
@@ -483,36 +580,69 @@ export default function HomeClient() {
                 Catch us live at these upcoming shows and performances
               </p>
             </motion.div>
-            <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            
+            {/* Interactive Timeline */}
+            <div className="relative max-w-3xl mx-auto">
+              {/* Timeline Line */}
+              <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-piko-teal via-piko-pink to-piko-orange hidden md:block" />
+              
               {upcomingEvents.map((event, idx) => (
                 <motion.div
                   key={event.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, x: idx % 2 === 0 ? -50 : 50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: 0.1 * idx, duration: 0.6 }}
-                  className="group relative rounded-2xl border border-zinc-800 bg-zinc-900/50 backdrop-blur-md p-6 hover:border-piko-orange/50 transition-all"
+                  transition={{ delay: 0.2 * idx, duration: 0.6 }}
+                  className={`relative mb-8 md:mb-12 md:grid md:grid-cols-2 md:gap-8 ${
+                    idx % 2 === 0 ? '' : 'md:grid-flow-dense'
+                  }`}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-piko-orange/10 to-piko-pink/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
-                  <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-piko-orange to-piko-pink flex items-center justify-center">
-                        <Calendar className="h-5 w-5 text-white" />
+                  {/* Event Card */}
+                  <div className={idx % 2 === 0 ? 'md:col-start-1' : 'md:col-start-2'}>
+                    <div className="group relative rounded-2xl border border-zinc-800 bg-zinc-900/60 backdrop-blur-md p-6 hover:border-piko-orange/50 transition-all hover:-translate-y-1 hover:shadow-[0_22px_46px_-28px_rgba(255,158,0,0.35)]">
+                      <div className="absolute inset-0 bg-gradient-to-br from-piko-orange/10 to-piko-pink/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
+                      <div className="relative z-10">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-piko-orange to-piko-pink flex items-center justify-center shadow-lg shadow-piko-orange/30">
+                              <Calendar className="h-6 w-6 text-white" />
+                            </div>
+                            <div>
+                              <p className="text-xs uppercase tracking-[0.24em] text-piko-orange font-semibold">
+                                {event.date}
+                              </p>
+                              <div className="flex items-center gap-1 mt-1">
+                                <MapPin className="w-3 h-3 text-zinc-500" />
+                                <p className="text-xs text-zinc-500">Live Show</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <h3 className="text-2xl font-bold text-zinc-100 mb-2 group-hover:text-piko-orange transition">
+                          {event.name}
+                        </h3>
+                        <p className="text-zinc-400 mb-4">{event.venue}</p>
+                        <div className="flex gap-2">
+                          <span className="px-3 py-1 text-xs rounded-full bg-piko-orange/10 text-piko-orange border border-piko-orange/30">
+                            Tickets Available
+                          </span>
+                        </div>
                       </div>
-                      <p className="text-xs uppercase tracking-[0.24em] text-piko-orange">{event.date}</p>
                     </div>
-                    <h3 className="text-xl font-semibold text-zinc-100 mb-1">{event.name}</h3>
-                    <p className="text-sm text-zinc-400">{event.venue}</p>
                   </div>
+                  
+                  {/* Timeline Node (Desktop only) */}
+                  <div className="hidden md:block absolute left-1/2 top-8 w-4 h-4 -ml-2 rounded-full bg-gradient-to-br from-piko-teal to-piko-pink shadow-lg shadow-piko-pink/50 ring-4 ring-zinc-950" />
                 </motion.div>
               ))}
             </div>
+
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.5, duration: 0.8 }}
-              className="text-center mt-8"
+              className="text-center mt-12"
             >
               <Link href="/events">
                 <motion.button
