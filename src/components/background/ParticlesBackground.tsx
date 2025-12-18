@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import Particles from 'react-tsparticles';
 import { loadSlim } from 'tsparticles-slim';
 import type { ISourceOptions } from 'tsparticles-engine';
+import type { Engine } from 'tsparticles-engine';
 
 export default function ParticlesBackground() {
   const options: ISourceOptions = useMemo(
@@ -95,7 +96,7 @@ export default function ParticlesBackground() {
     <div className="fixed inset-0 -z-10 pointer-events-none">
       <Particles
         id="tsparticles"
-        init={async (engine) => {
+        init={async (engine: Engine) => {
           await loadSlim(engine);
         }}
         options={options}
@@ -103,4 +104,3 @@ export default function ParticlesBackground() {
     </div>
   );
 }
-
