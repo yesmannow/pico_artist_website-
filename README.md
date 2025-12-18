@@ -4,7 +4,7 @@ A cinematic music platform with a built-in mobile-friendly recording studio - yo
 
 ![Pico Artist Studio](https://github.com/user-attachments/assets/4bf878bd-63c0-4aee-b355-ec7573b1b265)
 
-## ✨ Features
+## ✨ Features -
 
 ### 🎧 Music Streaming
 - **Stream Your Music** - Browse and play tracks with beautiful waveform visualizations
