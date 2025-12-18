@@ -8,6 +8,7 @@
 import { use, useMemo, useState } from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getTrackBySlug, getTracks } from '@/data/tracks';
 import { usePlayerStore } from '@/store/playerStore';
 import Waveform from '@/components/player/Waveform';
@@ -279,10 +280,14 @@ export default function TrackDetailPage({ params }: TrackDetailPageProps) {
                       href={`/music/${relatedTrack.slug}`}
                       className="flex items-center gap-3 p-3 rounded-lg bg-zinc-800/30 hover:bg-zinc-800/60 transition group"
                     >
-                      <div 
-                        className="w-10 h-10 rounded bg-cover bg-center flex-shrink-0 relative overflow-hidden"
-                        style={{ backgroundImage: `url(${relatedTrack.coverArt || '/piko-logo.jpg'})` }}
-                      >
+                      <div className="w-10 h-10 rounded bg-zinc-800 flex-shrink-0 relative overflow-hidden">
+                        <Image
+                          src={relatedTrack.coverArt || '/piko-logo.jpg'}
+                          alt={relatedTrack.title}
+                          fill
+                          className="object-cover"
+                          sizes="40px"
+                        />
                         <div className="absolute inset-0 bg-gradient-to-br from-piko-teal/40 to-piko-pink/40 opacity-0 group-hover:opacity-100 transition" />
                       </div>
                       <div className="flex-1 min-w-0">
