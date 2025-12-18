@@ -105,6 +105,9 @@ const menuItems = [
   },
 ];
 
+// Studio is handled separately below as a special "always visible" link
+// after authentication was disabled. It appears in the slide-out menu footer
+// rather than in the main menuItems grid to maintain its special status.
 const studioLink = {
   title: 'Member Studio',
   href: '/studio',
