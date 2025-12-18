@@ -1,15 +1,66 @@
-import { createClient } from '@supabase/supabase-js';
+/**
+ * Supabase Client and Helpers
+ *
+ * NOTE: Currently running in no-login mode with localStorage mocks.
+ * To re-enable Supabase:
+ * 1. Uncomment the import: import { createClient } from '@supabase/supabase-js';
+ * 2. Uncomment the supabase client initialization below
+ * 3. Replace localStorage mocks with actual Supabase calls
+ * 4. Enable magic link auth in Supabase dashboard
+ * 5. Update RLS policies to match migrations/sql/001_secure_policies.sql
+ */
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+// ============================================================================
+// SUPABASE CLIENT (Currently disabled - uncomment when ready)
+// ============================================================================
+// import { createClient } from '@supabase/supabase-js';
+//
+// const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+// const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+//
+// if (!supabaseUrl || !supabaseAnonKey) {
+//   throw new Error('Missing Supabase environment variables');
+// }
+//
+// export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
+// Stub client for type compatibility (remove when Supabase is enabled)
+// Minimal stub to avoid 'any' - provides no-op methods for components that reference supabase
+export const supabase = {
+  from: () => {
+    throw new Error('Supabase is disabled. Enable in src/lib/supabase.ts');
+  },
+  auth: {
+    getUser: async () => ({ data: { user: null } }),
+    signInWithPassword: () => {
+      throw new Error('Supabase is disabled. Enable in src/lib/supabase.ts');
+    },
+    signOut: async () => ({ error: null }),
+  },
+  storage: {
+    from: () => {
+      throw new Error('Supabase is disabled. Enable in src/lib/supabase.ts');
+    },
+  },
+  rpc: () => {
+    throw new Error('Supabase is disabled. Enable in src/lib/supabase.ts');
+  },
+  removeChannel: () => {
+    // No-op for SharedActivityLog compatibility
+  },
+  channel: () => ({
+    on: () => ({
+      subscribe: () => {
+        // No-op subscription stub
+      },
+    }),
+  }),
+};
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// ============================================================================
+// TYPE DEFINITIONS (Keep for future Supabase integration)
+// ============================================================================
 
-// Database types
 export interface Track {
   id: string;
   title: string;
@@ -30,104 +81,6 @@ export interface Profile {
   created_at: string;
 }
 
-// Helper functions for database operations
-export async function getTracks() {
-  const { data, error } = await supabase
-    .from('tracks')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error('Error fetching tracks:', error);
-    return [];
-  }
-
-  return data as Track[];
-}
-
-export async function likeTrack(trackId: string) {
-  const { data, error } = await supabase.rpc('increment_likes', {
-    track_id: trackId
-  });
-
-  if (error) {
-    console.error('Error liking track:', error);
-    return null;
-  }
-
-  return data;
-}
-
-export async function uploadTrack(file: File, metadata: Partial<Track>) {
-  try {
-    // Upload audio file to storage
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-    const filePath = `tracks/${fileName}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from('media')
-      .upload(filePath, file);
-
-    if (uploadError) {
-      throw uploadError;
-    }
-
-    // Get public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('media')
-      .getPublicUrl(filePath);
-
-    // Insert track metadata into database
-    const { data, error: insertError } = await supabase
-      .from('tracks')
-      .insert([
-        {
-          ...metadata,
-          audio_url: publicUrl,
-        },
-      ])
-      .select()
-      .single();
-
-    if (insertError) {
-      throw insertError;
-    }
-
-    return data as Track;
-  } catch (error) {
-    console.error('Error uploading track:', error);
-    throw error;
-  }
-}
-
-export async function getCurrentUser() {
-  const { data: { user } } = await supabase.auth.getUser();
-  return user;
-}
-
-export async function signIn(email: string, password: string) {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) {
-    throw error;
-  }
-
-  return data;
-}
-
-export async function signOut() {
-  const { error } = await supabase.auth.signOut();
-
-  if (error) {
-    throw error;
-  }
-}
-
-// Project JSON Schema Types
 export interface Clip {
   id: string;
   startTime: number;
@@ -158,102 +111,240 @@ export interface Project {
   updated_at?: string;
 }
 
-// Project Management Functions
-// SHARED LIBRARY MODEL: Using hardcoded user_id for shared access
-const SHARED_USER_ID = '00000000-0000-0000-0000-000000000000';
+// Interface for Supabase project rows (commented out until Supabase is re-enabled)
+// interface SupabaseProjectRow extends Project {
+//   id: string;
+//   project_data?: string | Partial<Project>;
+//   created_at: string;
+//   updated_at: string;
+// }
 
-export async function saveProject(project: Omit<Project, 'id' | 'created_at' | 'updated_at'>) {
-  const { data, error } = await supabase
-    .from('projects')
-    .insert([
-      {
-        ...project,
-        user_id: SHARED_USER_ID,
-        project_data: JSON.stringify(project),
-      },
-    ])
-    .select()
-    .single();
+// ============================================================================
+// LOCALSTORAGE UTILITIES (Replace with Supabase calls when ready)
+// ============================================================================
 
-  if (error) {
-    console.error('Error saving project:', error);
-    throw error;
-  }
-
-  return data;
-}
-
-export async function updateProject(projectId: string, project: Partial<Project>) {
-  const { data, error } = await supabase
-    .from('projects')
-    .update({
-      ...project,
-      project_data: JSON.stringify(project),
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', projectId)
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Error updating project:', error);
-    throw error;
-  }
-
-  return data;
-}
-
-export async function getProjects() {
-  const { data, error } = await supabase
-    .from('projects')
-    .select('*')
-    .order('updated_at', { ascending: false });
-
-  if (error) {
-    console.error('Error fetching projects:', error);
-    return [];
-  }
-
-  // Parse JSON data
-  return data.map((item: any) => ({
-    ...item,
-    ...(typeof item.project_data === 'string' ? JSON.parse(item.project_data) : item.project_data),
-  })) as (Project & { id: string; created_at: string; updated_at: string })[];
-}
-
-export async function loadProject(projectId: string): Promise<Project | null> {
-  const { data, error } = await supabase
-    .from('projects')
-    .select('*')
-    .eq('id', projectId)
-    .single();
-
-  if (error) {
-    console.error('Error loading project:', error);
+// Utility: safely parse JSON from localStorage
+function safeParse<T>(raw: string | null): T | null {
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
     return null;
   }
-
-  // Parse JSON data
-  const projectData = typeof data.project_data === 'string'
-    ? JSON.parse(data.project_data)
-    : data.project_data;
-
-  return {
-    ...projectData,
-    id: data.id,
-    created_at: data.created_at,
-    updated_at: data.updated_at,
-  } as Project;
 }
 
-export async function deleteProject(projectId: string) {
-  const { error } = await supabase
-    .from('projects')
-    .delete()
-    .eq('id', projectId);
+// ============================================================================
+// TRACK FUNCTIONS (Stubbed with localStorage)
+// ============================================================================
 
-  if (error) {
-    console.error('Error deleting project:', error);
-    throw error;
+/**
+ * Get all tracks (mock implementation)
+ * TODO: Replace with: await supabase.from('tracks').select('*').order('created_at', { ascending: false })
+ */
+export async function getTracks(): Promise<Track[]> {
+  if (typeof window === 'undefined') {
+    return [
+      {
+        id: '1',
+        title: 'Ambient Beat',
+        artist: 'Piko FG',
+        duration: '3:20',
+        audio_url: '/lofi-teaser.wav',
+        likes: 0,
+        created_at: new Date().toISOString(),
+      },
+    ];
   }
+
+  const raw = localStorage.getItem('studio_tracks');
+  const parsed = safeParse<Track[]>(raw);
+  return parsed ?? [
+    {
+      id: '1',
+      title: 'Ambient Beat',
+      artist: 'Piko FG',
+      duration: '3:20',
+      audio_url: '/lofi-teaser.wav',
+      likes: 0,
+      created_at: new Date().toISOString(),
+    },
+  ];
 }
+
+/**
+ * Like a track (mock implementation)
+ * TODO: Replace with: await supabase.rpc('increment_likes', { track_id: trackId })
+ */
+export async function likeTrack(trackId: string): Promise<Track | null> {
+  if (typeof window === 'undefined') return null;
+
+  const tracks = await getTracks();
+  const updated = tracks.map((t) =>
+    t.id === trackId ? { ...t, likes: (t.likes || 0) + 1 } : t
+  );
+  localStorage.setItem('studio_tracks', JSON.stringify(updated));
+  return updated.find((t) => t.id === trackId) ?? null;
+}
+
+/**
+ * Upload a track (mock implementation - creates object URL)
+ * TODO: Replace with Supabase Storage upload + database insert
+ */
+export async function uploadTrack(file: File, metadata: Partial<Track>): Promise<Track> {
+  if (typeof window === 'undefined') {
+    throw new Error('uploadTrack requires browser environment');
+  }
+
+  const objectUrl = URL.createObjectURL(file);
+  const newTrack: Track = {
+    id: crypto.randomUUID(),
+    title: metadata.title ?? file.name,
+    artist: metadata.artist ?? 'Piko FG',
+    duration: metadata.duration ?? '0:00',
+    audio_url: objectUrl,
+    cover_art: metadata.cover_art,
+    likes: 0,
+    created_at: new Date().toISOString(),
+  };
+
+  const tracks = await getTracks();
+  tracks.push(newTrack);
+  localStorage.setItem('studio_tracks', JSON.stringify(tracks));
+
+  return newTrack;
+}
+
+// ============================================================================
+// AUTH FUNCTIONS (Stubbed - return null/throw for now)
+// ============================================================================
+
+/**
+ * Get current user (stubbed - returns null)
+ * TODO: Replace with: await supabase.auth.getUser()
+ */
+export async function getCurrentUser() {
+  // In no-login mode, always return null
+  return null;
+}
+
+/**
+ * Sign in (stubbed - throws error)
+ * TODO: Replace with magic link auth:
+ *   await supabase.auth.signInWithOtp({ email })
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function signIn(_email: string, _password: string) {
+  throw new Error('Authentication is disabled. Studio runs in no-login mode with localStorage.');
+}
+
+/**
+ * Sign out (stubbed - no-op)
+ * TODO: Replace with: await supabase.auth.signOut()
+ */
+export async function signOut() {
+  // No-op in no-login mode
+  console.log('Sign out called (no-op in no-login mode)');
+}
+
+// ============================================================================
+// PROJECT FUNCTIONS (Stubbed with localStorage)
+// ============================================================================
+
+/**
+ * Save a project (mock implementation)
+ * TODO: Replace with Supabase insert + RLS policy check
+ */
+export async function saveProject(
+  project: Project | Omit<Project, 'id' | 'created_at' | 'updated_at'>
+): Promise<Project & { id: string; created_at: string; updated_at: string }> {
+  if (typeof window === 'undefined') {
+    throw new Error('saveProject requires browser environment');
+  }
+
+  const projects = await getProjects();
+  const projectWithId = project as Project;
+  const newProject: Project & { id: string; created_at: string; updated_at: string } = {
+    ...project,
+    id: projectWithId.id ?? crypto.randomUUID(),
+    created_at: projectWithId.created_at ?? new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+
+  projects.push(newProject);
+  localStorage.setItem('studio_projects', JSON.stringify(projects));
+
+  return newProject;
+}
+
+/**
+ * Update a project (mock implementation)
+ * TODO: Replace with Supabase update + RLS policy check
+ */
+export async function updateProject(
+  projectId: string,
+  updates: Partial<Project>
+): Promise<Project & { id: string; created_at: string; updated_at: string } | null> {
+  if (typeof window === 'undefined') {
+    throw new Error('updateProject requires browser environment');
+  }
+
+  const projects = await getProjects();
+  const updatedProjects = projects.map((p) =>
+    p.id === projectId
+      ? { ...p, ...updates, updated_at: new Date().toISOString() }
+      : p
+  );
+  localStorage.setItem('studio_projects', JSON.stringify(updatedProjects));
+  return updatedProjects.find((p) => p.id === projectId) ?? null;
+}
+
+/**
+ * Get all projects (mock implementation)
+ * TODO: Replace with: await supabase.from('projects').select('*').order('updated_at', { ascending: false })
+ */
+export async function getProjects(): Promise<(Project & { id: string; created_at: string; updated_at: string })[]> {
+  if (typeof window === 'undefined') return [];
+
+  const raw = localStorage.getItem('studio_projects');
+  const parsed = safeParse<(Project & { id: string; created_at: string; updated_at: string })[]>(raw);
+  return parsed ?? [];
+}
+
+/**
+ * Load a specific project (mock implementation)
+ * TODO: Replace with: await supabase.from('projects').select('*').eq('id', projectId).single()
+ */
+export async function loadProject(projectId: string): Promise<Project | null> {
+  if (typeof window === 'undefined') return null;
+
+  const projects = await getProjects();
+  return projects.find((p) => p.id === projectId) ?? null;
+}
+
+/**
+ * Delete a project (mock implementation)
+ * TODO: Replace with: await supabase.from('projects').delete().eq('id', projectId)
+ */
+export async function deleteProject(projectId: string): Promise<void> {
+  if (typeof window === 'undefined') return;
+
+  const projects = await getProjects();
+  const filtered = projects.filter((p) => p.id !== projectId);
+  localStorage.setItem('studio_projects', JSON.stringify(filtered));
+}
+
+// ============================================================================
+// REALTIME STUB (For SharedActivityLog compatibility)
+// ============================================================================
+
+/**
+ * Stubbed realtime handler (no-op)
+ * TODO: Replace with actual Supabase realtime when enabled
+ */
+export const realtime = {
+  on: () => ({
+    subscribe: () => {
+      // no-op stub
+    },
+  }),
+};

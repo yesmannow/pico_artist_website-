@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Activity from 'lucide-react/dist/esm/icons/activity';
 import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down';
 import ChevronUp from 'lucide-react/dist/esm/icons/chevron-up';
-import { supabase } from '@/lib/supabase';
+import { useStudioLocalStore } from '@/store/studioLocalStore';
 
 interface ActivityItem {
   id: string;
@@ -30,170 +30,33 @@ function formatTimeAgo(timestamp: string): string {
   return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
 }
 
-type SupabaseEventType = 'INSERT' | 'UPDATE' | 'DELETE';
-
-interface SupabaseProjectRow {
-  id: string;
-  name?: string;
-  project_data?: string | { name?: string };
-  updated_at?: string;
-  created_at?: string;
-}
-
-interface SupabaseTrackRow {
-  id: string;
-  title?: string;
-  updated_at?: string;
-  created_at?: string;
-}
-
-interface SupabaseChangePayload<T> {
-  eventType: SupabaseEventType;
-  new?: T;
-  old?: T;
-}
-
-function resolveProjectName(project: SupabaseProjectRow): string {
-  let projectName = project.name || 'Untitled Project';
-  if (project.project_data) {
-    try {
-      const projectData =
-        typeof project.project_data === 'string'
-          ? (JSON.parse(project.project_data) as { name?: string })
-          : project.project_data;
-      if (projectData?.name) {
-        projectName = projectData.name;
-      }
-    } catch {
-      // Fall back to the provided name if JSON parsing fails
-    }
-  }
-  return projectName;
-}
-
-export default function SharedActivityLog() {
-  const [activities, setActivities] = useState<ActivityItem[]>([]);
+export default function SharedActivityLogLocal() {
+  const [, setRefreshTick] = useState(0);
   const [isExpanded, setIsExpanded] = useState(false);
   const activitiesEndRef = useRef<HTMLDivElement>(null);
+  const { projects } = useStudioLocalStore();
 
-  // Fetch initial activities
-  useEffect(() => {
-    async function fetchInitialActivities() {
-      try {
-        // Fetch last 10 projects ordered by updated_at
-        const { data: projects, error: projectsError } = await supabase
-          .from('projects')
-          .select('id, name, project_data, updated_at, created_at')
-          .order('updated_at', { ascending: false })
-          .limit(10);
+  const activities = useMemo<ActivityItem[]>(() => {
+    return projects
+      .slice()
+      .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+      .slice(0, 10)
+      .map((project) => {
+        const created = new Date(project.created_at).getTime();
+        const updated = new Date(project.updated_at).getTime();
+        const isNew = created && created === updated;
 
-        if (projectsError) {
-          console.error('Error fetching projects:', projectsError);
-          return;
-        }
-
-        const projectRows = (projects || []) as SupabaseProjectRow[];
-        const initialActivities: ActivityItem[] = projectRows.map((project) => {
-          const projectName = resolveProjectName(project);
-          const created = project.created_at ? new Date(project.created_at).getTime() : 0;
-          const updated = project.updated_at ? new Date(project.updated_at).getTime() : 0;
-          const isNew = created && created === updated;
-
-          return {
-            id: `project-${project.id}`,
-            type: isNew ? 'project_saved' : 'project_updated',
-            message: isNew
-              ? `New project "${projectName}" saved`
-              : `Project "${projectName}" updated`,
-            timestamp: project.updated_at || new Date().toISOString(),
-            projectName,
-          };
-        });
-
-        setActivities(initialActivities);
-      } catch (error) {
-        console.error('Error fetching initial activities:', error);
-      }
-    }
-
-    fetchInitialActivities();
-  }, []);
-
-  // Set up real-time subscriptions
-  useEffect(() => {
-    // Subscribe to projects table
-    const projectsChannel = supabase
-      .channel('projects-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'projects',
-        },
-        (payload: SupabaseChangePayload<SupabaseProjectRow>) => {
-          if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
-            const project = payload.new;
-            if (!project) return;
-
-            const projectName = resolveProjectName(project);
-            const newActivity: ActivityItem = {
-              id: `activity-${Date.now()}-${Math.random()}`,
-              type: payload.eventType === 'INSERT' ? 'project_saved' : 'project_updated',
-              message: payload.eventType === 'INSERT'
-                ? `New project "${projectName}" saved`
-                : `Project "${projectName}" updated`,
-              timestamp: project.updated_at || new Date().toISOString(),
-              projectName,
-            };
-
-            setActivities((prev) => {
-              const filtered = prev.filter((a) => a.id !== newActivity.id);
-              return [newActivity, ...filtered].slice(0, 20);
-            });
-          }
-        }
-      )
-      .subscribe();
-
-    // Subscribe to tracks table
-    const tracksChannel = supabase
-      .channel('tracks-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'tracks',
-        },
-        (payload: SupabaseChangePayload<SupabaseTrackRow>) => {
-          if (payload.eventType === 'UPDATE') {
-            const track = payload.new;
-            if (!track) return;
-
-            const trackTitle = track.title || 'Untitled Track';
-            const newActivity: ActivityItem = {
-              id: `activity-${Date.now()}-${Math.random()}`,
-              type: 'track_updated',
-              message: `Track "${trackTitle}" updated`,
-              timestamp: track.updated_at || track.created_at || new Date().toISOString(),
-              trackTitle,
-            };
-
-            setActivities((prev) => {
-              const filtered = prev.filter((a) => a.id !== newActivity.id);
-              return [newActivity, ...filtered].slice(0, 20);
-            });
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(projectsChannel);
-      supabase.removeChannel(tracksChannel);
-    };
-  }, []);
+        return {
+          id: `project-${project.id}`,
+          type: isNew ? 'project_saved' : 'project_updated',
+          message: isNew
+            ? `New project "${project.name}" saved`
+            : `Project "${project.name}" updated`,
+          timestamp: project.updated_at,
+          projectName: project.name,
+        };
+      });
+  }, [projects]);
 
   // Auto-scroll to bottom when new activities arrive
   useEffect(() => {
@@ -205,7 +68,7 @@ export default function SharedActivityLog() {
   // Update timestamps every minute
   useEffect(() => {
     const interval = setInterval(() => {
-      setActivities((prev) => [...prev]);
+      setRefreshTick((prev) => prev + 1);
     }, 60000);
 
     return () => clearInterval(interval);
@@ -220,7 +83,7 @@ export default function SharedActivityLog() {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 text-piko-teal">
                 <Activity className="h-4 w-4 animate-pulse" />
-                <span className="text-xs font-semibold uppercase tracking-wider">Shared Activity</span>
+                <span className="text-xs font-semibold uppercase tracking-wider">Activity Log</span>
               </div>
               <div className="flex-1 overflow-hidden">
                 <motion.div
@@ -268,7 +131,7 @@ export default function SharedActivityLog() {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2 text-piko-teal">
                     <Activity className="h-4 w-4" />
-                    <span className="text-sm font-semibold">Shared Activity Log</span>
+                    <span className="text-sm font-semibold">Activity Log</span>
                     <span className="text-xs text-zinc-500 ml-2">
                       {activities.length} {activities.length === 1 ? 'activity' : 'activities'}
                     </span>
@@ -285,7 +148,7 @@ export default function SharedActivityLog() {
                   <AnimatePresence>
                     {activities.length === 0 ? (
                       <div className="text-sm text-zinc-500 text-center py-4">
-                        No activity yet. Start creating to see shared updates!
+                        No activity yet. Start creating to see updates!
                       </div>
                     ) : (
                       activities.map((activity) => (
@@ -317,3 +180,4 @@ export default function SharedActivityLog() {
     </div>
   );
 }
+

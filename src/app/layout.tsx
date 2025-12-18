@@ -10,15 +10,18 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 // No runtime export needed - defaults to nodejs
 
 export const metadata: Metadata = {
-  title: "Pico Artist Studio - Private SoundCloud Experience",
-  description: "A cinematic music platform with built-in recording studio for artists",
+  title: "Piko Artist Studio",
+  description: "Music, videos, and tour dates",
   manifest: "/manifest.json",
-  themeColor: "#ff006e",
   appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
     title: "Piko Studio",
   },
+};
+
+export const viewport = {
+  themeColor: "#ff006e",
+  appleMobileWebAppCapable: "yes",
+  appleMobileWebAppStatusBarStyle: "black-translucent",
 };
 
 export default function RootLayout({

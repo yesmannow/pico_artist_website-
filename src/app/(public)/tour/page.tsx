@@ -63,21 +63,30 @@ const tourDates: TourDate[] = [
   },
 ];
 
+interface GlobeControls {
+  autoRotate: boolean;
+  autoRotateSpeed: number;
+}
+
+interface GlobeInstance {
+  controls: () => GlobeControls;
+}
+
 export default function TourPage() {
-  const globeEl = useRef<any>(null);
+  const globeEl = useRef<GlobeInstance | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<TourDate | null>(null);
-  const [globeReady, setGlobeReady] = useState(false);
 
   useEffect(() => {
-    if (globeEl.current) {
-      globeEl.current.controls().autoRotate = true;
-      globeEl.current.controls().autoRotateSpeed = 0.5;
-      setGlobeReady(true);
-    }
+    const globe = globeEl.current;
+    if (!globe) return;
+
+    const controls = globe.controls();
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.5;
   }, []);
 
-  const handlePointClick = (point: object, _event?: any, _coords?: any) => {
-    setSelectedEvent(point as TourDate);
+  const handlePointClick = (point: TourDate) => {
+    setSelectedEvent(point);
   };
 
   return (
@@ -115,7 +124,7 @@ export default function TourPage() {
             pointColor={() => '#00f5d4'}
             pointAltitude={0.07}
             pointRadius={0.5}
-            pointLabel={(d: any) => `
+            pointLabel={(d: TourDate) => `
               <div class="glassmorphism p-4 border-l-4 border-pikoTeal bg-zinc-900/90 backdrop-blur-md rounded-lg">
                 <h3 class="text-white font-bold text-lg">${d.name}</h3>
                 <p class="text-pikoPink text-sm">${d.venue}</p>

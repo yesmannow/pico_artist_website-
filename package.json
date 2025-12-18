@@ -11,24 +11,21 @@
     "optimize-media": "node scripts/optimize-media.js"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.8.0",
-    "@supabase/supabase-js": "^2.88.0",
+    "@next/bundle-analyzer": "^16.0.10",
+    "@tsparticles/engine": "^3.9.1",
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.9.1",
     "ffmpeg-static": "^5.2.0",
     "framer-motion": "^12.23.26",
     "howler": "^2.2.4",
-    "lodash": "^4.17.21",
     "lucide-react": "^0.561.0",
     "next": "16.0.10",
-    "react": "19.2.1",
-    "react-dom": "19.2.1",
-    "react-fast-marquee": "^1.6.5",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
     "react-globe.gl": "^2.37.0",
     "react-lite-youtube-embed": "^3.3.3",
-    "react-media-recorder": "^1.7.2",
     "react-parallax-tilt": "^1.7.315",
-    "sharp": "^0.33.5",
+    "sharp": "^0.34.5",
     "wavesurfer.js": "^7.12.1",
     "zustand": "^5.0.9"
   },
@@ -36,12 +33,13 @@
     "@opennextjs/cloudflare": "^1.14.6",
     "@tailwindcss/postcss": "^4",
     "@types/howler": "^2.2.12",
-    "@types/node": "^22",
+    "@types/node": "^25.0.3",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.0.10",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.55.0"
   }
 }

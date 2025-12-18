@@ -21,7 +21,7 @@ export default function BioPage() {
           </h1>
           <p className="text-zinc-400 max-w-3xl mx-auto">
             Raised on late-night subway static and club strobes, Piko FG blends neon melodies with
-            smoky verses. The Private SoundCloud vibe you're hearing here is the lab where new
+            smoky verses. The Private SoundCloud vibe you&apos;re hearing here is the lab where new
             stories are forged.
           </p>
         </motion.div>
@@ -45,7 +45,7 @@ export default function BioPage() {
           <div className="space-y-4">
             <h2 className="text-2xl font-semibold text-zinc-50">The pulse</h2>
             <p className="text-zinc-400 text-sm leading-relaxed">
-              Piko's cinematic dark palette was born from street murals that glowed under
+            Piko&apos;s cinematic dark palette was born from street murals that glowed under
               sodium lights. Every hook is layered like a paint drip—rounded, bright, and ready to
               cut through the night. Expect glitch transitions, wavesurfer renderings, and live
               overdubs captured straight from the /studio workspace.

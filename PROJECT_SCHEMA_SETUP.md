@@ -2,6 +2,16 @@
 
 This document describes the database schema required for the Studio Project Manager feature.
 
+## ⚠️ Current Status: No-Login Mode
+
+**Studio currently runs in no-login mode with localStorage persistence.** Supabase integration is deferred until magic link authentication is enabled. All project data is stored locally in the browser.
+
+To re-enable Supabase:
+1. Uncomment Supabase client initialization in `src/lib/supabase.ts`
+2. Replace localStorage mocks with actual Supabase calls
+3. Enable magic link auth in Supabase dashboard
+4. Run the migration scripts in `migrations/sql/` to set up RLS policies
+
 ## Database Table: `projects`
 
 Create the following table in your Supabase database:
@@ -35,9 +45,12 @@ CREATE POLICY "Users can update own projects" ON projects
 CREATE POLICY "Users can delete own projects" ON projects
   FOR DELETE USING (auth.uid() = user_id);
 
--- Create index for faster queries
-CREATE INDEX idx_projects_user_id ON projects(user_id);
-CREATE INDEX idx_projects_updated_at ON projects(updated_at DESC);
+ -- Create index for faster queries (only the updated_at index is required now)
+ CREATE INDEX idx_projects_updated_at ON projects(updated_at DESC);
+
+## 🧱 Migration sync
+
+These exact policies and indexes are captured in `migrations/sql/001_secure_policies.sql` and `migrations/sql/002_perf_indexes.sql`. The latter drops the unused `idx_projects_user_id` (and the `likes` index) so only `idx_projects_updated_at` remains for the app's query paths, while the security migration enforces the documented RLS rules.
 ```
 
 ## Project JSON Schema

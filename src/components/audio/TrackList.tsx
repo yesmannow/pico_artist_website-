@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import Play from 'lucide-react/dist/esm/icons/play';
 import Pause from 'lucide-react/dist/esm/icons/pause';
 import Heart from 'lucide-react/dist/esm/icons/heart';
@@ -25,6 +25,35 @@ function TrackCard({ track, isPlaying, onPlay }: TrackCardProps) {
   const [showSplatter, setShowSplatter] = useState<{ x: number; y: number } | null>(null);
   const previewRef = useRef<Howl | null>(null);
   const previewTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const stopPreview = useCallback(() => {
+    if (previewTimeout.current) {
+      clearTimeout(previewTimeout.current);
+      previewTimeout.current = null;
+    }
+    if (previewRef.current) {
+      previewRef.current.stop();
+      previewRef.current.unload();
+      previewRef.current = null;
+    }
+  }, []);
+
+  const startPreview = () => {
+    if (previewRef.current) return;
+
+    const src = track.audio_url || PREVIEW_FALLBACK_SRC;
+    const howl = new Howl({
+      src: [src],
+      volume: 0.35,
+      html5: true,
+    });
+
+    previewRef.current = howl;
+    howl.play();
+    previewTimeout.current = setTimeout(() => {
+      stopPreview();
+    }, PREVIEW_DURATION_MS);
+  };
 
   useEffect(() => {
     // Initialize wavesurfer.js
@@ -65,36 +94,7 @@ function TrackCard({ track, isPlaying, onPlay }: TrackCardProps) {
     return () => {
       stopPreview();
     };
-  }, []);
-
-  const stopPreview = () => {
-    if (previewTimeout.current) {
-      clearTimeout(previewTimeout.current);
-      previewTimeout.current = null;
-    }
-    if (previewRef.current) {
-      previewRef.current.stop();
-      previewRef.current.unload();
-      previewRef.current = null;
-    }
-  };
-
-  const startPreview = () => {
-    if (previewRef.current) return;
-
-    const src = track.audio_url || PREVIEW_FALLBACK_SRC;
-    const howl = new Howl({
-      src: [src],
-      volume: 0.35,
-      html5: true,
-    });
-
-    previewRef.current = howl;
-    howl.play();
-    previewTimeout.current = setTimeout(() => {
-      stopPreview();
-    }, PREVIEW_DURATION_MS);
-  };
+  }, [stopPreview]);
 
   const handleActionClick = async (e: React.MouseEvent, action: 'like' | 'share') => {
     const rect = e.currentTarget.getBoundingClientRect();

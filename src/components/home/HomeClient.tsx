@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useScroll, useTransform, useMotionValue } from "framer-motion";
+import { motion, useScroll, useMotionValue } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -21,7 +21,6 @@ export default function HomeClient() {
   const router = useRouter();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHoveringLogo, setIsHoveringLogo] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ container: containerRef });
   const vinylRotation = useMotionValue(0);
@@ -38,15 +37,6 @@ export default function HomeClient() {
     });
     return () => unsubscribe();
   }, [scrollYProgress, vinylRotation]);
-
-  // Track scroll position
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {

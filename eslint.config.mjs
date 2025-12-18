@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Node.js scripts that use CommonJS
     "scripts/**",
+    "mcp-tools/**",
+    ".open-next/**",
   ]),
 ]);
 

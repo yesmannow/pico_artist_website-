@@ -115,3 +115,12 @@ html {
     transform: translateX(-50%);
   }
 }
+
+/* Interactive Mouse Spotlight - Dynamic gradient based on mouse position */
+.mouse-spotlight {
+  background: radial-gradient(
+    600px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 0, 110, 0.15),
+    transparent 80%
+  );
+}

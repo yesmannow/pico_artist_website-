@@ -8,6 +8,12 @@ import SkipForward from 'lucide-react/dist/esm/icons/skip-forward';
 import Volume2 from 'lucide-react/dist/esm/icons/volume-2';
 import { Howl } from 'howler';
 
+const DEFAULT_CRACKLE_VOLUME = 0.02;
+
+interface HowlWithInternals extends Howl {
+  _sounds?: Array<{ _node?: AudioNode | null }>;
+}
+
 interface GlobalMusicPlayerState {
   currentTrack: {
     id: string;
@@ -31,7 +37,6 @@ export default function GlobalMusicPlayer() {
   });
 
   const [isScrubbing, setIsScrubbing] = useState(false);
-  const [crackleVolume, setCrackleVolume] = useState(0.02);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
   const soundRef = useRef<Howl | null>(null);
@@ -41,7 +46,16 @@ export default function GlobalMusicPlayer() {
 
   // Initialize crackle sound with Web Audio API for proper lowpass filter
   useEffect(() => {
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const AudioContextClass =
+      window.AudioContext ??
+      (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+
+    if (!AudioContextClass) {
+      console.warn('Web Audio API is not available in this browser.');
+      return;
+    }
+
+    const audioContext = new AudioContextClass();
 
     // Generate crackle noise buffer
     const buffer = audioContext.createBuffer(1, audioContext.sampleRate * 2, audioContext.sampleRate);
@@ -55,14 +69,15 @@ export default function GlobalMusicPlayer() {
     // Create Howl instance for crackle
     crackleRef.current = new Howl({
       src: ['/lofi-teaser.wav'], // Fallback - would ideally be a crackle sound file
-      volume: crackleVolume,
+      volume: DEFAULT_CRACKLE_VOLUME,
       loop: true,
       rate: 0.3, // Slow down for crackle effect
     });
 
     // Apply Web Audio API processing for lowpass filter
     if (crackleRef.current && audioContext) {
-      const rawNode = (crackleRef.current as any)._sounds?.[0]?._node;
+      const howlInternal = crackleRef.current as HowlWithInternals;
+      const rawNode = howlInternal._sounds?.[0]?._node;
       const mediaElement = rawNode instanceof HTMLMediaElement ? rawNode : new Audio();
       const source = audioContext.createMediaElementSource(mediaElement);
       const filter = audioContext.createBiquadFilter();
@@ -80,17 +95,18 @@ export default function GlobalMusicPlayer() {
 
   // Update crackle volume and apply lowpass filter when scrubbing
   useEffect(() => {
-    if (crackleRef.current) {
-      if (isScrubbing) {
-        crackleRef.current.volume(0.15);
-        // Apply resonant lowpass effect by adjusting rate and using Web Audio API
-        crackleRef.current.rate(0.25); // Slower for more resonant effect
-      } else {
-        crackleRef.current.volume(crackleVolume);
-        crackleRef.current.rate(0.3);
-      }
+    const howl = crackleRef.current;
+    if (!howl) return;
+
+    if (isScrubbing) {
+      howl.volume(0.15);
+      // Apply resonant lowpass effect by adjusting rate and using Web Audio API
+      howl.rate(0.25); // Slower for more resonant effect
+    } else {
+      howl.volume(DEFAULT_CRACKLE_VOLUME);
+      howl.rate(0.3);
     }
-  }, [isScrubbing, crackleVolume]);
+  }, [isScrubbing]);
 
   // Play crackle when playing
   useEffect(() => {

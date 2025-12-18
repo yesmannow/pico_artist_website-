@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Volume2 from 'lucide-react/dist/esm/icons/volume-2';
 import VolumeX from 'lucide-react/dist/esm/icons/volume-x';
@@ -9,7 +9,7 @@ import Trash2 from 'lucide-react/dist/esm/icons/trash-2';
 import Play from 'lucide-react/dist/esm/icons/play';
 import Pause from 'lucide-react/dist/esm/icons/pause';
 import Square from 'lucide-react/dist/esm/icons/square';
-import { useStudioStore, type Track } from '@/store/studioStore';
+import { useStudioLocalStore } from '@/store/studioLocalStore';
 import WaveSurfer from 'wavesurfer.js';
 
 interface MultitrackTimelineProps {
@@ -19,7 +19,6 @@ interface MultitrackTimelineProps {
 export default function MultitrackTimeline({ className }: MultitrackTimelineProps) {
   const {
     tracks,
-    currentTime,
     isPlaying,
     isRecording,
     selectedTrackId,
@@ -29,7 +28,7 @@ export default function MultitrackTimeline({ className }: MultitrackTimelineProp
     toggleMute,
     toggleSolo,
     setSelectedTrack,
-  } = useStudioStore();
+  } = useStudioLocalStore();
 
   const waveformRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const wavesurfers = useRef<Map<string, WaveSurfer>>(new Map());
@@ -37,9 +36,10 @@ export default function MultitrackTimeline({ className }: MultitrackTimelineProp
 
   // Initialize WaveSurfer instances
   useEffect(() => {
+    const waveSurferMap = wavesurfers.current;
     tracks.forEach((track) => {
       const container = waveformRefs.current.get(track.id);
-      if (!container || wavesurfers.current.has(track.id)) return;
+      if (!container || waveSurferMap.has(track.id)) return;
 
       const wavesurfer = WaveSurfer.create({
         container,
@@ -63,12 +63,12 @@ export default function MultitrackTimeline({ className }: MultitrackTimelineProp
         }
       });
 
-      wavesurfers.current.set(track.id, wavesurfer);
+      waveSurferMap.set(track.id, wavesurfer);
     });
 
     return () => {
-      wavesurfers.current.forEach((ws) => ws.destroy());
-      wavesurfers.current.clear();
+      waveSurferMap.forEach((ws) => ws.destroy());
+      waveSurferMap.clear();
     };
   }, [tracks, selectedTrackId, setCurrentTime]);
 

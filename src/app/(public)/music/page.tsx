@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import Image from 'next/image';
 import Music2 from 'lucide-react/dist/esm/icons/music-2';
 import Play from 'lucide-react/dist/esm/icons/play';
 import ExternalLink from 'lucide-react/dist/esm/icons/external-link';
@@ -63,7 +64,7 @@ export default function DiscographyPage() {
           <p className="text-xs uppercase tracking-[0.3em] text-piko-teal">Discography</p>
           <h1 className="text-4xl md:text-5xl font-bold text-zinc-100">Music Collection</h1>
           <p className="text-zinc-400 max-w-3xl mx-auto">
-            Explore the complete catalog of Piko FG's digital graffiti soundscapes.
+            Explore the complete catalog of Piko FG&apos;s digital graffiti soundscapes.
           </p>
         </motion.div>
 
@@ -107,10 +108,12 @@ export default function DiscographyPage() {
               {/* Album Cover */}
               <div className="relative aspect-square overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-piko-teal/20 via-piko-pink/20 to-piko-orange/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <img
+                <Image
                   src={album.cover}
                   alt={album.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover group-hover:scale-110 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <motion.div

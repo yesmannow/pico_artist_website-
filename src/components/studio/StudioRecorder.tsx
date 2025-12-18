@@ -13,10 +13,11 @@ import Music from 'lucide-react/dist/esm/icons/music';
 import Settings from 'lucide-react/dist/esm/icons/settings';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import CanvasVisualizer from './CanvasVisualizer';
-import { uploadTrack, type Track } from '@/lib/supabase';
+import { useStudioLocalStore } from '@/store/studioLocalStore';
+import type { Track as SupabaseTrack } from '@/lib/supabase';
 
 interface StudioRecorderProps {
-  backingTracks?: Track[];
+  backingTracks?: SupabaseTrack[];
 }
 
 export default function StudioRecorder({ backingTracks = [] }: StudioRecorderProps) {
@@ -33,6 +34,8 @@ export default function StudioRecorder({ backingTracks = [] }: StudioRecorderPro
     clearRecording,
     analyser,
   } = useAudioRecorder();
+
+  const { addTrack } = useStudioLocalStore();
 
   const [selectedTrackUrl, setSelectedTrackUrl] = useState<string | null>(null);
   const [isPlayingBacking, setIsPlayingBacking] = useState(false);
@@ -104,25 +107,32 @@ export default function StudioRecorder({ backingTracks = [] }: StudioRecorderPro
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
+
     setShowSplatter({ x, y });
     setTimeout(() => setShowSplatter(null), 600);
 
     setUploading(true);
     try {
-      const file = new File([audioBlob], `${trackTitle}.webm`, { type: 'audio/webm' });
-      await uploadTrack(file, {
-        title: trackTitle,
-        artist: 'Piko FG',
-        duration: formatTime(recordingTime),
-        likes: 0,
+      // Create object URL for the audio blob
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      // Add track to local store
+      addTrack({
+        name: trackTitle,
+        audioUrl: audioUrl,
+        startTime: 0,
+        duration: recordingTime,
+        volume: 1.0,
+        muted: false,
+        solo: false,
       });
-      alert('Track uploaded successfully!');
+
+      alert('Track added to timeline!');
       clearRecording();
       setTrackTitle('');
     } catch (error) {
-      console.error('Upload error:', error);
-      alert('Failed to upload track');
+      console.error('Add track error:', error);
+      alert('Failed to add track');
     } finally {
       setUploading(false);
     }

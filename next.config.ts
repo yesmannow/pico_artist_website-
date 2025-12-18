@@ -1,7 +1,13 @@
 import type { NextConfig } from "next";
+import bundleAnalyzer from "@next/bundle-analyzer";
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  reactStrictMode: true,
+
   // Note: If you see a "Multiple Lockfiles" warning, it's because Next.js detected
   // a package-lock.json in your user home directory (C:\Users\hoosi\package-lock.json).
   // This is informational only - Next.js will use the lockfile in this project directory.
@@ -24,4 +30,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);

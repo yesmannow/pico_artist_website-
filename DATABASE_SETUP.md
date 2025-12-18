@@ -1,6 +1,12 @@
 # Supabase Database Setup
 
-This project requires a Supabase database with the following configuration:
+This project requires a Supabase database with the following configuration.
+
+## ⚠️ Current Status: No-Login Mode
+
+**Studio currently runs in no-login mode. Supabase integration deferred until magic link auth is enabled.**
+
+The Studio feature uses localStorage for persistence. All database setup below is for future integration when Supabase is re-enabled.
 
 ## Tables
 
@@ -95,3 +101,13 @@ If you don't have a Supabase database set up yet, the app will:
 - Display placeholder content
 
 To fully test all features, set up the database as described above.
+
+## 🧱 Supabase migrations
+
+Run the SQL scripts inside `migrations/sql/` whenever you provision or refresh the Supabase database:
+
+1. `migrations/sql/001_secure_policies.sql` enables RLS and gates public tables (`tracks`, `projects`, `likes`, `auth_user_meta`) so the anon role can only use the documented policies (public `SELECT` where appropriate, authenticated `INSERT`, and owner-only `UPDATE/DELETE`). The same script locks down every `*_backup` table with service-role-only access and adds validation comments such as `SELECT 1 FROM tracks LIMIT 1;`.
+
+2. `migrations/sql/002_perf_indexes.sql` adds missing primary keys to `tracks_backup`, `projects_backup`, `likes_backup`, and `auth_user_meta_backup`, drops unused indexes `idx_likes_user_id`/`idx_projects_user_id`, and re-creates the indexes the tracker code actually relies on (for example, `tracks(created_at DESC)` and `projects(updated_at DESC)`).
+
+Execute both scripts with `psql` or `supabase db query` before you deploy so the schema, policies, and indexes match the expectations described elsewhere in this repo.

@@ -2,10 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import Marquee from 'react-fast-marquee';
 import CloudRain from 'lucide-react/dist/esm/icons/cloud-rain';
 import { Howl } from 'howler';
-import { motion } from 'framer-motion';
+import { STUDIO_CONFIG } from '@/lib/studioConfig';
 
 export default function Footer() {
   const [streetRainEnabled, setStreetRainEnabled] = useState(false);
@@ -33,6 +32,23 @@ export default function Footer() {
     }
   }, [streetRainEnabled]);
 
+  // Keyboard shortcut for Studio access (Shift+S)
+  useEffect(() => {
+    if (!STUDIO_CONFIG.visible) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for Shift+S (case-insensitive)
+      if (e.shiftKey && e.key.toLowerCase() === 's') {
+        // Prevent default browser behavior if needed
+        e.preventDefault();
+        window.location.href = '/studio';
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   return (
     <footer className="relative border-t border-zinc-800 bg-zinc-950/80 backdrop-blur-xl">
       {/* Glassmorphic Background */}
@@ -40,26 +56,26 @@ export default function Footer() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,245,212,0.05),transparent_70%)]" />
 
       {/* Infinite CSS Marquee */}
-      <div className="relative z-10 py-4 border-b border-zinc-800/50 overflow-hidden">
+      <div className="relative z-10 py-4 border-b border-zinc-800/50 overflow-hidden" aria-hidden="true">
         <div className="marquee-container">
           <div className="marquee-content">
-            <span className="text-piko-teal mx-8 text-sm font-semibold">PIKO FG</span>
-            <span className="text-zinc-400 mx-8 text-sm font-semibold">—</span>
-            <span className="text-piko-pink mx-8 text-sm font-semibold">NEW ALBUM 2026</span>
-            <span className="text-zinc-400 mx-8 text-sm font-semibold">—</span>
-            <span className="text-piko-orange mx-8 text-sm font-semibold">STAY TUNED</span>
-            <span className="text-zinc-400 mx-8 text-sm font-semibold">—</span>
-            <span className="text-piko-teal mx-8 text-sm font-semibold">DIGITAL GRAFFITI COLLECTIVE</span>
-            <span className="text-zinc-400 mx-8 text-sm font-semibold">—</span>
+            <span className="text-piko-teal mx-8 text-sm font-semibold" aria-hidden="true">PIKO FG</span>
+            <span className="text-zinc-400 mx-8 text-sm font-semibold" aria-hidden="true">—</span>
+            <span className="text-piko-pink mx-8 text-sm font-semibold" aria-hidden="true">NEW ALBUM 2026</span>
+            <span className="text-zinc-400 mx-8 text-sm font-semibold" aria-hidden="true">—</span>
+            <span className="text-piko-orange mx-8 text-sm font-semibold" aria-hidden="true">STAY TUNED</span>
+            <span className="text-zinc-400 mx-8 text-sm font-semibold" aria-hidden="true">—</span>
+            <span className="text-piko-teal mx-8 text-sm font-semibold" aria-hidden="true">DIGITAL GRAFFITI COLLECTIVE</span>
+            <span className="text-zinc-400 mx-8 text-sm font-semibold" aria-hidden="true">—</span>
             {/* Duplicate for seamless loop */}
-            <span className="text-piko-teal mx-8 text-sm font-semibold">PIKO FG</span>
-            <span className="text-zinc-400 mx-8 text-sm font-semibold">—</span>
-            <span className="text-piko-pink mx-8 text-sm font-semibold">NEW ALBUM 2026</span>
-            <span className="text-zinc-400 mx-8 text-sm font-semibold">—</span>
-            <span className="text-piko-orange mx-8 text-sm font-semibold">STAY TUNED</span>
-            <span className="text-zinc-400 mx-8 text-sm font-semibold">—</span>
-            <span className="text-piko-teal mx-8 text-sm font-semibold">DIGITAL GRAFFITI COLLECTIVE</span>
-            <span className="text-zinc-400 mx-8 text-sm font-semibold">—</span>
+            <span className="text-piko-teal mx-8 text-sm font-semibold" aria-hidden="true">PIKO FG</span>
+            <span className="text-zinc-400 mx-8 text-sm font-semibold" aria-hidden="true">—</span>
+            <span className="text-piko-pink mx-8 text-sm font-semibold" aria-hidden="true">NEW ALBUM 2026</span>
+            <span className="text-zinc-400 mx-8 text-sm font-semibold" aria-hidden="true">—</span>
+            <span className="text-piko-orange mx-8 text-sm font-semibold" aria-hidden="true">STAY TUNED</span>
+            <span className="text-zinc-400 mx-8 text-sm font-semibold" aria-hidden="true">—</span>
+            <span className="text-piko-teal mx-8 text-sm font-semibold" aria-hidden="true">DIGITAL GRAFFITI COLLECTIVE</span>
+            <span className="text-zinc-400 mx-8 text-sm font-semibold" aria-hidden="true">—</span>
           </div>
         </div>
       </div>
@@ -86,9 +102,16 @@ export default function Footer() {
             <Link href="/tour" className="text-sm text-zinc-400 hover:text-piko-teal transition">
               Tour
             </Link>
-            <Link href="/studio" className="text-sm text-zinc-400 hover:text-piko-teal transition">
-              Studio
-            </Link>
+            {STUDIO_CONFIG.visible && (
+              <Link
+                href="/studio"
+                aria-label="Studio (hidden access)"
+                className="text-sm text-zinc-400 hover:text-piko-teal transition"
+                style={{ opacity: STUDIO_CONFIG.footerLinkOpacity }}
+              >
+                Studio
+              </Link>
+            )}
           </nav>
 
           {/* Right: Street Rain Toggle */}
@@ -96,6 +119,8 @@ export default function Footer() {
             {/* Street Rain Toggle */}
             <button
               onClick={() => setStreetRainEnabled(!streetRainEnabled)}
+              aria-pressed={streetRainEnabled}
+              aria-label="Toggle street rain ambiance"
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition ${
                 streetRainEnabled
                   ? 'border-piko-teal/50 bg-piko-teal/10 text-piko-teal'
