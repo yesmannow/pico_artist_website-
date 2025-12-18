@@ -1,12 +1,12 @@
 'use client';
 
-export const runtime = 'edge';
-
 import { Music, Mic, Radio } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import TrackList from "@/components/audio/TrackList";
+
+export const runtime = "edge";
 
 export default function Home() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
