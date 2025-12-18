@@ -13,25 +13,6 @@ export interface MediaItem {
 }
 
 /**
- * Get all media files from the gallery content directory
- * This function is meant to be called server-side or in an API route
- */
-export async function getGalleryMedia(): Promise<MediaItem[]> {
-  // In a real implementation, this would read from the file system
-  // For now, we'll return mock data that can be replaced when files are added
-  const media: MediaItem[] = [];
-
-  // This is a placeholder - in production, you would use fs to read the directories
-  // Example implementation would look like:
-  // const fs = require('fs').promises;
-  // const path = require('path');
-  // const imagesDir = path.join(process.cwd(), 'public/assets/content/images');
-  // const videosDir = path.join(process.cwd(), 'public/assets/content/videos');
-  
-  return media;
-}
-
-/**
  * Client-side function to fetch gallery media from API
  */
 export async function fetchGalleryMedia(): Promise<MediaItem[]> {

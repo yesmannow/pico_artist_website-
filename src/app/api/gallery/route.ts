@@ -46,9 +46,9 @@ export async function GET() {
           });
         }
       }
-    } catch {
+    } catch (error) {
       // Directory might not exist or be empty
-      console.log('No images found or directory does not exist');
+      console.error('Error reading images directory:', error);
     }
 
     // Read videos
@@ -65,9 +65,9 @@ export async function GET() {
           });
         }
       }
-    } catch {
+    } catch (error) {
       // Directory might not exist or be empty
-      console.log('No videos found or directory does not exist');
+      console.error('Error reading videos directory:', error);
     }
 
     return NextResponse.json(media);

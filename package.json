@@ -13,6 +13,7 @@
     "@supabase/auth-helpers-nextjs": "^0.15.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.88.0",
+    "ffmpeg-static": "^5.2.0",
     "framer-motion": "^12.23.26",
     "howler": "^2.2.4",
     "lucide-react": "^0.561.0",
@@ -20,6 +21,7 @@
     "react": "19.2.1",
     "react-dom": "19.2.1",
     "react-media-recorder": "^1.7.2",
+    "sharp": "^0.33.5",
     "wavesurfer.js": "^7.12.1"
   },
   "devDependencies": {
@@ -29,8 +31,6 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.0.10",
-    "ffmpeg-static": "^5.2.0",
-    "sharp": "^0.33.5",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

@@ -9,7 +9,10 @@
 const fs = require('fs').promises;
 const path = require('path');
 const sharp = require('sharp');
-const { execSync } = require('child_process');
+const { execFile } = require('child_process');
+const { promisify } = require('util');
+
+const execFileAsync = promisify(execFile);
 
 // Paths
 const DOWNLOADS_DIR = path.join(__dirname, '../downloads');
@@ -70,10 +73,18 @@ async function processVideo(inputPath, outputDir) {
     // Get ffmpeg-static path
     const ffmpegPath = require('ffmpeg-static');
 
-    // Use ffmpeg to convert video with optimized settings
-    const command = `"${ffmpegPath}" -i "${inputPath}" -c:v libx264 -preset medium -crf 23 -c:a aac -b:a 128k -movflags +faststart -y "${outputPath}"`;
-    
-    execSync(command, { stdio: 'inherit' });
+    // Use execFile to convert video with optimized settings
+    await execFileAsync(ffmpegPath, [
+      '-i', inputPath,
+      '-c:v', 'libx264',
+      '-preset', 'medium',
+      '-crf', '23',
+      '-c:a', 'aac',
+      '-b:a', '128k',
+      '-movflags', '+faststart',
+      '-y',
+      outputPath
+    ]);
 
     const stats = await fs.stat(outputPath);
     console.log(`✅ Video optimized: ${outputName} (${(stats.size / (1024 * 1024)).toFixed(2)} MB)`);
