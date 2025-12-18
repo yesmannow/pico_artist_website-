@@ -47,14 +47,23 @@ export default function VisualizerStage({
     if (!canvas || !ctx) return;
 
     const resize = () => {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
+      // MANDATORY: Clamp DPR to max 1.5 to prevent VRAM exhaustion
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
     };
 
     resize();
     window.addEventListener('resize', resize);
 
     const draw = () => {
+      // MANDATORY: Visibility kill-switch at TOP of render loop
+      if (document.hidden || !canvas) {
+        return;
+      }
+
       if (!ctx || !canvas) return;
       const { width, height } = canvas;
       ctx.clearRect(0, 0, width, height);
@@ -90,7 +99,11 @@ export default function VisualizerStage({
 
     return () => {
       window.removeEventListener('resize', resize);
-      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+      // MANDATORY: Hard cleanup on unmount
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
     };
   }, [active, prefersReducedMotion, isPlaying, intensity]);
 

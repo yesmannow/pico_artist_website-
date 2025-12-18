@@ -105,7 +105,8 @@ export function createEngine(options: EngineOptions) {
   let isVisible = true;
 
   const quality = calculateQualitySettings();
-  const dpr = Math.min(window.devicePixelRatio || 1, 2) * quality.scale;
+  // MANDATORY: Clamp DPR to max 1.5 to prevent VRAM exhaustion
+  const dpr = Math.min(window.devicePixelRatio || 1, 1.5) * quality.scale;
 
   // State that will be passed to render function
   const state: EngineState = {
@@ -151,7 +152,8 @@ export function createEngine(options: EngineOptions) {
    * Main render loop
    */
   function loop(currentTime: number) {
-    if (isPaused || !isVisible) {
+    // MANDATORY: Visibility kill-switch at the TOP of render loop
+    if (document.hidden || isPaused || !isVisible) {
       rafId = null;
       return;
     }

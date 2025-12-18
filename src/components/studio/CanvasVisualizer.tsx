@@ -13,8 +13,10 @@ export default function CanvasVisualizer({ analyser, isActive }: CanvasVisualize
 
   useEffect(() => {
     if (!analyser || !canvasRef.current || !isActive) {
+      // MANDATORY: Hard cleanup on unmount
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
+        animationRef.current = undefined;
       }
       return;
     }
@@ -27,7 +29,10 @@ export default function CanvasVisualizer({ analyser, isActive }: CanvasVisualize
     const dataArray = new Uint8Array(bufferLength);
 
     const draw = () => {
-      if (!isActive) return;
+      // MANDATORY: Visibility kill-switch at TOP of render loop
+      if (document.hidden || !isActive || !canvasRef.current) {
+        return;
+      }
 
       animationRef.current = requestAnimationFrame(draw);
 
@@ -82,8 +87,10 @@ export default function CanvasVisualizer({ analyser, isActive }: CanvasVisualize
     draw();
 
     return () => {
+      // MANDATORY: Hard cleanup on unmount
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
+        animationRef.current = undefined;
       }
     };
   }, [analyser, isActive]);
