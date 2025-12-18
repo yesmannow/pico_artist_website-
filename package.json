@@ -9,6 +9,7 @@
     "build:cloudflare": "npm run clean && npx @opennextjs/cloudflare build && node scripts/cf-pages-postbuild.mjs",
 
     "clean": "npx rimraf .next .open-next .vercel",
+    "verify:cf": "node scripts/verify-cf-build.mjs",
     "start": "next start",
     "lint": "npx eslint . --max-warnings=0",
     "optimize-media": "node scripts/optimize-media.js"
