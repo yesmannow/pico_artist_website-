@@ -30,23 +30,17 @@ function MediaContent() {
   
   // Get tab from URL, default to 'tracks'
   const tabParam = searchParams?.get('tab');
-  const initialTab = (tabParam === 'videos' ? 'videos' : 'tracks') as TabType;
+  const tabFromUrl = (tabParam === 'videos' ? 'videos' : 'tracks') as TabType;
   
-  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
+  const [activeTab, setActiveTab] = useState<TabType>(tabFromUrl);
   const [featuredVideo, setFeaturedVideo] = useState<Video | null>(videos[0] || null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
   // Sync tab with URL params when they change
-  // Compute the new tab value on every render based on current URL params
-  const currentTabFromUrl = (tabParam === 'videos' ? 'videos' : 'tracks') as TabType;
-  
+  // Using useEffect with both dependencies to properly sync state with URL
   useEffect(() => {
-    // Only update if different from current state
-    if (currentTabFromUrl !== activeTab) {
-      setActiveTab(currentTabFromUrl);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentTabFromUrl]);
+    setActiveTab(tabFromUrl);
+  }, [tabFromUrl]);
 
   // Filter videos by tag
   const filteredVideos = selectedTag
