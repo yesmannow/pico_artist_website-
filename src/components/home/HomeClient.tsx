@@ -6,7 +6,6 @@ import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import CustomCursor from "@/components/cursor/CustomCursor";
 import Play from "lucide-react/dist/esm/icons/play";
 import ArrowRight from "lucide-react/dist/esm/icons/arrow-right";
 import { Howl } from "howler";
@@ -135,7 +134,6 @@ export default function HomeClient() {
   return (
     <>
       <ParticlesBackground />
-      <CustomCursor />
       <div
         ref={containerRef}
         className="flex min-h-screen flex-col relative overflow-hidden"
