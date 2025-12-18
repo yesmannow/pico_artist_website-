@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import Play from 'lucide-react/dist/esm/icons/play';
 import Pause from 'lucide-react/dist/esm/icons/pause';
 import Heart from 'lucide-react/dist/esm/icons/heart';
@@ -8,6 +8,7 @@ import Share2 from 'lucide-react/dist/esm/icons/share-2';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getTracks, likeTrack, type Track } from '@/lib/supabase';
 import { Howl } from 'howler';
+import StaticWaveform from './StaticWaveform';
 
 const PREVIEW_DURATION_MS = 5000;
 const PREVIEW_FALLBACK_SRC = '/lofi-teaser.wav';
@@ -19,7 +20,6 @@ interface TrackCardProps {
 }
 
 function TrackCard({ track, isPlaying, onPlay }: TrackCardProps) {
-  const waveformRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(track.likes);
   const [showSplatter, setShowSplatter] = useState<{ x: number; y: number } | null>(null);
@@ -55,42 +55,8 @@ function TrackCard({ track, isPlaying, onPlay }: TrackCardProps) {
     }, PREVIEW_DURATION_MS);
   };
 
+  // Cleanup preview on unmount
   useEffect(() => {
-    // Initialize wavesurfer.js
-    if (waveformRef.current) {
-      // Placeholder for actual wavesurfer initialization
-      // In a real implementation, this would use WaveSurfer.create()
-      const ctx = document.createElement('canvas').getContext('2d');
-      if (ctx) {
-        const canvas = waveformRef.current.querySelector('canvas') || document.createElement('canvas');
-        canvas.width = waveformRef.current.clientWidth;
-        canvas.height = 60;
-        if (!waveformRef.current.querySelector('canvas')) {
-          waveformRef.current.appendChild(canvas);
-        }
-        
-        const canvasCtx = canvas.getContext('2d');
-        if (canvasCtx) {
-          // Draw gradient waveform
-          const gradient = canvasCtx.createLinearGradient(0, 0, canvas.width, 0);
-          gradient.addColorStop(0, '#00f5d4');
-          gradient.addColorStop(1, '#ff006e');
-          
-          canvasCtx.fillStyle = gradient;
-          
-          // Draw waveform bars
-          const bars = 100;
-          const barWidth = canvas.width / bars;
-          for (let i = 0; i < bars; i++) {
-            const height = Math.random() * 40 + 10;
-            const x = i * barWidth;
-            const y = (canvas.height - height) / 2;
-            canvasCtx.fillRect(x, y, barWidth * 0.8, height);
-          }
-        }
-      }
-    }
-
     return () => {
       stopPreview();
     };
@@ -155,8 +121,10 @@ function TrackCard({ track, isPlaying, onPlay }: TrackCardProps) {
         </div>
       </div>
 
-      {/* Waveform */}
-      <div ref={waveformRef} className="h-15 rounded bg-zinc-950/50 mb-3 overflow-hidden" />
+      {/* Waveform - Using lightweight SVG instead of canvas */}
+      <div className="h-12 rounded bg-zinc-950/50 mb-3 overflow-hidden flex items-center px-2">
+        <StaticWaveform seed={track.id} height={40} barCount={60} />
+      </div>
 
       {/* Actions */}
       <div className="flex items-center gap-2">

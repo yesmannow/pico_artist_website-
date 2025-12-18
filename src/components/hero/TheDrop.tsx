@@ -65,33 +65,19 @@ export default function TheDrop({
             </span>
           </motion.div>
 
-          {/* Track Title with Glitch Effect */}
+          {/* Track Title with CSS-only Glitch Effect */}
           <motion.h1
-            className="text-6xl md:text-8xl lg:text-9xl font-black mb-8 relative"
+            className="text-6xl md:text-8xl lg:text-9xl font-black mb-8 relative overflow-hidden"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
           >
-            {/* Main title */}
-            <span className="relative inline-block">
-              <span className="bg-gradient-to-r from-piko-pink via-piko-teal to-piko-orange bg-clip-text text-transparent">
-                {trackTitle}
-              </span>
-              {/* Glitch layers */}
-              <span 
-                className="absolute inset-0 bg-gradient-to-r from-piko-pink to-piko-teal bg-clip-text text-transparent opacity-70"
-                style={{ transform: 'translate(-2px, 2px)' }}
-                aria-hidden="true"
-              >
-                {trackTitle}
-              </span>
-              <span 
-                className="absolute inset-0 bg-gradient-to-r from-piko-teal to-piko-orange bg-clip-text text-transparent opacity-70"
-                style={{ transform: 'translate(2px, -2px)' }}
-                aria-hidden="true"
-              >
-                {trackTitle}
-              </span>
+            {/* Main title with CSS glitch animation */}
+            <span 
+              className="glitch-text bg-gradient-to-r from-piko-pink via-piko-teal to-piko-orange bg-clip-text text-transparent"
+              data-text={trackTitle}
+            >
+              {trackTitle}
             </span>
           </motion.h1>
 
