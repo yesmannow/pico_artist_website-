@@ -29,14 +29,35 @@ export default function Waveform({
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const isSeekingRef = useRef(false);
   const [progress, setProgress] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
   const playheadGlow = '0 0 20px rgba(0,245,212,0.35)'; // aligns with piko-teal brand
 
-  // Initialize wavesurfer
+  // Lazy initialization with IntersectionObserver
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Try WebAudio first, fallback to MediaElement if needed
-    const backend: 'WebAudio' | 'MediaElement' = 'WebAudio';
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          setIsVisible(entry.isIntersecting);
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(containerRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  // Initialize wavesurfer only when visible
+  useEffect(() => {
+    if (!containerRef.current || !isVisible) return;
+
+    // MANDATORY: Force MediaElement backend to prevent full audio decode into RAM
+    const backend = 'MediaElement' as const;
     
     try {
       // Create wavesurfer instance
@@ -72,15 +93,16 @@ export default function Waveform({
         }
       });
 
-       // Cleanup
+       // Cleanup: Destroy immediately on unmount
        return () => {
          wavesurfer.destroy();
+         wavesurferRef.current = null;
        };
      } catch (error) {
        console.error('WaveSurfer initialization failed:', error);
       // Fallback already attempted through backend setting
     }
-  }, [url, height, onSeek]);
+  }, [url, height, onSeek, isVisible]);
 
   // Update current time from external source
    useEffect(() => {

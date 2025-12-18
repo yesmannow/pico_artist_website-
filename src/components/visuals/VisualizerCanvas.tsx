@@ -103,6 +103,7 @@ export default function VisualizerCanvas({
     engine.start();
 
     return () => {
+      // MANDATORY: Hard cleanup on unmount
       engine.destroy();
       if (analyserRef.current) {
         analyserRef.current.destroy();

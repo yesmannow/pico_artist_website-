@@ -35,6 +35,11 @@ export default function MiniVisualizer({ trackId, className = '' }: MiniVisualiz
     }
 
     const draw = () => {
+      // MANDATORY: Visibility kill-switch at TOP of render loop
+      if (document.hidden || !canvasRef.current) {
+        return;
+      }
+
       // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -108,8 +113,8 @@ export default function MiniVisualizer({ trackId, className = '' }: MiniVisualiz
     if (!canvas) return;
 
     const updateCanvasSize = () => {
-      // Use device pixel ratio for sharp rendering
-      const dpr = window.devicePixelRatio || 1;
+      // MANDATORY: Clamp DPR to max 1.5 to prevent VRAM exhaustion
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       const rect = canvas.getBoundingClientRect();
       
       canvas.width = rect.width * dpr;
