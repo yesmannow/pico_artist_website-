@@ -28,8 +28,9 @@ export async function GET() {
 
     return NextResponse.json(mediaItems);
   } catch (error) {
-    // Log error once for debugging, but return 200 with empty array to prevent UI breaking
-    console.error('[/api/gallery] Failed to load media manifest:', error);
+    // Log sanitized error for debugging without exposing sensitive details
+    // Use specific prefix for easier log filtering and monitoring in production
+    console.error('API_GALLERY_ERROR:', error instanceof Error ? error.message : 'Unknown error');
     
     // Return empty array as fallback - matches MediaItem[] type expected by Gallery.tsx
     return NextResponse.json([]);

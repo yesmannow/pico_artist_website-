@@ -74,16 +74,21 @@ export default function CustomCursor() {
     // Only hide default cursor if custom cursor is enabled
     if (!isEnabled) return;
     
-    // Add CSS rule to hide cursor globally, but allow normal cursor on interactive elements
-    const style = document.createElement('style');
-    style.id = 'custom-cursor-style';
-    style.textContent = `
-      body { cursor: none !important; }
-      input, textarea, select, button, a, [role="button"], [contenteditable="true"] {
-        cursor: auto !important;
-      }
-    `;
-    document.head.appendChild(style);
+    // Check if style already exists to prevent duplicates
+    let style = document.getElementById('custom-cursor-style');
+    
+    if (!style) {
+      // Add CSS rule to hide cursor globally, but allow normal cursor on interactive elements
+      style = document.createElement('style');
+      style.id = 'custom-cursor-style';
+      style.textContent = `
+        body { cursor: none !important; }
+        input, textarea, select, button, a, [role="button"], [contenteditable="true"] {
+          cursor: auto !important;
+        }
+      `;
+      document.head.appendChild(style);
+    }
     
     return () => {
       // Clean up on unmount or when disabled
