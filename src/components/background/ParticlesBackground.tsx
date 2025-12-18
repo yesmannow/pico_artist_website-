@@ -1,10 +1,9 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import Particles, { initParticlesEngine } from '@tsparticles/react';
 import { loadSlim } from '@tsparticles/slim';
 import type { ISourceOptions } from '@tsparticles/engine';
-import { useEffect, useState } from 'react';
 
 export default function ParticlesBackground() {
   const [init, setInit] = useState(false);
@@ -12,9 +11,15 @@ export default function ParticlesBackground() {
   useEffect(() => {
     initParticlesEngine(async (engine) => {
       await loadSlim(engine);
-    }).then(() => {
-      setInit(true);
-    });
+    })
+      .then(() => {
+        setInit(true);
+      })
+      .catch((error) => {
+        console.error('Failed to initialize particles engine:', error);
+        // Set init to true to allow component to render without particles
+        setInit(true);
+      });
   }, []);
 
   const options: ISourceOptions = useMemo(
