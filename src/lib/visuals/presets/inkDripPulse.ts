@@ -49,7 +49,7 @@ export function render(
   const { width, height, colors, intensity, trackProgress, audio } = state;
 
   // Fade existing content instead of clearing (creates trailing effect)
-  ctx.fillStyle = 'rgba(9, 9, 11, 0.05)'; // Very subtle fade
+  ctx.fillStyle = colors.inkBlack + '0D'; // ~5% opacity (0D in hex)
   ctx.fillRect(0, 0, width, height);
 
   pulsePhase += dt * 1.5;

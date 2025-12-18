@@ -27,10 +27,14 @@ export class AudioAnalyser {
 
   /**
    * Try to initialize analyser from Howler's audio context
+   * NOTE: This accesses Howler's private API (_audioContext, _masterGain)
+   * which may change in future versions. The implementation includes
+   * fallback handling if these internals are unavailable.
    */
   init(): boolean {
     try {
       // Howler uses a global audio context
+      // WARNING: Accessing private API - may break in future Howler versions
       const ctx = (Howl as unknown as { _audioContext: AudioContext }).
         _audioContext;
       
@@ -42,6 +46,7 @@ export class AudioAnalyser {
       }
 
       // Try to get master gain node from Howler
+      // WARNING: Accessing private API - may break in future Howler versions
       const masterGain = (Howl as unknown as { _masterGain: GainNode })._masterGain;
       
       if (!masterGain) {

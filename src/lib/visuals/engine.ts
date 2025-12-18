@@ -238,7 +238,7 @@ export function createEngine(options: EngineOptions) {
   };
 
   // Handle window resize
-  let resizeTimeout: NodeJS.Timeout | null = null;
+  let resizeTimeout: ReturnType<typeof setTimeout> | null = null;
   function handleResize() {
     if (resizeTimeout) clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(resize, 100);

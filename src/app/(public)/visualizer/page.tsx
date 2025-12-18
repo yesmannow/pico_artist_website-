@@ -41,7 +41,7 @@ export default function VisualizerPage() {
   const [intensity, setIntensity] = useState(1);
   const [audioReactive, setAudioReactive] = useState(true);
   const [showControls, setShowControls] = useState(true);
-  const [hideTimeout, setHideTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [hideTimeout, setHideTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   const { isPlaying, togglePlay, current, seek, currentTime } = usePlayerStore();
 

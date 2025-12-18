@@ -69,9 +69,13 @@ export default function VisualizerCanvas({
       const analyser = createAudioAnalyser();
       if (analyser) {
         analyserRef.current = analyser;
-        console.log('[VisualizerCanvas] Audio analyser initialized');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[VisualizerCanvas] Audio analyser initialized');
+        }
       } else {
-        console.log('[VisualizerCanvas] Audio analyser not available, using fallback');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[VisualizerCanvas] Audio analyser not available, using fallback');
+        }
       }
     }
 
