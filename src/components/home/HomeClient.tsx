@@ -18,8 +18,13 @@ import TrackCard from "@/components/player/TrackCard";
 import MarqueeHeader from "@/components/ui/MarqueeHeader";
 import { getSocialLinks } from "@/data/socials";
 
-const ParticlesBackground = dynamic(
-  () => import("@/components/background/ParticlesBackground"),
+const FilmGrain = dynamic(
+  () => import("@/components/visuals/FilmGrain"),
+  { ssr: false }
+);
+
+const GraffitiPreloader = dynamic(
+  () => import("@/components/ui/GraffitiPreloader"),
   { ssr: false }
 );
 
@@ -45,6 +50,7 @@ const InstagramFeed = dynamic(
 
 export default function HomeClient() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isLoading, setIsLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ container: containerRef });
   const vinylRotation = useMotionValue(0);
@@ -85,7 +91,13 @@ export default function HomeClient() {
 
   return (
     <>
-      <ParticlesBackground />
+      {isLoading && (
+        <GraffitiPreloader 
+          minDuration={1200} 
+          onComplete={() => setIsLoading(false)} 
+        />
+      )}
+      <FilmGrain />
       <div
         ref={containerRef}
         className="flex min-h-screen flex-col relative overflow-hidden"
