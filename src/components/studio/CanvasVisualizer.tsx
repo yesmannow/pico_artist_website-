@@ -9,14 +9,14 @@ interface CanvasVisualizerProps {
 
 export default function CanvasVisualizer({ analyser, isActive }: CanvasVisualizerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number | undefined>(undefined);
+  const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!analyser || !canvasRef.current || !isActive) {
       // MANDATORY: Hard cleanup on unmount
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
-        animationRef.current = undefined;
+        animationRef.current = null;
       }
       return;
     }
@@ -90,7 +90,7 @@ export default function CanvasVisualizer({ analyser, isActive }: CanvasVisualize
       // MANDATORY: Hard cleanup on unmount
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
-        animationRef.current = undefined;
+        animationRef.current = null;
       }
     };
   }, [analyser, isActive]);
