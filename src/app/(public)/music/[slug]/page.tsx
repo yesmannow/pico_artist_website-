@@ -89,7 +89,7 @@ export default function TrackDetailPage({ params }: TrackDetailPageProps) {
     : track.previewUrl;
 
   const heroImage = useMemo(
-    () => track.coverArt || '/images%20design%20assets/on%20the%20mic.jpg',
+    () => track.coverArt || '/assets/images/artist/on_the_mic.jpg',
     [track.coverArt]
   );
 

@@ -7,13 +7,14 @@ import TrackList from '@/components/player/TrackList';
 import CinematicHero from '@/components/media/CinematicHero';
 import { usePlayerStore } from '@/store/playerStore';
 import { useIdle } from '@/hooks/useIdle';
+import BackgroundTexture from '@/components/ui/BackgroundTexture';
 
 const featuredShots = [
-  { src: '/images%20design%20assets/on%20the%20mic.jpg', caption: 'On the Mic' },
-  { src: '/images%20design%20assets/black%20and%20white%20standing%20low%20shot.jpg', caption: 'Low Light Stage' },
-  { src: '/images%20design%20assets/close%20up%20face.jpg', caption: 'Close Up' },
-  { src: '/images%20design%20assets/piko%20musician%20bio%20photo.jpg', caption: 'Studio Portrait' },
-  { src: '/images%20design%20assets/green%20shillioette.jpg', caption: 'Silhouette Glow' },
+  { src: '/assets/images/artist/on_the_mic.jpg', caption: 'On the Mic' },
+  { src: '/assets/images/hero/black_and_white_standing_low_shot.jpg', caption: 'Low Light Stage' },
+  { src: '/assets/images/artist/close_up_face.jpg', caption: 'Close Up' },
+  { src: '/assets/images/artist/piko_musician_bio_photo.jpg', caption: 'Studio Portrait' },
+  { src: '/assets/images/bg/green_shillioette.jpg', caption: 'Silhouette Glow' },
 ];
 
 export default function MusicPage() {
@@ -25,11 +26,17 @@ export default function MusicPage() {
   const dimUI = isIdle && isPlaying;
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden bg-zinc-950">
+      <BackgroundTexture
+        src="/assets/images/bg/street_art_2254155_1280.jpg"
+        opacity={0.18}
+        blend="soft-light"
+        className="absolute inset-0"
+      />
       <CinematicHero
         title="Digital Graffiti Soundscapes"
         subtitle="Stream the full collection of Piko FG tracks"
-        backgroundImageUrl="/images%20design%20assets/white%20hero.jpg"
+        backgroundImageUrl="/assets/images/hero/black_and_white_standing_low_shot.jpg"
         variant="music"
       />
 

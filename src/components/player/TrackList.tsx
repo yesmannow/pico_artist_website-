@@ -87,23 +87,28 @@ export default function TrackList({ tracks, showFilter = false }: TrackListProps
             <motion.div
               key={track.id}
               initial={{ opacity: 0, y: 20 }}
-               animate={{ opacity: 1, y: 0 }}
-               transition={{ delay: index * 0.05 }}
-               className={`group relative overflow-hidden rounded-lg border bg-zinc-900/50 backdrop-blur-md p-4 transition-all hover:border-piko-teal/50 hover:shadow-lg hover:shadow-piko-teal/10 ${
-                 isCurrentTrack ? 'border-piko-teal/50' : 'border-zinc-800'
-               }`}
-             >
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              className={`group relative overflow-hidden rounded-xl border bg-zinc-900/60 backdrop-blur-md p-4 transition-all duration-300 hover:-translate-y-1 hover:border-piko-teal/50 hover:shadow-[0_22px_46px_-28px_rgba(0,245,212,0.35)] ${
+                isCurrentTrack
+                  ? 'border-piko-teal/60 shadow-[0_0_0_1px_rgba(0,245,212,0.28),0_0_40px_rgba(255,0,110,0.14)]'
+                  : 'border-zinc-800/80'
+              }`}
+            >
               {isCurrentTrack && (
-                <motion.div
-                  aria-hidden
-                  className="absolute inset-0 rounded-lg pointer-events-none"
-                  animate={
-                    isPlaying && !prefersReducedMotion
-                      ? { boxShadow: ['0 0 0 0 rgba(0,245,212,0.15)', '0 0 0 12px rgba(255,0,110,0)'] }
-                      : { boxShadow: '0 0 0 0 rgba(0,0,0,0)' }
-                  }
-                  transition={{ repeat: isPlaying && !prefersReducedMotion ? Infinity : 0, duration: 1.8, ease: 'easeOut' }}
-                />
+                <>
+                  <div className="absolute -inset-10 bg-[radial-gradient(circle_at_center,rgba(0,245,212,0.12),transparent_55%)] opacity-50 blur-3xl pointer-events-none" />
+                  <motion.div
+                    aria-hidden
+                    className="absolute inset-0 rounded-xl pointer-events-none"
+                    animate={
+                      isPlaying && !prefersReducedMotion
+                        ? { boxShadow: ['0 0 0 0 rgba(0,245,212,0.2)', '0 0 0 14px rgba(255,0,110,0)'] }
+                        : { boxShadow: '0 0 0 0 rgba(0,0,0,0)' }
+                    }
+                    transition={{ repeat: isPlaying && !prefersReducedMotion ? Infinity : 0, duration: 1.9, ease: 'easeOut' }}
+                  />
+                </>
               )}
 
               {/* Now Playing indicator */}

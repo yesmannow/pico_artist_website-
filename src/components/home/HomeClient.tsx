@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useScroll, useMotionValue } from "framer-motion";
+import { motion, useScroll, useMotionValue, useTransform, useReducedMotion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,6 +11,7 @@ import Play from "lucide-react/dist/esm/icons/play";
 import ArrowRight from "lucide-react/dist/esm/icons/arrow-right";
 import { Howl } from "howler";
 import { getTracks, type Track as SupabaseTrack } from "@/lib/supabase";
+import BackgroundTexture from "@/components/ui/BackgroundTexture";
 
 const ParticlesBackground = dynamic(
   () => import("@/components/background/ParticlesBackground"),
@@ -29,14 +30,16 @@ export default function HomeClient() {
   const [featuredTracks, setFeaturedTracks] = useState<SupabaseTrack[]>([]);
   const [hoveredTrackId, setHoveredTrackId] = useState<string | null>(null);
   const trackTeaserRefs = useRef<Map<string, Howl>>(new Map());
+  const prefersReducedMotion = useReducedMotion();
 
   // Scroll-based vinyl rotation
   useEffect(() => {
+    if (prefersReducedMotion) return;
     const unsubscribe = scrollYProgress.on('change', (latest) => {
       vinylRotation.set(latest * 360);
     });
     return () => unsubscribe();
-  }, [scrollYProgress, vinylRotation]);
+  }, [scrollYProgress, vinylRotation, prefersReducedMotion]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -126,6 +129,9 @@ export default function HomeClient() {
     setTeaserPlaying(true);
   };
 
+  const backgroundParallax = useTransform(scrollYProgress, [0, 1], [0, -60]);
+  const heroImageParallax = useTransform(scrollYProgress, [0, 1], [0, -40]);
+
   return (
     <>
       <ParticlesBackground />
@@ -143,78 +149,146 @@ export default function HomeClient() {
         />
 
         {/* Hero Section - Full Height */}
-        <section className="min-h-screen flex flex-col items-center justify-center px-4 relative z-10">
+        <section className="min-h-screen flex items-center px-4 relative z-10">
           <motion.div
-            initial={{ scale: 0, rotate: -10 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{
-              type: "spring",
-              stiffness: 260,
-              damping: 20,
-              duration: 0.8
-            }}
-            className="relative mb-8"
-            onMouseEnter={() => setIsHoveringLogo(true)}
-            onMouseLeave={() => setIsHoveringLogo(false)}
+            className="absolute inset-0"
+            style={{ y: prefersReducedMotion ? 0 : backgroundParallax }}
           >
-            {/* Floating 3D Vinyl Record */}
-            <motion.div
-              style={{ rotate: vinylRotation }}
-              className="relative w-64 h-64 md:w-80 md:h-80"
-            >
-              {/* RGB Glitch Layers */}
-              {isHoveringLogo && (
-                <>
-                  <div className="absolute inset-0 opacity-70 mix-blend-screen">
-                    <Image
-                      src="/piko-logo.jpg"
-                      alt="Piko FG Logo - Red Channel"
-                      fill
-                      className="object-contain rounded-full"
-                      style={{ filter: "grayscale(100%) sepia(100%) hue-rotate(-50deg) saturate(600%)", transform: "translate(-2px, 0)" }}
-                    />
-                  </div>
-                  <div className="absolute inset-0 opacity-70 mix-blend-screen">
-                    <Image
-                      src="/piko-logo.jpg"
-                      alt="Piko FG Logo - Blue Channel"
-                      fill
-                      className="object-contain rounded-full"
-                      style={{ filter: "grayscale(100%) sepia(100%) hue-rotate(180deg) saturate(600%)", transform: "translate(2px, 0)" }}
-                    />
-                  </div>
-                </>
-              )}
-              <Image
-                src="/piko-logo.jpg"
-                alt="Piko FG Logo"
-                fill
-                className="object-contain relative z-10 rounded-full"
-                priority
-              />
-              {/* Vinyl Grooves */}
-              <div className="absolute inset-0 rounded-full border-8 border-zinc-800/50" />
-              <div className="absolute inset-4 rounded-full border-2 border-zinc-700/30" />
-              <div className="absolute inset-8 rounded-full border border-zinc-700/20" />
-            </motion.div>
+            <BackgroundTexture
+              src="/assets/images/bg/graffiti_1874452_1280.jpg"
+              opacity={0.16}
+              blend="soft-light"
+            />
           </motion.div>
+          <div className="relative max-w-6xl mx-auto w-full grid lg:grid-cols-[1.05fr_0.95fr] gap-10 items-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="space-y-6 text-center lg:text-left"
+            >
+              <motion.div
+                initial={{ scale: 0, rotate: -10 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 260,
+                  damping: 20,
+                  duration: 0.8
+                }}
+                className="relative mx-auto lg:mx-0 w-52 h-52 md:w-64 md:h-64"
+                onMouseEnter={() => setIsHoveringLogo(true)}
+                onMouseLeave={() => setIsHoveringLogo(false)}
+              >
+                {/* Floating 3D Vinyl Record */}
+                <motion.div
+                  style={{ rotate: vinylRotation }}
+                  className="relative w-full h-full"
+                >
+                  {/* RGB Glitch Layers */}
+                  {isHoveringLogo && (
+                    <>
+                      <div className="absolute inset-0 opacity-70 mix-blend-screen">
+                        <Image
+                          src="/piko-logo.jpg"
+                          alt="Piko FG Logo - Red Channel"
+                          fill
+                          className="object-contain rounded-full"
+                          style={{ filter: "grayscale(100%) sepia(100%) hue-rotate(-50deg) saturate(600%)", transform: "translate(-2px, 0)" }}
+                        />
+                      </div>
+                      <div className="absolute inset-0 opacity-70 mix-blend-screen">
+                        <Image
+                          src="/piko-logo.jpg"
+                          alt="Piko FG Logo - Blue Channel"
+                          fill
+                          className="object-contain rounded-full"
+                          style={{ filter: "grayscale(100%) sepia(100%) hue-rotate(180deg) saturate(600%)", transform: "translate(2px, 0)" }}
+                        />
+                      </div>
+                    </>
+                  )}
+                  <Image
+                    src="/piko-logo.jpg"
+                    alt="Piko FG Logo"
+                    fill
+                    className="object-contain relative z-10 rounded-full"
+                    priority
+                  />
+                  {/* Vinyl Grooves */}
+                  <div className="absolute inset-0 rounded-full border-8 border-zinc-800/50" />
+                  <div className="absolute inset-4 rounded-full border-2 border-zinc-700/30" />
+                  <div className="absolute inset-8 rounded-full border border-zinc-700/20" />
+                </motion.div>
+              </motion.div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.6 }}
-            className="max-w-2xl text-5xl font-bold leading-tight tracking-tight text-zinc-100 md:text-6xl text-center mb-4"
-          >
-            Piko FG Studio
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            className="max-w-md text-lg text-zinc-400 text-center"
-          >
-            Digital Graffiti Collective — Cinematic Soundscapes
-          </motion.p>
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.6 }}
+                className="text-4xl md:text-6xl font-bold leading-tight tracking-tight text-zinc-100"
+              >
+                Piko FG Studio
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35, duration: 0.6 }}
+                className="text-lg text-zinc-300 max-w-xl mx-auto lg:mx-0"
+              >
+                Digital Graffiti Collective — Cinematic Soundscapes
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45, duration: 0.6 }}
+                className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start"
+              >
+                <Link
+                  href="/music"
+                  className="group inline-flex items-center justify-center gap-2 rounded-full bg-piko-teal px-6 py-3 font-semibold text-zinc-950 shadow-lg shadow-piko-teal/30 transition hover:scale-[1.02]"
+                >
+                  Listen
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+                <Link
+                  href="/videos"
+                  className="group inline-flex items-center justify-center gap-2 rounded-full border border-piko-pink/60 bg-piko-pink/10 px-6 py-3 font-semibold text-piko-pink shadow-lg shadow-piko-pink/20 transition hover:scale-[1.02]"
+                >
+                  Watch
+                  <Play className="h-4 w-4" fill="currentColor" />
+                </Link>
+              </motion.div>
+            </motion.div>
+
+            <motion.div
+              className="relative w-full h-[420px] md:h-[480px]"
+              style={{ y: prefersReducedMotion ? 0 : heroImageParallax }}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <div className="absolute -inset-6 bg-gradient-to-br from-piko-teal/10 via-piko-pink/10 to-piko-orange/10 blur-3xl" />
+              <div className="relative h-full w-full overflow-hidden rounded-[28px] border border-zinc-800/70 bg-zinc-900/60 backdrop-blur-xl shadow-2xl shadow-piko-pink/10">
+                <Image
+                  src="/assets/images/hero/white_hero.jpg"
+                  alt="Piko FG Hero"
+                  fill
+                  priority
+                  className="object-cover"
+                  sizes="(min-width: 1024px) 45vw, 90vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/70 via-transparent to-transparent" />
+                <BackgroundTexture
+                  src="/assets/images/bg/wall_2602116_1280.jpg"
+                  opacity={0.14}
+                  blend="soft-light"
+                  grain={false}
+                />
+              </div>
+            </motion.div>
+          </div>
         </section>
 
         {/* The Lab - Bio Section - Full Height */}

@@ -13,6 +13,7 @@ import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
 import Play from 'lucide-react/dist/esm/icons/play';
 import CinematicHero from '@/components/media/CinematicHero';
+import BackgroundTexture from '@/components/ui/BackgroundTexture';
 
 export default function VideosPage() {
   const videos = getVideos();
@@ -30,12 +31,17 @@ export default function VideosPage() {
   ).sort();
 
   return (
-    <div className="min-h-screen px-4 pb-16">
-      <div className="max-w-7xl mx-auto space-y-12">
+    <div className="min-h-screen px-4 pb-16 relative overflow-hidden bg-zinc-950">
+      <BackgroundTexture
+        src="/assets/images/bg/window_999882_1280.jpg"
+        opacity={0.12}
+        blend="soft-light"
+      />
+      <div className="max-w-7xl mx-auto space-y-12 relative">
         <CinematicHero
           title="Visual Gallery"
           subtitle="Watch the latest music videos, behind-the-scenes, and more from Piko FG"
-          backgroundImageUrl="/images%20design%20assets/header%20with%20logo.jpg"
+          backgroundImageUrl="/assets/images/hero/white_hero.jpg"
           align="center"
           variant="videos"
         />
@@ -76,8 +82,14 @@ export default function VideosPage() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.3 }}
-            className="rounded-2xl border border-zinc-800 bg-zinc-900/50 backdrop-blur-xl overflow-hidden shadow-2xl"
+            className="relative rounded-2xl border border-piko-teal/20 bg-zinc-900/60 backdrop-blur-xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.45)]"
           >
+            <BackgroundTexture
+              src="/assets/images/bg/graffiti_1874452_1280.jpg"
+              opacity={0.1}
+              blend="soft-light"
+              className="z-0"
+            />
             <div className="aspect-video">
               <LiteYouTubeEmbed
                 id={featuredVideo.youtubeVideoId}
@@ -119,8 +131,10 @@ export default function VideosPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => setFeaturedVideo(video)}
-                className={`group relative overflow-hidden rounded-lg border transition-all ${
+                className={`group relative overflow-hidden rounded-xl border bg-zinc-900/60 backdrop-blur-sm transition-all ${
                   isFeatured
                     ? 'border-piko-teal shadow-lg shadow-piko-teal/20'
                     : 'border-zinc-800 hover:border-piko-teal/50 hover:shadow-lg hover:shadow-piko-teal/10'
@@ -128,6 +142,7 @@ export default function VideosPage() {
               >
                 {/* Thumbnail */}
                 <div className="relative aspect-video overflow-hidden bg-zinc-900">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={`https://img.youtube.com/vi/${video.youtubeVideoId}/hqdefault.jpg`}
                     alt={video.title}
@@ -143,12 +158,12 @@ export default function VideosPage() {
 
                   {/* Paint splatter glow on hover */}
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                    <div className="absolute inset-0 bg-gradient-to-br from-piko-teal/20 via-piko-pink/20 to-piko-orange/20" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-piko-teal/20 via-piko-pink/20 to-piko-orange/20 blur-sm" />
                   </div>
                 </div>
 
                 {/* Video info */}
-                <div className="p-3 bg-zinc-900/80 backdrop-blur-sm">
+                <div className="p-3 bg-zinc-900/80 backdrop-blur-sm relative">
                   <h3 className="text-sm font-semibold text-zinc-100 truncate group-hover:text-piko-teal transition">
                     {video.title}
                   </h3>
