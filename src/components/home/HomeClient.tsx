@@ -1,10 +1,12 @@
 'use client';
 
-import { Music, Mic, Radio } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import TrackList from "@/components/audio/TrackList";
+import TourSection from "@/components/home/TourSection";
+import MerchGrid from "@/components/home/MerchGrid";
+import { Music, Mic, Radio } from "lucide-react";
 
 export default function HomeClient() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -20,6 +22,26 @@ export default function HomeClient() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4 relative overflow-hidden">
+      <motion.div
+        className="absolute inset-0 -z-10"
+        aria-hidden="true"
+      >
+        <motion.div
+          className="absolute -left-24 top-10 h-[420px] w-[420px] rounded-full bg-piko-teal/10 blur-3xl"
+          animate={{ y: [0, -12, 0], rotate: [0, 4, 0] }}
+          transition={{ repeat: Infinity, duration: 12, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute right-[-160px] top-32 h-[540px] w-[540px] rounded-full bg-[url('/piko-logo.jpg')] bg-cover bg-center opacity-[0.08] blur-[90px]"
+          animate={{ x: [0, -20, 0], scale: [1, 1.05, 1] }}
+          transition={{ repeat: Infinity, duration: 18, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute left-10 bottom-[-120px] h-[360px] w-[360px] rounded-full bg-gradient-to-br from-piko-pink/15 via-transparent to-piko-orange/20 blur-3xl"
+          animate={{ x: [0, 12, 0], y: [0, 6, 0] }}
+          transition={{ repeat: Infinity, duration: 16, ease: "easeInOut" }}
+        />
+      </motion.div>
       {/* Interactive Mouse Spotlight */}
       <div
         className="fixed inset-0 pointer-events-none transition-opacity duration-300"
@@ -30,7 +52,7 @@ export default function HomeClient() {
       
       <main className="flex flex-col items-center gap-8 text-center relative z-10">
         {/* Hero Section with Logo */}
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-4" data-hero>
           {/* Stamped Logo with RGB Glitch Effect */}
           <motion.div
             initial={{ scale: 0, rotate: -10 }}
@@ -154,6 +176,17 @@ export default function HomeClient() {
           <button className="rounded-full border border-zinc-700 px-8 py-3 font-semibold text-zinc-100 transition-all hover:border-piko-teal hover:bg-zinc-800/50 hover:text-piko-teal">
             Learn More
           </button>
+        </motion.div>
+
+        {/* Public hooks */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.0, duration: 0.6 }}
+          className="w-full mt-14 space-y-10"
+        >
+          <TourSection />
+          <MerchGrid condensed />
         </motion.div>
         
         {/* Track List Section */}
