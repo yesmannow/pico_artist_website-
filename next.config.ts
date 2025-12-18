@@ -8,7 +8,9 @@ const nextConfig: NextConfig = {
   // To suppress the warning, delete the unrelated lockfile at the user root if not needed.
 
   // Image optimization configuration
+  // CLOUDFLARE FIX: unoptimized: true required for Cloudflare Pages
   images: {
+    unoptimized: true, // Cloudflare Pages cannot resize images dynamically
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
