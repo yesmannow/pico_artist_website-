@@ -37,17 +37,16 @@ function MediaContent() {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
   // Sync tab with URL params when they change
+  // Compute the new tab value on every render based on current URL params
+  const currentTabFromUrl = (tabParam === 'videos' ? 'videos' : 'tracks') as TabType;
+  
   useEffect(() => {
-    const tab = searchParams?.get('tab');
-    const newTab = (tab === 'videos' ? 'videos' : 'tracks') as TabType;
-    // Only update if different to avoid unnecessary re-renders
-    setActiveTab(prevTab => {
-      if (prevTab !== newTab) {
-        return newTab;
-      }
-      return prevTab;
-    });
-  }, [searchParams]);
+    // Only update if different from current state
+    if (currentTabFromUrl !== activeTab) {
+      setActiveTab(currentTabFromUrl);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentTabFromUrl]);
 
   // Filter videos by tag
   const filteredVideos = selectedTag

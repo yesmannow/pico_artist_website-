@@ -19,7 +19,6 @@ interface StatCounterProps {
 
 export default function StatCounter({
   end,
-  duration = 2,
   label,
   icon,
   suffix = '',

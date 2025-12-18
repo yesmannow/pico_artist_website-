@@ -40,7 +40,7 @@ export default function TourSection({ compact = false }: { compact?: boolean }) 
           </div>
 
           <Link
-            href="/tour"
+            href="/events"
             className="inline-flex items-center gap-2 rounded-full border border-piko-pink/50 bg-piko-pink/10 px-5 py-2 text-sm font-semibold text-white shadow-[0_0_30px_rgba(255,0,110,0.25)] transition hover:scale-[1.02] hover:border-piko-teal hover:text-piko-teal"
           >
             Tickets

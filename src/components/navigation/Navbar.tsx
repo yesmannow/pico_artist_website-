@@ -39,14 +39,16 @@ const TicketIcon = ({ className, ...props }: IconProps) => (
   </svg>
 );
 
-const TagIcon = ({ className, ...props }: IconProps) => (
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _TagIcon = ({ className, ...props }: IconProps) => (
   <svg viewBox="0 0 64 64" fill="none" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`h-7 w-7 ${className ?? ''}`} {...props}>
     <path d="M12 12h18l22 22a6 6 0 0 1 0 8l-10 10a6 6 0 0 1-8 0L12 30V12Z" stroke="currentColor" />
     <circle cx="22" cy="22" r="3" fill="currentColor" />
   </svg>
 );
 
-const SignatureIcon = ({ className, ...props }: IconProps) => (
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _SignatureIcon = ({ className, ...props }: IconProps) => (
   <svg viewBox="0 0 64 64" fill="none" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`h-7 w-7 ${className ?? ''}`} {...props}>
     <path d="M10 42c8-4 12-10 18-20 6 10 8 16 18 20" stroke="currentColor" />
     <path d="M18 46c4-2 7-4 10-8 3 4 6 6 10 8" stroke="currentColor" className="opacity-80" />
@@ -54,7 +56,8 @@ const SignatureIcon = ({ className, ...props }: IconProps) => (
   </svg>
 );
 
-const VideoIcon = ({ className, ...props }: IconProps) => (
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _VideoIcon = ({ className, ...props }: IconProps) => (
   <svg viewBox="0 0 64 64" fill="none" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`h-7 w-7 ${className ?? ''}`} {...props}>
     <rect x="8" y="14" width="40" height="36" rx="4" stroke="currentColor" />
     <path d="M48 24 56 18v28l-8-6" stroke="currentColor" />

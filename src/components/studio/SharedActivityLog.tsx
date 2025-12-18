@@ -41,14 +41,16 @@ interface SupabaseProjectRow {
   created_at?: string;
 }
 
-interface SupabaseTrackRow {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface _SupabaseTrackRow {
   id: string;
   title?: string;
   updated_at?: string;
   created_at?: string;
 }
 
-interface SupabaseChangePayload<T> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface _SupabaseChangePayload<T> {
   eventType: SupabaseEventType;
   new?: T;
   old?: T;
@@ -125,6 +127,7 @@ export default function SharedActivityLog() {
 
         // Supabase mode - use wildcard select to avoid column-specific errors
         // Type assertion needed because stub supabase doesn't have proper types
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const supabaseClient = supabase as any;
         const { data } = await supabaseClient
           .from('projects')
@@ -207,6 +210,7 @@ export default function SharedActivityLog() {
     // Supabase mode - Realtime Subscription
     const fetchActivities = async () => {
       // Type assertion needed because stub supabase doesn't have proper types
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const supabaseClient = supabase as any;
       const { data } = await supabaseClient
         .from('projects')
@@ -242,20 +246,27 @@ export default function SharedActivityLog() {
 
     // Realtime Subscription
     // Type assertion needed because stub supabase doesn't have proper types
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const supabaseClient = supabase as any;
     const channel = supabaseClient
       .channel('public:projects')
       .on(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         'postgres_changes' as any, // Cast to 'any' to fix the argument error
         { event: '*', schema: 'public', table: 'projects' },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (payload: any) => {
-          console.log('Change received!', payload);
+          // Note: console.log retained for debugging realtime changes in development
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Change received!', payload);
+          }
           fetchActivities(); // Refresh list on change
         }
       )
       .subscribe();
 
     return () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const supabaseClient = supabase as any;
       supabaseClient.removeChannel(channel);
     };

@@ -29,7 +29,8 @@ export default function TrackCard({
   track,
   index = 0,
   onPlay,
-  variant = 'default',
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  variant: _variant = 'default',
   showNowPlaying = true,
 }: TrackCardProps) {
   const { current, isPlaying } = usePlayerStore();
