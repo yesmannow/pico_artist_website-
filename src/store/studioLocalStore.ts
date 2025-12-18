@@ -139,7 +139,7 @@ export const useStudioLocalStore = create<StudioLocalState>()((set, get) => ({
               ...state.tracks,
               {
                 ...track,
-                id: `track-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                id: `track-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
                 clips: track.clips || [],
               },
             ],
@@ -202,7 +202,7 @@ export const useStudioLocalStore = create<StudioLocalState>()((set, get) => ({
                       ...t.clips,
                       {
                         ...clip,
-                        id: `clip-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                        id: `clip-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
                       },
                     ],
                   }
