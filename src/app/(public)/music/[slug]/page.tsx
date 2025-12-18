@@ -5,14 +5,15 @@
 
 'use client';
 
-import { use } from 'react';
+import { use, useMemo, useState } from 'react';
 import { notFound } from 'next/navigation';
-import { motion } from 'framer-motion';
-import Image from 'next/image';
 import Link from 'next/link';
 import { getTrackBySlug, getTracks } from '@/data/tracks';
 import { usePlayerStore } from '@/store/playerStore';
 import Waveform from '@/components/player/Waveform';
+import CinematicHero from '@/components/media/CinematicHero';
+import VisualizerStage from '@/components/player/VisualizerStage';
+import { useIdle } from '@/hooks/useIdle';
 import Play from 'lucide-react/dist/esm/icons/play';
 import Pause from 'lucide-react/dist/esm/icons/pause';
 import ExternalLink from 'lucide-react/dist/esm/icons/external-link';
@@ -43,6 +44,8 @@ export default function TrackDetailPage({ params }: TrackDetailPageProps) {
     seek,
     queue,
   } = usePlayerStore();
+  const [stageMode, setStageMode] = useState(false);
+  const isIdle = useIdle();
 
   const isCurrentTrack = current?.id === track.id;
   const isCurrentPlaying = isCurrentTrack && isPlaying;
@@ -85,6 +88,13 @@ export default function TrackDetailPage({ params }: TrackDetailPageProps) {
       : track.previewUrl
     : track.previewUrl;
 
+  const heroImage = useMemo(
+    () => track.coverArt || '/images%20design%20assets/on%20the%20mic.jpg',
+    [track.coverArt]
+  );
+
+  const dimUI = isIdle && isCurrentPlaying;
+
   return (
     <div className="min-h-screen">
       {/* Back Button */}
@@ -98,108 +108,103 @@ export default function TrackDetailPage({ params }: TrackDetailPageProps) {
         </Link>
       </div>
 
-      {/* Hero Section */}
-      <div className="relative h-[50vh] overflow-hidden">
-        <div className="absolute inset-0">
-          {track.coverArt ? (
-            <Image
-              src={track.coverArt}
-              alt={track.title}
-              fill
-              className="object-cover"
-              priority
-            />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-piko-teal/20 via-piko-pink/20 to-piko-orange/20" />
-          )}
-          {/* Dark overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/60 via-zinc-950/80 to-zinc-950" />
-        </div>
-
-        {/* Hero Content */}
-        <div className="relative h-full flex items-end pb-12">
-          <div className="max-w-6xl mx-auto px-4 w-full">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="space-y-4"
-            >
-              <p className="text-xs uppercase tracking-[0.3em] text-piko-teal">
-                {track.releaseYear || 'Track'}
-              </p>
-              <h1 className="text-5xl md:text-7xl font-bold text-zinc-100">
-                {track.title}
-              </h1>
-              <p className="text-xl text-zinc-300">{track.artist}</p>
-
-              {/* Play Buttons */}
-              <div className="flex gap-3 pt-4">
-                <button
-                  onClick={handlePlay}
-                  className="flex items-center gap-2 px-6 py-3 rounded-full bg-piko-teal text-white font-semibold hover:bg-piko-teal/80 transition"
-                >
-                  {isCurrentPlaying && source === 'preview' ? (
-                    <>
-                      <Pause className="w-5 h-5" fill="currentColor" />
-                      Pause Preview
-                    </>
-                  ) : (
-                    <>
-                      <Play className="w-5 h-5 ml-0.5" fill="currentColor" />
-                      Play Preview
-                    </>
-                  )}
-                </button>
-
-                {track.fullUrl && (
-                  <button
-                    onClick={handlePlayFull}
-                    className="flex items-center gap-2 px-6 py-3 rounded-full border border-piko-pink bg-piko-pink/10 text-piko-pink font-semibold hover:bg-piko-pink/20 transition"
-                  >
-                    {isCurrentPlaying && source === 'full' ? (
-                      <>
-                        <Pause className="w-5 h-5" fill="currentColor" />
-                        Pause Full Track
-                      </>
-                    ) : (
-                      <>
-                        <Play className="w-5 h-5 ml-0.5" fill="currentColor" />
-                        Play Full Track
-                      </>
-                    )}
-                  </button>
-                )}
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </div>
+      <CinematicHero
+        title={track.title}
+        subtitle={track.artist}
+        backgroundImageUrl={heroImage}
+        align="left"
+        variant="music"
+      />
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="max-w-6xl mx-auto px-4 py-12 transition-opacity duration-300" style={{ opacity: dimUI ? 0.65 : 1 }}>
+        <div className="flex flex-wrap items-center gap-3 mb-6">
+          <button
+            onClick={handlePlay}
+            className="flex items-center gap-2 px-5 py-2 rounded-full bg-piko-teal text-white font-semibold hover:bg-piko-teal/80 transition shadow-lg shadow-piko-teal/15"
+          >
+            {isCurrentPlaying && source === 'preview' ? (
+              <>
+                <Pause className="w-4 h-4" fill="currentColor" />
+                Pause Preview
+              </>
+            ) : (
+              <>
+                <Play className="w-4 h-4 ml-0.5" fill="currentColor" />
+                Play Preview
+              </>
+            )}
+          </button>
+
+          {track.fullUrl && (
+            <button
+              onClick={handlePlayFull}
+              className="flex items-center gap-2 px-5 py-2 rounded-full border border-piko-pink bg-piko-pink/10 text-piko-pink font-semibold hover:bg-piko-pink/20 transition shadow-lg shadow-piko-pink/10"
+            >
+              {isCurrentPlaying && source === 'full' ? (
+                <>
+                  <Pause className="w-4 h-4" fill="currentColor" />
+                  Pause Full Track
+                </>
+              ) : (
+                <>
+                  <Play className="w-4 h-4 ml-0.5" fill="currentColor" />
+                  Play Full Track
+                </>
+              )}
+            </button>
+          )}
+
+          <button
+            onClick={() => setStageMode((prev) => !prev)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm transition ${
+              stageMode
+                ? 'border-piko-teal bg-piko-teal/15 text-piko-teal shadow-[0_0_24px_rgba(0,245,212,0.25)]'
+                : 'border-zinc-700 bg-zinc-900/70 text-zinc-300 hover:border-piko-teal/60 hover:text-piko-teal'
+            }`}
+          >
+            <span className="inline-block h-2 w-2 rounded-full bg-piko-teal animate-pulse" />
+            Stage Mode
+          </button>
+        </div>
+
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Left Column - Waveform */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 backdrop-blur-xl p-6">
-              <h2 className="text-lg font-semibold text-zinc-100 mb-4">
-                {isCurrentTrack && source === 'full' && track.fullUrl
-                  ? 'Full Track'
-                  : 'Preview'}
-              </h2>
-              {isCurrentTrack ? (
-                <Waveform
-                  url={currentUrl}
+            <div className={`relative rounded-xl border bg-zinc-900/60 backdrop-blur-xl p-6 overflow-hidden transition-all ${stageMode ? 'border-piko-teal/50 ring-1 ring-piko-teal/30 shadow-[0_0_45px_rgba(0,245,212,0.12)]' : 'border-zinc-800'}`}>
+              {stageMode && (
+                <VisualizerStage
+                  active={stageMode}
+                  isPlaying={isCurrentPlaying}
                   currentTime={currentTime}
-                  onSeek={handleWaveformSeek}
-                  height={120}
-                  className="mb-4"
+                  className="opacity-90"
+                  intensity={1.1}
                 />
-              ) : (
-                <div className="h-[120px] rounded-lg bg-zinc-950/50 flex items-center justify-center text-zinc-500">
-                  Click play to load waveform
-                </div>
               )}
+              <div className="relative">
+                <h2 className="text-lg font-semibold text-zinc-100 mb-4 flex items-center gap-3">
+                  <span>
+                    {isCurrentTrack && source === 'full' && track.fullUrl
+                      ? 'Full Track'
+                      : 'Preview'}
+                  </span>
+                  {stageMode && <span className="text-xs uppercase tracking-[0.2em] text-piko-teal/80">Stage</span>}
+                </h2>
+                {isCurrentTrack ? (
+                  <Waveform
+                    url={currentUrl}
+                    currentTime={currentTime}
+                    onSeek={handleWaveformSeek}
+                    height={stageMode ? 160 : 120}
+                    className="mb-4"
+                    isPlaying={isCurrentPlaying}
+                  />
+                ) : (
+                  <div className="h-[120px] rounded-lg bg-zinc-950/50 flex items-center justify-center text-zinc-500">
+                    Click play to load waveform
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* External Links */}
@@ -248,7 +253,7 @@ export default function TrackDetailPage({ params }: TrackDetailPageProps) {
           </div>
 
           {/* Right Column - Next Up */}
-          <div className="space-y-4">
+          <div className="space-y-4 transition-opacity duration-300" style={{ opacity: stageMode ? 0.9 : 1 }}>
             {nextTracks.length > 0 && (
               <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 backdrop-blur-xl p-6">
                 <h2 className="text-lg font-semibold text-zinc-100 mb-4">Next Up</h2>

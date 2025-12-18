@@ -7,7 +7,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { usePlayerStore } from '@/store/playerStore';
 import type { Track } from '@/data/tracks';
 import Play from 'lucide-react/dist/esm/icons/play';
@@ -22,6 +22,7 @@ interface TrackListProps {
 export default function TrackList({ tracks, showFilter = false }: TrackListProps) {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const { current, isPlaying, playTrack, setQueue, togglePlay } = usePlayerStore();
+  const prefersReducedMotion = useReducedMotion();
 
   // Filter tracks by tag
   const filteredTracks = selectedTag
@@ -86,12 +87,25 @@ export default function TrackList({ tracks, showFilter = false }: TrackListProps
             <motion.div
               key={track.id}
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className={`group relative overflow-hidden rounded-lg border bg-zinc-900/50 backdrop-blur-md p-4 transition-all hover:border-piko-teal/50 hover:shadow-lg hover:shadow-piko-teal/10 ${
-                isCurrentTrack ? 'border-piko-teal/50' : 'border-zinc-800'
-              }`}
-            >
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ delay: index * 0.05 }}
+               className={`group relative overflow-hidden rounded-lg border bg-zinc-900/50 backdrop-blur-md p-4 transition-all hover:border-piko-teal/50 hover:shadow-lg hover:shadow-piko-teal/10 ${
+                 isCurrentTrack ? 'border-piko-teal/50' : 'border-zinc-800'
+               }`}
+             >
+              {isCurrentTrack && (
+                <motion.div
+                  aria-hidden
+                  className="absolute inset-0 rounded-lg pointer-events-none"
+                  animate={
+                    isPlaying && !prefersReducedMotion
+                      ? { boxShadow: ['0 0 0 0 rgba(0,245,212,0.15)', '0 0 0 12px rgba(255,0,110,0)'] }
+                      : { boxShadow: '0 0 0 0 rgba(0,0,0,0)' }
+                  }
+                  transition={{ repeat: isPlaying && !prefersReducedMotion ? Infinity : 0, duration: 1.8, ease: 'easeOut' }}
+                />
+              )}
+
               {/* Now Playing indicator */}
               {isCurrentTrack && (
                 <div className="absolute top-2 right-2">

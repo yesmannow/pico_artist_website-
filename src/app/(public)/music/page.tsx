@@ -1,93 +1,81 @@
 'use client';
 
-import { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
+import { motion, useReducedMotion } from 'framer-motion';
 import { getTracks } from '@/data/tracks';
 import TrackList from '@/components/player/TrackList';
+import CinematicHero from '@/components/media/CinematicHero';
+import { usePlayerStore } from '@/store/playerStore';
+import { useIdle } from '@/hooks/useIdle';
+
+const featuredShots = [
+  { src: '/images%20design%20assets/on%20the%20mic.jpg', caption: 'On the Mic' },
+  { src: '/images%20design%20assets/black%20and%20white%20standing%20low%20shot.jpg', caption: 'Low Light Stage' },
+  { src: '/images%20design%20assets/close%20up%20face.jpg', caption: 'Close Up' },
+  { src: '/images%20design%20assets/piko%20musician%20bio%20photo.jpg', caption: 'Studio Portrait' },
+  { src: '/images%20design%20assets/green%20shillioette.jpg', caption: 'Silhouette Glow' },
+];
 
 export default function MusicPage() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start end', 'end start'],
-  });
-
   const tracks = getTracks();
+  const { isPlaying } = usePlayerStore();
+  const isIdle = useIdle();
+  const prefersReducedMotion = useReducedMotion();
 
-  // Visualizer bars that react to scroll
-  const bar1 = useTransform(scrollYProgress, [0, 1], [20, 100]);
-  const bar2 = useTransform(scrollYProgress, [0, 1], [40, 80]);
-  const bar3 = useTransform(scrollYProgress, [0, 1], [60, 120]);
-  const bar4 = useTransform(scrollYProgress, [0, 1], [30, 90]);
-  const bar5 = useTransform(scrollYProgress, [0, 1], [50, 110]);
+  const dimUI = isIdle && isPlaying;
 
   return (
-    <div ref={containerRef} className="min-h-screen relative overflow-hidden">
-      {/* Hero Section with Artist Image Background */}
-      <div className="relative h-[40vh] overflow-hidden">
-        <div className="absolute inset-0">
-          <Image
-            src="/images design assets/white hero.jpg"
-            alt="Piko FG"
-            fill
-            className="object-cover"
-            priority
-          />
-          {/* Dark overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/80 via-zinc-950/60 to-zinc-950" />
-          {/* Brand glow */}
-          <div className="absolute inset-0 bg-gradient-to-br from-piko-teal/10 via-transparent to-piko-pink/10" />
+    <div className="min-h-screen relative overflow-hidden">
+      <CinematicHero
+        title="Digital Graffiti Soundscapes"
+        subtitle="Stream the full collection of Piko FG tracks"
+        backgroundImageUrl="/images%20design%20assets/white%20hero.jpg"
+        variant="music"
+      />
+
+      {/* Featured Shots */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-semibold text-zinc-100">Featured Shots</h2>
+          <p className="text-xs uppercase tracking-[0.2em] text-piko-teal">Cinematic Frames</p>
         </div>
-
-        {/* Hero Content */}
-        <div className="relative h-full flex flex-col items-center justify-center px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center space-y-3"
-          >
-            <p className="text-xs uppercase tracking-[0.3em] text-piko-teal">Music</p>
-            <h1 className="text-4xl md:text-6xl font-bold text-zinc-100">
-              Digital Graffiti Soundscapes
-            </h1>
-            <p className="text-zinc-300 max-w-2xl mx-auto">
-              Stream the full collection of Piko FG&apos;s tracks
-            </p>
-          </motion.div>
-
-          {/* Scroll Visualizer */}
-          <motion.div
-            className="flex items-end justify-center gap-2 h-20 mt-8"
-            style={{ opacity: useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.3, 1, 1, 0.3]) }}
-          >
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {featuredShots.slice(0, 6).map((shot, idx) => (
             <motion.div
-              className="w-2 rounded-t-full bg-gradient-to-t from-piko-teal to-piko-pink"
-              style={{ height: bar1 }}
-            />
-            <motion.div
-              className="w-2 rounded-t-full bg-gradient-to-t from-piko-pink to-piko-orange"
-              style={{ height: bar2 }}
-            />
-            <motion.div
-              className="w-2 rounded-t-full bg-gradient-to-t from-piko-orange to-piko-teal"
-              style={{ height: bar3 }}
-            />
-            <motion.div
-              className="w-2 rounded-t-full bg-gradient-to-t from-piko-teal to-piko-pink"
-              style={{ height: bar4 }}
-            />
-            <motion.div
-              className="w-2 rounded-t-full bg-gradient-to-t from-piko-pink to-piko-orange"
-              style={{ height: bar5 }}
-            />
-          </motion.div>
+              key={shot.src}
+              className="group relative overflow-hidden rounded-2xl border border-zinc-800/70 bg-zinc-900/60"
+              initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
+              whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.35 }}
+              transition={{ delay: idx * 0.05 }}
+            >
+              <div className="relative h-48 w-full">
+                <Image
+                  src={shot.src}
+                  alt={shot.caption}
+                  fill
+                  className="object-cover transition duration-500 group-hover:scale-105"
+                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                  priority={idx < 2}
+                  unoptimized
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-80" />
+              <div className="absolute inset-0 flex items-end p-4">
+                <div className="w-full rounded-lg bg-zinc-900/70 px-3 py-2 text-sm text-zinc-100 backdrop-blur-md border border-zinc-800/60 group-hover:border-piko-teal/60 transition">
+                  {shot.caption}
+                </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
 
       {/* Track List Section */}
-      <div className="max-w-6xl mx-auto px-4 py-16">
+      <div
+        className="max-w-6xl mx-auto px-4 py-16 transition-opacity duration-300"
+        style={{ opacity: dimUI ? 0.65 : 1 }}
+      >
         <TrackList tracks={tracks} showFilter />
       </div>
 
