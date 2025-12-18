@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:cloudflare": "npm run clean && npx @opennextjs/cloudflare build && cp .open-next/worker.js .open-next/assets/_worker.js",
+    "build:cloudflare": "npm run clean && npx @opennextjs/cloudflare build && rm -rf .open-next/output && mkdir -p .open-next/output && cp .open-next/worker.js .open-next/output/_worker.js && cp -R .open-next/cloudflare .open-next/output/cloudflare && cp -R .open-next/middleware .open-next/output/middleware && cp -R .open-next/server-functions .open-next/output/server-functions && cp -R .open-next/.build .open-next/output/.build && cp -R .open-next/assets/* .open-next/output/",
     "clean": "npx rimraf .next .open-next .vercel",
     "start": "next start",
     "lint": "npx eslint . --max-warnings=0",
