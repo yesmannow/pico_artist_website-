@@ -60,9 +60,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <head>
-        <link rel="manifest" href="/manifest.json" />
-      </head>
       <body className="antialiased bg-zinc-950 text-zinc-100">
         <ErrorBoundary>
           <SprayCursor />

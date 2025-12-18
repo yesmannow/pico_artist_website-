@@ -8,6 +8,12 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
+  // Provide generateBuildId that returns null to use Next.js fallback
+  // This fixes the "generate is not a function" error
+  generateBuildId: async () => {
+    return null as any; // Return null to trigger nanoid fallback
+  },
+
   // Redirects for site restructure
   async redirects() {
     return [
