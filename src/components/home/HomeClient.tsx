@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import Play from "lucide-react/dist/esm/icons/play";
 import ArrowRight from "lucide-react/dist/esm/icons/arrow-right";
 import Calendar from "lucide-react/dist/esm/icons/calendar";
