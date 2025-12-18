@@ -1,0 +1,30 @@
+<svg width="640" height="480" viewBox="0 0 640 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="hatBrim" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#00f5d4" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#ff006e" stop-opacity="0.85"/>
+    </linearGradient>
+    <linearGradient id="hatCrown" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#11131b" stop-opacity="1"/>
+      <stop offset="1" stop-color="#161822" stop-opacity="1"/>
+    </linearGradient>
+    <radialGradient id="hatGlow" cx="50%" cy="20%" r="70%">
+      <stop offset="0%" stop-color="#00f5d4" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#0b0b0e" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="640" height="480" fill="#0b0b0e"/>
+  <rect width="640" height="480" fill="url(#hatGlow)"/>
+
+  <path d="M140 320C140 294 162 272 188 272H452C478 272 500 294 500 320C500 344 480 364 456 364H184C160 364 140 344 140 320Z" fill="url(#hatBrim)" opacity="0.9"/>
+  <path d="M196 156C196 126 220 102 250 102H390C420 102 444 126 444 156V242C444 272 420 296 390 296H250C220 296 196 272 196 242V156Z" fill="url(#hatCrown)" stroke="#262835" stroke-width="10"/>
+
+  <path d="M264 150H376" stroke="#ff006e" stroke-width="8" stroke-linecap="round"/>
+  <path d="M260 186H380" stroke="#00f5d4" stroke-width="8" stroke-linecap="round" stroke-dasharray="14 10"/>
+  <path d="M288 224H352" stroke="#ff9e00" stroke-width="7" stroke-linecap="round"/>
+
+  <circle cx="320" cy="212" r="32" fill="#0f1119" stroke="#2f303a" stroke-width="8"/>
+  <path d="M296 212C296 198 308 186 322 186H318C332 186 344 198 344 212C344 226 332 238 318 238H322C308 238 296 226 296 212Z" fill="#00f5d4" opacity="0.85"/>
+
+  <path d="M210 260C210 248 220 238 232 238H408C420 238 430 248 430 260C430 280 414 296 394 296H246C226 296 210 280 210 260Z" fill="#11131b" stroke="#2c2e38" stroke-width="8"/>
+</svg>

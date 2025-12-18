@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Play, Pause, Heart, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getTracks, likeTrack, type Track } from '@/lib/supabase';
+import { Howl } from 'howler';
 
 interface TrackCardProps {
   track: Track;
@@ -16,6 +17,8 @@ function TrackCard({ track, isPlaying, onPlay }: TrackCardProps) {
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(track.likes);
   const [showSplatter, setShowSplatter] = useState<{ x: number; y: number } | null>(null);
+  const previewRef = useRef<Howl | null>(null);
+  const previewTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     // Initialize wavesurfer.js
@@ -52,7 +55,45 @@ function TrackCard({ track, isPlaying, onPlay }: TrackCardProps) {
         }
       }
     }
+
+    return () => {
+      if (previewTimeout.current) {
+        clearTimeout(previewTimeout.current);
+      }
+      previewRef.current?.stop();
+      previewRef.current?.unload();
+      previewRef.current = null;
+    };
   }, []);
+
+  const stopPreview = () => {
+    if (previewTimeout.current) {
+      clearTimeout(previewTimeout.current);
+      previewTimeout.current = null;
+    }
+    if (previewRef.current) {
+      previewRef.current.stop();
+      previewRef.current.unload();
+      previewRef.current = null;
+    }
+  };
+
+  const startPreview = () => {
+    if (previewRef.current) return;
+
+    const src = track.audio_url || '/lofi-teaser.wav';
+    const howl = new Howl({
+      src: [src],
+      volume: 0.35,
+      html5: true,
+    });
+
+    previewRef.current = howl;
+    howl.play();
+    previewTimeout.current = setTimeout(() => {
+      stopPreview();
+    }, 5000);
+  };
 
   const handleActionClick = async (e: React.MouseEvent, action: 'like' | 'share') => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -84,6 +125,9 @@ function TrackCard({ track, isPlaying, onPlay }: TrackCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="group relative overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/50 backdrop-blur-md p-4 transition-all hover:border-piko-teal/50 hover:shadow-lg hover:shadow-piko-teal/10"
+      onMouseEnter={startPreview}
+      onMouseLeave={stopPreview}
+      onTouchStart={startPreview}
     >
       {/* Track Info */}
       <div className="flex items-center gap-3 mb-3">
@@ -100,7 +144,11 @@ function TrackCard({ track, isPlaying, onPlay }: TrackCardProps) {
           </button>
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-zinc-100 truncate">
+          <h3
+            className="text-sm font-semibold text-zinc-100 truncate"
+            onMouseEnter={startPreview}
+            onMouseLeave={stopPreview}
+          >
             {track.title}
           </h3>
           <p className="text-xs text-zinc-400 truncate">{track.artist}</p>
@@ -214,7 +262,12 @@ export default function TrackList() {
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-8" id="tracks">
-      <h2 className="text-2xl font-bold text-zinc-100 mb-6">Featured Tracks</h2>
+      <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
+        <h2 className="text-2xl font-bold text-zinc-100">Featured Tracks</h2>
+        <p className="text-xs uppercase tracking-[0.2em] text-piko-teal">
+          Hover a title to hear the 5s lo-fi teaser
+        </p>
+      </div>
       {loading ? (
         <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-piko-teal"></div>
