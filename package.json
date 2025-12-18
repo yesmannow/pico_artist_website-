@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:cloudflare": "npm run clean && npx @opennextjs/cloudflare build",
+    "build:cloudflare": "npm run clean && npx @opennextjs/cloudflare build && cp .open-next/worker.js .open-next/assets/_worker.js",
     "clean": "npx rimraf .next .open-next .vercel",
     "start": "next start",
     "lint": "npx eslint . --max-warnings=0",
