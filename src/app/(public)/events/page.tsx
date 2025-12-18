@@ -64,7 +64,7 @@ const tourDates: TourDate[] = [
   },
 ];
 
-export default function TourPage() {
+export default function EventsPage() {
   // Use a MutableRefObject matching GlobeMethods signature by using any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const globeRef = useRef<any>(null);
@@ -96,11 +96,10 @@ export default function TourPage() {
           transition={{ duration: 0.6 }}
           className="text-center space-y-3"
         >
-          <p className="text-xs uppercase tracking-[0.3em] text-piko-teal">Tour</p>
-          <h1 className="text-4xl md:text-5xl font-bold text-zinc-100">Digital Graffiti Tour</h1>
+          <p className="text-xs uppercase tracking-[0.3em] text-piko-teal">Events</p>
+          <h1 className="text-4xl md:text-5xl font-bold text-zinc-100">Digital Graffiti Events</h1>
           <p className="text-zinc-400 max-w-3xl mx-auto">
-            Ultra-fast, SEO-friendly tour listing with ticket CTAs and the same paint-drip neon you
-            see on stage.
+            Upcoming shows, performances, and experiences — tickets and dates for the Digital Graffiti Collective.
           </p>
         </motion.div>
 
