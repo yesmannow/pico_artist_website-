@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Globe from 'react-globe.gl';
+import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import X from 'lucide-react/dist/esm/icons/x';
 import ExternalLink from 'lucide-react/dist/esm/icons/external-link';
+
+const Globe = dynamic(() => import('react-globe.gl'), { ssr: false });
 
 type TourDate = {
   lat: number;

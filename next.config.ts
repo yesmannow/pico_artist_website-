@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   typescript: {
+    // Temporary Cloudflare build unblocker; address underlying type errors before removing
     ignoreBuildErrors: true,
   },
 };
