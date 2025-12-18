@@ -86,9 +86,12 @@ export default function Footer() {
             <Link href="/tour" className="text-sm text-zinc-400 hover:text-piko-teal transition">
               Tour
             </Link>
+            <Link href="/studio" className="text-sm text-zinc-400 hover:text-piko-teal transition">
+              Studio
+            </Link>
           </nav>
 
-          {/* Right: Street Rain Toggle & Stealth Link */}
+          {/* Right: Street Rain Toggle */}
           <div className="flex items-center gap-4">
             {/* Street Rain Toggle */}
             <button
@@ -103,29 +106,6 @@ export default function Footer() {
               <CloudRain className="h-4 w-4" />
               <span className="text-xs font-medium">Rain</span>
             </button>
-
-            {/* Stealth Artist Portal Link */}
-            <Link
-              href="/login"
-              className="text-xs text-zinc-500 opacity-30 hover:opacity-100 hover:text-piko-teal transition-all duration-300 relative group"
-            >
-              <span className="relative z-10">Artist Portal</span>
-              <motion.span
-                className="absolute inset-0 bg-piko-teal/10 blur-md opacity-0 group-hover:opacity-100 transition-opacity -z-10"
-                animate={{
-                  boxShadow: [
-                    '0 0 0px rgba(0, 245, 212, 0)',
-                    '0 0 20px rgba(0, 245, 212, 0.5)',
-                    '0 0 0px rgba(0, 245, 212, 0)',
-                  ],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-              />
-            </Link>
           </div>
         </div>
       </div>

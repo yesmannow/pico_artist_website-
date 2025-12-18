@@ -6,6 +6,7 @@ import StudioRecorder from '@/components/studio/StudioRecorder';
 import MultitrackTimeline from '@/components/studio/MultitrackTimeline';
 import ProjectManager from '@/components/studio/ProjectManager';
 import StudioHeader from '@/components/studio/StudioHeader';
+import SharedActivityLog from '@/components/studio/SharedActivityLog';
 import { getTracks, type Track } from '@/lib/supabase';
 import { FolderOpen } from 'lucide-react';
 import { useStudioStore } from '@/store/studioStore';
@@ -47,8 +48,9 @@ export default function StudioPage() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4 pt-24 pb-12 relative overflow-hidden">
+    <div className="flex min-h-screen flex-col items-center justify-center px-4 pt-40 md:pt-44 pb-12 relative overflow-hidden">
       <StudioHeader />
+      <SharedActivityLog />
       {/* Interactive Mouse Spotlight */}
       <div
         className="fixed inset-0 pointer-events-none transition-opacity duration-300"

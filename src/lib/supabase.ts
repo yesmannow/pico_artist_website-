@@ -159,16 +159,16 @@ export interface Project {
 }
 
 // Project Management Functions
-export async function saveProject(project: Omit<Project, 'id' | 'created_at' | 'updated_at'>) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('User not authenticated');
+// SHARED LIBRARY MODEL: Using hardcoded user_id for shared access
+const SHARED_USER_ID = '00000000-0000-0000-0000-000000000000';
 
+export async function saveProject(project: Omit<Project, 'id' | 'created_at' | 'updated_at'>) {
   const { data, error } = await supabase
     .from('projects')
     .insert([
       {
         ...project,
-        user_id: user.id,
+        user_id: SHARED_USER_ID,
         project_data: JSON.stringify(project),
       },
     ])
@@ -184,9 +184,6 @@ export async function saveProject(project: Omit<Project, 'id' | 'created_at' | '
 }
 
 export async function updateProject(projectId: string, project: Partial<Project>) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('User not authenticated');
-
   const { data, error } = await supabase
     .from('projects')
     .update({
@@ -195,7 +192,6 @@ export async function updateProject(projectId: string, project: Partial<Project>
       updated_at: new Date().toISOString(),
     })
     .eq('id', projectId)
-    .eq('user_id', user.id)
     .select()
     .single();
 
@@ -208,13 +204,9 @@ export async function updateProject(projectId: string, project: Partial<Project>
 }
 
 export async function getProjects() {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return [];
-
   const { data, error } = await supabase
     .from('projects')
     .select('*')
-    .eq('user_id', user.id)
     .order('updated_at', { ascending: false });
 
   if (error) {
@@ -230,14 +222,10 @@ export async function getProjects() {
 }
 
 export async function loadProject(projectId: string): Promise<Project | null> {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('User not authenticated');
-
   const { data, error } = await supabase
     .from('projects')
     .select('*')
     .eq('id', projectId)
-    .eq('user_id', user.id)
     .single();
 
   if (error) {
@@ -259,14 +247,10 @@ export async function loadProject(projectId: string): Promise<Project | null> {
 }
 
 export async function deleteProject(projectId: string) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('User not authenticated');
-
   const { error } = await supabase
     .from('projects')
     .delete()
-    .eq('id', projectId)
-    .eq('user_id', user.id);
+    .eq('id', projectId);
 
   if (error) {
     console.error('Error deleting project:', error);
