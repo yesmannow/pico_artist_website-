@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import GlobalMusicPlayer from "@/components/audio/GlobalMusicPlayer";
+import PlayerDock from "@/components/player/PlayerDock";
 import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
 import PWARegister from "@/components/PWARegister";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import CustomCursor from "@/components/cursor/CustomCursor";
 
 // CLOUDFLARE FIX: Edge runtime removed entirely to keep the worker lean
 // No runtime export needed - defaults to nodejs
@@ -33,13 +34,14 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className="antialiased bg-zinc-950 text-zinc-100">
         <ErrorBoundary>
+          <CustomCursor />
           <PWARegister />
           <Navbar />
           <div className="min-h-screen pb-24 pt-16">
             {children}
           </div>
           <Footer />
-          <GlobalMusicPlayer />
+          <PlayerDock />
         </ErrorBoundary>
       </body>
     </html>
