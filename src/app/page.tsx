@@ -1,5 +1,7 @@
 'use client';
 
+export const runtime = 'edge';
+
 import { Music, Mic, Radio } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";

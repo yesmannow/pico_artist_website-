@@ -4,6 +4,8 @@ import GlobalMusicPlayer from "@/components/audio/GlobalMusicPlayer";
 import Navbar from "@/components/navigation/Navbar";
 import PWARegister from "@/components/PWARegister";
 
+export const runtime = "edge";
+
 export const metadata: Metadata = {
   title: "Pico Artist Studio - Private SoundCloud Experience",
   description: "A cinematic music platform with built-in recording studio for artists",
