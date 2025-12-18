@@ -4,12 +4,15 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import StudioRecorder from '@/components/studio/StudioRecorder';
 import MultitrackTimeline from '@/components/studio/MultitrackTimeline';
+import ProjectManager from '@/components/studio/ProjectManager';
 import { getTracks, type Track } from '@/lib/supabase';
+import { FolderOpen } from 'lucide-react';
 
 export default function StudioPage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [backingTracks, setBackingTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState(true);
+  const [projectManagerOpen, setProjectManagerOpen] = useState(false);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -59,6 +62,18 @@ export default function StudioPage() {
           </p>
         </motion.div>
 
+        {/* Project Manager Button */}
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+          onClick={() => setProjectManagerOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg border border-zinc-800 bg-zinc-900/50 backdrop-blur-md text-zinc-100 hover:border-piko-teal hover:bg-zinc-800/50 transition"
+        >
+          <FolderOpen className="h-4 w-4" />
+          <span>Project Manager</span>
+        </motion.button>
+
         {/* Studio Interface */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -104,6 +119,9 @@ export default function StudioPage() {
           </div>
         </motion.div>
       </main>
+
+      {/* Project Manager Modal */}
+      <ProjectManager isOpen={projectManagerOpen} onClose={() => setProjectManagerOpen(false)} />
     </div>
   );
 }

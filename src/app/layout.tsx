@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import GlobalMusicPlayer from "@/components/audio/GlobalMusicPlayer";
 import Navbar from "@/components/navigation/Navbar";
+import Footer from "@/components/navigation/Footer";
 import PWARegister from "@/components/PWARegister";
 
 export const runtime = "edge";
@@ -31,6 +32,7 @@ export default function RootLayout({
         <div className="min-h-screen pb-24 pt-16">
           {children}
         </div>
+        <Footer />
         <GlobalMusicPlayer />
       </body>
     </html>

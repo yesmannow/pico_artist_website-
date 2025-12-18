@@ -18,6 +18,7 @@ interface StudioState {
   isPlaying: boolean;
   isRecording: boolean;
   selectedTrackId: string | null;
+  masterVolume: number;
   addTrack: (track: Omit<Track, 'id'>) => void;
   removeTrack: (id: string) => void;
   updateTrack: (id: string, updates: Partial<Track>) => void;
@@ -27,6 +28,7 @@ interface StudioState {
   setSelectedTrack: (id: string | null) => void;
   toggleMute: (id: string) => void;
   toggleSolo: (id: string) => void;
+  setMasterVolume: (volume: number) => void;
 }
 
 export const useStudioStore = create<StudioState>((set) => ({
@@ -35,6 +37,7 @@ export const useStudioStore = create<StudioState>((set) => ({
   isPlaying: false,
   isRecording: false,
   selectedTrackId: null,
+  masterVolume: 1.0,
 
   addTrack: (track) =>
     set((state) => ({
@@ -71,5 +74,7 @@ export const useStudioStore = create<StudioState>((set) => ({
     set((state) => ({
       tracks: state.tracks.map((t) => (t.id === id ? { ...t, solo: !t.solo } : t)),
     })),
+
+  setMasterVolume: (volume) => set({ masterVolume: volume }),
 }));
 

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import Tilt from "react-parallax-tilt";
 
 type MerchItem = {
   title: string;
@@ -47,49 +48,60 @@ export default function MerchGrid({ condensed = false }: { condensed?: boolean }
 
       <div className={`grid gap-5 ${condensed ? "sm:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-3"}`}>
         {merch.map((item, idx) => (
-          <motion.div
+          <Tilt
             key={item.title}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: idx * 0.05, duration: 0.4 }}
-            whileTap={{ scale: 0.95 }}
-            className="group relative overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-950/60 p-5 backdrop-blur-xl shadow-[0_20px_120px_rgba(0,0,0,0.45)] hover:border-piko-teal/50 transition"
+            className="parallax-effect-glare-scale"
+            perspective={1000}
+            glareEnable={true}
+            glareMaxOpacity={0.3}
+            scale={1.02}
+            tiltMaxAngleX={15}
+            tiltMaxAngleY={15}
+            transitionSpeed={1000}
           >
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300">
-              <div className={`absolute -inset-8 bg-gradient-to-br ${item.accent} blur-3xl`} />
-              <div className="absolute -bottom-10 -left-6 h-24 w-24 rounded-full bg-piko-pink/30 blur-3xl" />
-            </div>
-
-            <div className="relative flex items-center justify-between gap-3">
-              <div>
-                <p className="text-sm font-semibold text-zinc-50">{item.title}</p>
-                <p className="text-xs text-zinc-400">{item.price}</p>
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.05, duration: 0.4 }}
+              whileTap={{ scale: 0.95 }}
+              className="group relative overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-950/60 p-5 backdrop-blur-xl shadow-[0_20px_120px_rgba(0,0,0,0.45)] hover:border-piko-teal/50 transition"
+            >
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300">
+                <div className={`absolute -inset-8 bg-gradient-to-br ${item.accent} blur-3xl`} />
+                <div className="absolute -bottom-10 -left-6 h-24 w-24 rounded-full bg-piko-pink/30 blur-3xl" />
               </div>
-              <span className="text-xs rounded-full border border-piko-orange/50 bg-piko-orange/10 px-3 py-1 text-piko-orange font-semibold shadow-[0_0_20px_rgba(255,158,0,0.3)]">
-                Piko Splash
-              </span>
-            </div>
 
-            <div className="relative mt-4">
-              <div className="absolute -inset-2 bg-gradient-to-br from-piko-teal/10 via-piko-pink/8 to-transparent blur-2xl" />
-              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-800/60 bg-zinc-900/60">
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  className="object-cover transition duration-500 group-hover:scale-105"
-                  priority={idx === 0}
-                />
+              <div className="relative flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-zinc-50">{item.title}</p>
+                  <p className="text-xs text-zinc-400">{item.price}</p>
+                </div>
+                <span className="text-xs rounded-full border border-piko-orange/50 bg-piko-orange/10 px-3 py-1 text-piko-orange font-semibold shadow-[0_0_20px_rgba(255,158,0,0.3)]">
+                  Piko Splash
+                </span>
+              </div>
 
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,245,212,0.18),transparent_35%),radial-gradient(circle_at_80%_0%,rgba(255,0,110,0.16),transparent_32%),radial-gradient(circle_at_60%_80%,rgba(255,158,0,0.18),transparent_32%)]" />
-                  <div className="absolute inset-x-4 -bottom-10 h-24 rounded-full bg-gradient-to-r from-piko-teal/40 via-piko-pink/30 to-piko-orange/40 blur-3xl" />
+              <div className="relative mt-4">
+                <div className="absolute -inset-2 bg-gradient-to-br from-piko-teal/10 via-piko-pink/8 to-transparent blur-2xl" />
+                <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-800/60 bg-zinc-900/60">
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover transition duration-500 group-hover:scale-105"
+                    priority={idx === 0}
+                  />
+
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,245,212,0.18),transparent_35%),radial-gradient(circle_at_80%_0%,rgba(255,0,110,0.16),transparent_32%),radial-gradient(circle_at_60%_80%,rgba(255,158,0,0.18),transparent_32%)]" />
+                    <div className="absolute inset-x-4 -bottom-10 h-24 rounded-full bg-gradient-to-r from-piko-teal/40 via-piko-pink/30 to-piko-orange/40 blur-3xl" />
+                  </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </Tilt>
         ))}
       </div>
     </section>

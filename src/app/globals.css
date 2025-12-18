@@ -85,3 +85,13 @@ html {
   -webkit-backdrop-filter: blur(12px);
   border-radius: 0.5rem;
 }
+
+/* Parallax Tilt Effect */
+.parallax-effect-glare-scale {
+  transform-style: preserve-3d;
+  transform: perspective(1000px);
+}
+
+.parallax-effect-glare-scale .inner-element {
+  transform: translateZ(20px);
+}
