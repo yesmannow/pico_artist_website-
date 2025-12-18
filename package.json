@@ -6,9 +6,10 @@
     "dev": "next dev",
     "build": "next build",
 
-    "build:cloudflare": "npm run clean && npx @opennextjs/cloudflare build && rm -rf .open-next/output && mkdir -p .open-next/output && cp .open-next/worker.js .open-next/output/_worker.js && cp -R .open-next/cloudflare .open-next/output/cloudflare && cp -R .open-next/middleware .open-next/output/middleware && cp -R .open-next/server-functions .open-next/output/server-functions && cp -R .open-next/.build .open-next/output/.build && cp -R .open-next/assets/* .open-next/output/",
+    "build:cloudflare": "npm run clean && npx @opennextjs/cloudflare build && node scripts/cf-pages-postbuild.mjs",
 
     "clean": "npx rimraf .next .open-next .vercel",
+    "verify:cf": "node scripts/verify-cf-build.mjs",
     "start": "next start",
     "lint": "npx eslint . --max-warnings=0",
     "optimize-media": "node scripts/optimize-media.js"

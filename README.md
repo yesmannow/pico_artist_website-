@@ -79,58 +79,88 @@ Open [http://localhost:3000](http://localhost:3000) to see the application.
 
 ### Cloudflare Pages Build
 
-- **Production build:** Run `npm run build:cloudflare`; OpenNext writes the Cloudflare Pages bundle into `.open-next/output`, which is the directory that `wrangler.jsonc` exposes via `pages_build_output_dir`.
-- **Environment parity:** ⚠️ **Windows builds can succeed but trigger OpenNext warnings and may behave differently on Cloudflare Pages.** Run production builds inside **WSL/Linux/macOS** to mirror the target environment and avoid compatibility issues.
-- **Local verification:** After the build completes, you can inspect `.open-next/output` or run `npm start` locally for quick sanity checks, but only `npm run build:cloudflare` should be used to prepare artifacts for deployment.
+This project uses **OpenNext** to deploy Next.js to Cloudflare Pages with full support for dynamic routes and server-side rendering.
 
-### Wrangler Configuration
-
-The `wrangler.jsonc` file is configured for Cloudflare Pages:
-- Build output directory: `.open-next/output`
-- Compatibility date: `2025-12-18`
-- Node.js compatibility enabled via `nodejs_compat` flag
-
-### Deployment to Cloudflare Pages
-
-**⚠️ Important:** Use the correct Wrangler command for deployment:
-
+**Build Command:**
 ```bash
-# Build the project (run in WSL/Linux/macOS for production parity)
 npm run build:cloudflare
+```
+
+This command:
+1. Cleans previous builds (`.next`, `.open-next`, `.vercel`)
+2. Runs OpenNext to generate Cloudflare-compatible output
+3. Prepares the deployment structure with `_worker.js` and `_routes.json`
+4. Verifies all critical files are present
+
+**Verify Build:**
+```bash
+npm run verify:cf
+```
+
+This verification script checks that:
+- `_worker.js` exists (Cloudflare Worker for SSR)
+- `_routes.json` exists (routes static assets correctly)
+- `_next/static/` has content (JS/CSS bundles)
+- All public assets are present
+
+### Cloudflare Pages Settings
+
+Configure your Cloudflare Pages project with these **exact settings**:
+
+| Setting | Value |
+|---------|-------|
+| **Build command** | `npm run build:cloudflare` |
+| **Build output directory** | `.open-next/output` |
+| **Node version** | `22` |
+
+**Important:** Set `NODE_VERSION=22` in your Cloudflare Pages environment variables.
+
+### Deployment
+
+**Option 1: Automatic (Recommended)**
+- Push to GitHub
+- Cloudflare Pages will automatically build and deploy
+
+**Option 2: Manual via Wrangler**
+```bash
+# Build locally (run in WSL/Linux/macOS for production parity)
+npm run build:cloudflare
+
+# Verify build output
+npm run verify:cf
 
 # Deploy to Cloudflare Pages
 npx wrangler pages deploy .open-next/output
 ```
 
-**Do not use `wrangler pages build`** - this command is unsupported for Next.js projects using OpenNext.
+### Environment Parity
 
-**Production Build Requirements:**
-- Run builds inside **WSL/Linux/macOS** for production parity
-- Windows builds may succeed but can cause runtime issues on Cloudflare Pages
-- The build output (`.open-next/output`) is platform-specific and should match the deployment environment
+⚠️ **Important:** Production builds should be run in **Linux/macOS or WSL** to match the Cloudflare Pages environment. Windows builds may succeed but can cause runtime issues.
 
-**Deployment Troubleshooting:**
+### Troubleshooting
 
-1. **OAuth Login:** If the browser doesn't open automatically, manually visit the OAuth URL shown in the terminal or use:
-   ```bash
-   npx wrangler login
-   ```
+For detailed deployment troubleshooting, static asset routing, and verification steps, see [CLOUDFLARE_DEPLOYMENT.md](./CLOUDFLARE_DEPLOYMENT.md).
 
-2. **Update Wrangler:** If you see a version warning, update Wrangler:
-   ```bash
-   npm install -D wrangler@latest
-   ```
+Common issues:
+- **Unstyled site / CSS 404s**: Missing or incorrect `_routes.json` (fixed by new build process)
+- **JavaScript 404s**: Static assets not excluded from Worker routing (fixed by new build process)
+- **Dynamic routes fail**: Worker not executing properly - check Cloudflare build logs
 
-3. **Build Verification:** Before deploying, verify the build output exists:
-   ```bash
-   ls -la .open-next/output  # Linux/macOS
-   dir .open-next\output    # Windows
-   ```
+### Build Output Structure
 
-4. **Environment Variables:** Set Cloudflare Pages environment variables in the dashboard or via Wrangler:
-   ```bash
-   npx wrangler pages secret put VARIABLE_NAME
-   ```
+After a successful build, `.open-next/output/` contains:
+
+```
+.open-next/output/
+├── _worker.js          # Cloudflare Worker (handles SSR and API routes)
+├── _routes.json        # Routes config (excludes static assets from Worker)
+├── _next/static/       # Next.js static assets (JS, CSS, fonts, images)
+├── manifest.json       # PWA manifest
+├── piko-logo.jpg       # Public assets
+└── ...                 # Other runtime files
+```
+
+The `_routes.json` file ensures static assets (`/_next/static/*`, images, fonts, etc.) are served directly from Cloudflare's CDN, not through the Worker, preventing 404s and improving performance.
 
 ## 🎛️ Studio Access (Hidden Pattern)
 
