@@ -204,9 +204,13 @@ class HowlerEngine {
     try {
       // Howler stores sounds internally - when using html5 mode, each sound has an audio element
       // WARNING: Accessing private API - may break in future Howler versions
-      const sounds = (this.howl as unknown as { _sounds?: Array<{ _node?: HTMLMediaElement }> })._sounds;
+      const sounds = (this.howl as unknown as { _sounds?: Array<{ _node?: unknown }> })._sounds;
       if (sounds && sounds.length > 0 && sounds[0]._node) {
-        return sounds[0]._node;
+        const node = sounds[0]._node;
+        // Validate that the node is actually an HTMLMediaElement (Audio or Video element)
+        if (node instanceof HTMLMediaElement) {
+          return node;
+        }
       }
     } catch {
       // Ignore errors when accessing private API

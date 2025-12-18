@@ -136,9 +136,16 @@ export class AudioAnalyser {
         return true;
       }
 
-      // Set crossOrigin for CORS compliance (only if not already set)
-      // This is required for Web Audio API to access the audio data
+      // CORS check: crossOrigin must be set BEFORE audio loads for Web Audio API access
+      // If not set and audio is already loaded, warn the user
       if (!mediaElement.crossOrigin) {
+        // If media has already started loading, setting crossOrigin may be too late
+        // but we still try - it will work if the server sends proper CORS headers
+        if (mediaElement.readyState > 0) {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('[AudioAnalyser] Media already loading - crossOrigin may need to be set earlier for CORS');
+          }
+        }
         mediaElement.crossOrigin = 'anonymous';
       }
 
