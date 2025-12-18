@@ -15,6 +15,7 @@ import { usePlayerStore } from '@/store/playerStore';
 import Play from 'lucide-react/dist/esm/icons/play';
 import Pause from 'lucide-react/dist/esm/icons/pause';
 import Music from 'lucide-react/dist/esm/icons/music';
+import MiniVisualizer from './MiniVisualizer';
 
 interface TrackCardProps {
   track: Track;
@@ -117,6 +118,13 @@ export default function TrackCard({
 
           {/* Track Info */}
           <div className="relative bg-zinc-900/80 backdrop-blur-xl p-4 border-t border-zinc-800/50">
+            {/* Mini Visualizer Bar */}
+            <div className="absolute top-0 left-0 right-0 h-1 overflow-hidden">
+              <div className="h-full">
+                <MiniVisualizer trackId={track.id} />
+              </div>
+            </div>
+
             {/* Now Playing Indicator */}
             {showNowPlaying && isCurrentTrack && (
               <div className="absolute -top-3 right-4">

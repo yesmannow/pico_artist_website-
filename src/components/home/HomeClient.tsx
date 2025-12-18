@@ -5,7 +5,6 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
 import Play from "lucide-react/dist/esm/icons/play";
 import ArrowRight from "lucide-react/dist/esm/icons/arrow-right";
 import Calendar from "lucide-react/dist/esm/icons/calendar";
@@ -14,11 +13,12 @@ import Headphones from "lucide-react/dist/esm/icons/headphones";
 import TrendingUp from "lucide-react/dist/esm/icons/trending-up";
 import MapPin from "lucide-react/dist/esm/icons/map-pin";
 import { getTracks, type Track } from "@/data/tracks";
-import { getVideos, type Video } from "@/data/videos";
+import { getVideos } from "@/data/videos";
 import { usePlayerStore } from "@/store/playerStore";
 import BackgroundTexture from "@/components/ui/BackgroundTexture";
 import TrackCard from "@/components/player/TrackCard";
 import StatCounter from "@/components/home/StatCounter";
+import StoryTimeline from "@/components/home/StoryTimeline";
 
 const ParticlesBackground = dynamic(
   () => import("@/components/background/ParticlesBackground"),
@@ -354,6 +354,9 @@ export default function HomeClient() {
             </motion.div>
           </div>
         </section>
+
+        {/* Story Timeline Section */}
+        <StoryTimeline />
 
         {/* Featured Tracks Section */}
         <section className="min-h-screen flex items-center justify-center px-4 py-20 relative">

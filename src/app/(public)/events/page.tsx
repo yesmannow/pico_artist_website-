@@ -5,6 +5,9 @@ import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import X from 'lucide-react/dist/esm/icons/x';
 import ExternalLink from 'lucide-react/dist/esm/icons/external-link';
+import Download from 'lucide-react/dist/esm/icons/download';
+import CommunityPlaceholder from '@/components/events/CommunityPlaceholder';
+import { downloadICS, parseEventDate, addHours } from '@/lib/calendar';
 
 const Globe = dynamic(() => import('react-globe.gl'), { ssr: false });
 
@@ -83,6 +86,20 @@ export default function EventsPage() {
 
   const handlePointClick = (point: TourDate) => {
     setSelectedEvent(point);
+  };
+
+  const handleDownloadCalendar = (event: TourDate) => {
+    const startDate = parseEventDate(event.date);
+    const endDate = addHours(startDate, 3); // 3 hour event duration
+
+    downloadICS({
+      title: `Piko FG - ${event.name}`,
+      description: `Piko FG live performance at ${event.venue}`,
+      location: `${event.venue}, ${event.name}`,
+      startDate,
+      endDate,
+      url: event.ticketUrl,
+    });
   };
 
   return (
@@ -178,6 +195,9 @@ export default function EventsPage() {
             </motion.div>
           ))}
         </motion.div>
+
+        {/* Community Section */}
+        <CommunityPlaceholder />
       </div>
 
       {/* Event Modal */}
@@ -219,17 +239,28 @@ export default function EventsPage() {
                   </span>
                 </div>
 
-                {selectedEvent.ticketUrl && (
-                  <a
-                    href={selectedEvent.ticketUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 w-full mt-6 px-6 py-3 rounded-full bg-gradient-to-r from-piko-teal to-piko-pink text-white font-semibold hover:scale-105 transition shadow-lg shadow-piko-pink/20"
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-3 mt-6">
+                  <button
+                    onClick={() => handleDownloadCalendar(selectedEvent)}
+                    className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-full border border-piko-teal bg-piko-teal/10 text-piko-teal font-semibold hover:bg-piko-teal/20 transition"
                   >
-                    Buy Tickets
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                )}
+                    <Download className="h-4 w-4" />
+                    Add to Calendar
+                  </button>
+
+                  {selectedEvent.ticketUrl && (
+                    <a
+                      href={selectedEvent.ticketUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-full bg-gradient-to-r from-piko-teal to-piko-pink text-white font-semibold hover:scale-105 transition shadow-lg shadow-piko-pink/20"
+                    >
+                      Buy Tickets
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  )}
+                </div>
               </div>
             </motion.div>
           </motion.div>

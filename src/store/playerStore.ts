@@ -76,7 +76,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     }
     
     // Find track in queue or add it
-    let index = state.queue.findIndex((t) => t.id === track.id);
+    const index = state.queue.findIndex((t) => t.id === track.id);
     if (index === -1) {
       // Add to queue
       set({

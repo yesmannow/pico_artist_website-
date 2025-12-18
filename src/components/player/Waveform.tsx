@@ -36,7 +36,7 @@ export default function Waveform({
     if (!containerRef.current) return;
 
     // Try WebAudio first, fallback to MediaElement if needed
-    let backend: 'WebAudio' | 'MediaElement' = 'WebAudio';
+    const backend: 'WebAudio' | 'MediaElement' = 'WebAudio';
     
     try {
       // Create wavesurfer instance

@@ -25,28 +25,28 @@ type TabType = 'tracks' | 'videos';
 
 function MediaContent() {
   const searchParams = useSearchParams();
-  const [activeTab, setActiveTab] = useState<TabType>('tracks');
-  const [featuredVideo, setFeaturedVideo] = useState<Video | null>(null);
+  const videos = getVideos();
+  const tracks = getTracks();
+  
+  // Get tab from URL, default to 'tracks'
+  const tabParam = searchParams?.get('tab');
+  const initialTab = (tabParam === 'videos' ? 'videos' : 'tracks') as TabType;
+  
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
+  const [featuredVideo, setFeaturedVideo] = useState<Video | null>(videos[0] || null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
-  const tracks = getTracks();
-  const videos = getVideos();
-
-  // Initialize featured video
-  useEffect(() => {
-    if (videos.length > 0 && !featuredVideo) {
-      setFeaturedVideo(videos[0]);
-    }
-  }, [videos, featuredVideo]);
-
-  // Handle URL params for tab
+  // Sync tab with URL params when they change
   useEffect(() => {
     const tab = searchParams?.get('tab');
-    if (tab === 'videos') {
-      setActiveTab('videos');
-    } else if (tab === 'tracks') {
-      setActiveTab('tracks');
-    }
+    const newTab = (tab === 'videos' ? 'videos' : 'tracks') as TabType;
+    // Only update if different to avoid unnecessary re-renders
+    setActiveTab(prevTab => {
+      if (prevTab !== newTab) {
+        return newTab;
+      }
+      return prevTab;
+    });
   }, [searchParams]);
 
   // Filter videos by tag

@@ -46,6 +46,20 @@ export default function VisualizerCanvas({
     const preset = presetId ? getPresetById(presetId) : getDefaultPreset();
     if (!preset) {
       console.error('Invalid preset ID:', presetId);
+      // Fallback: render a simple gradient
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        const renderFallback = () => {
+          ctx.fillStyle = '#09090b';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+          gradient.addColorStop(0, 'rgba(0, 245, 212, 0.1)');
+          gradient.addColorStop(1, 'rgba(255, 0, 110, 0.1)');
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        };
+        renderFallback();
+      }
       return;
     }
 
@@ -56,8 +70,15 @@ export default function VisualizerCanvas({
     const engine = createEngine({
       canvas,
       render: (ctx, state, dt) => {
-        if (currentPresetRef.current) {
-          currentPresetRef.current.render(ctx, state, dt);
+        try {
+          if (currentPresetRef.current) {
+            currentPresetRef.current.render(ctx, state, dt);
+          }
+        } catch (err) {
+          console.error('[VisualizerCanvas] Render error:', err);
+          // Clear canvas on error
+          ctx.fillStyle = '#09090b';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
       },
     });
