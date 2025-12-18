@@ -42,7 +42,6 @@ export default function MultitrackTimeline({ className }: MultitrackTimelineProp
         cursorColor: '#ff9e00',
         barWidth: 2,
         barRadius: 1,
-        responsive: true,
         height: 60,
         normalize: true,
         backend: 'WebAudio',
@@ -216,4 +215,3 @@ export default function MultitrackTimeline({ className }: MultitrackTimelineProp
     </div>
   );
 }
-
