@@ -1,5 +1,6 @@
 {
   // Wrangler configuration for Cloudflare Pages + OpenNext
+  "name": "pico-artist-website",
   "pages_build_output_dir": ".open-next/output",
   "compatibility_date": "2025-11-17",
   "compatibility_flags": ["nodejs_compat"]
