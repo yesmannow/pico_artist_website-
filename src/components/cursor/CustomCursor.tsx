@@ -7,27 +7,14 @@ export default function CustomCursor() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isClicking, setIsClicking] = useState(false);
   const [trails, setTrails] = useState<Array<{ x: number; y: number; id: number }>>([]);
-  const [isEnabled, setIsEnabled] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
-
-  // Device capability detection
-  useEffect(() => {
-    // Only enable custom cursor if:
-    // 1. Device has fine pointer (mouse)
-    // 2. Device supports hover
-    // 3. User hasn't enabled prefers-reduced-motion
+  const [isEnabled] = useState(() => {
+    if (typeof window === 'undefined') return false;
     const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
     const supportsHover = window.matchMedia('(hover: hover)').matches;
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    
-    const shouldEnable = hasFinePointer && supportsHover && !prefersReducedMotion;
-    setIsEnabled(shouldEnable);
-    
-    if (!shouldEnable) {
-      // Ensure default cursor is restored on unsupported devices
-      document.body.style.cursor = 'auto';
-    }
-  }, []);
+    return hasFinePointer && supportsHover && !prefersReducedMotion;
+  });
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     // Only add event listeners if cursor is enabled
@@ -81,7 +68,14 @@ export default function CustomCursor() {
 
   useEffect(() => {
     // Only hide default cursor if custom cursor is enabled
-    if (!isEnabled) return;
+    if (!isEnabled) {
+      document.body.style.cursor = 'auto';
+      const existingStyle = document.getElementById('custom-cursor-style');
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+      return;
+    }
     
     // Check if style already exists to prevent duplicates
     let style = document.getElementById('custom-cursor-style');
