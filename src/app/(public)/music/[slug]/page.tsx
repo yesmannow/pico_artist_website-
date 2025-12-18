@@ -14,13 +14,11 @@ import { usePlayerStore } from '@/store/playerStore';
 import Waveform from '@/components/player/Waveform';
 import CinematicHero from '@/components/media/CinematicHero';
 import VisualizerStage from '@/components/player/VisualizerStage';
-import TrackCard from '@/components/player/TrackCard';
 import ShareButtons from '@/components/ui/ShareButtons';
 import { useIdle } from '@/hooks/useIdle';
 import Play from 'lucide-react/dist/esm/icons/play';
 import Pause from 'lucide-react/dist/esm/icons/pause';
 import ExternalLink from 'lucide-react/dist/esm/icons/external-link';
-import Music from 'lucide-react/dist/esm/icons/music';
 import ChevronLeft from 'lucide-react/dist/esm/icons/chevron-left';
 import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
 
@@ -46,28 +44,12 @@ export default function TrackDetailPage({ params }: TrackDetailPageProps) {
     playTrack,
     togglePlay,
     seek,
-    queue,
-    setQueue,
   } = usePlayerStore();
   const [stageMode, setStageMode] = useState(false);
   const isIdle = useIdle();
 
   const isCurrentTrack = current?.id === track.id;
   const isCurrentPlaying = isCurrentTrack && isPlaying;
-
-  // Constants for queue display
-  const MAX_RELATED_TRACKS = 6;
-
-  // Get related tracks (all tracks except current one)
-  const allTracks = getTracks();
-  const relatedTracks = allTracks
-    .filter((t) => t.id !== track.id)
-    .slice(0, MAX_RELATED_TRACKS);
-
-  const handleRelatedTrackPlay = (relatedTrack: typeof track, index: number) => {
-    setQueue(relatedTracks, index);
-    playTrack(relatedTrack, 'preview');
-  };
 
   const handlePlay = () => {
     if (isCurrentTrack) {
