@@ -90,17 +90,14 @@ export default function Footer() {
 
           {/* Center: Navigation Links */}
           <nav className="flex items-center gap-6 flex-wrap justify-center">
-            <Link href="/music" className="text-sm text-zinc-400 hover:text-piko-teal transition">
-              Music
+            <Link href="/media" className="text-sm text-zinc-400 hover:text-piko-teal transition">
+              Media
             </Link>
-            <Link href="/gallery" className="text-sm text-zinc-400 hover:text-piko-pink transition">
-              Gallery
+            <Link href="/events" className="text-sm text-zinc-400 hover:text-piko-pink transition">
+              Events
             </Link>
-            <Link href="/merch" className="text-sm text-zinc-400 hover:text-piko-orange transition">
-              Merch
-            </Link>
-            <Link href="/tour" className="text-sm text-zinc-400 hover:text-piko-teal transition">
-              Tour
+            <Link href="/visualizer" className="text-sm text-zinc-400 hover:text-piko-orange transition">
+              Visualizer
             </Link>
             {STUDIO_CONFIG.visible && (
               <Link

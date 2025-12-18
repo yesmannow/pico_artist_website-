@@ -8,6 +8,42 @@ const withBundleAnalyzer = bundleAnalyzer({
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
+  // Redirects for site restructure
+  async redirects() {
+    return [
+      {
+        source: '/music',
+        destination: '/media?tab=tracks',
+        permanent: true,
+      },
+      {
+        source: '/videos',
+        destination: '/media?tab=videos',
+        permanent: true,
+      },
+      {
+        source: '/bio',
+        destination: '/#bio',
+        permanent: true,
+      },
+      {
+        source: '/about',
+        destination: '/#bio',
+        permanent: true,
+      },
+      {
+        source: '/gallery',
+        destination: '/media?tab=videos',
+        permanent: true,
+      },
+      {
+        source: '/tour',
+        destination: '/events',
+        permanent: true,
+      },
+    ];
+  },
+
   // Note: If you see a "Multiple Lockfiles" warning, it's because Next.js detected
   // a package-lock.json in your user home directory (C:\Users\hoosi\package-lock.json).
   // This is informational only - Next.js will use the lockfile in this project directory.
