@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import X from 'lucide-react/dist/esm/icons/x';
@@ -68,21 +68,7 @@ const tourDates: TourDate[] = [
 ];
 
 export default function EventsPage() {
-  // Use a MutableRefObject matching GlobeMethods signature by using any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const globeRef = useRef<any>(null);
   const [selectedEvent, setSelectedEvent] = useState<TourDate | null>(null);
-
-  useEffect(() => {
-    const globe = globeRef.current;
-    if (!globe) return;
-
-    const controls = globe.controls();
-    if (controls) {
-      controls.autoRotate = true;
-      controls.autoRotateSpeed = 0.5;
-    }
-  }, []);
 
   const handlePointClick = (point: TourDate) => {
     setSelectedEvent(point);
@@ -128,40 +114,39 @@ export default function EventsPage() {
           className="relative h-[600px] rounded-3xl border border-zinc-800/70 bg-zinc-900/40 backdrop-blur-xl overflow-hidden shadow-[0_20px_120px_rgba(0,0,0,0.5)]"
         >
           <Globe
-            ref={globeRef}
-            globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
-            bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
-            backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
-            pointsData={tourDates}
-            pointColor={() => '#00f5d4'}
-            pointAltitude={0.07}
-            pointRadius={0.5}
-            // cast incoming object to any then to TourDate inside
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            pointLat={(obj: any) => (obj as TourDate).lat}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            pointLng={(obj: any) => (obj as TourDate).lng}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            pointLabel={(obj: any) => {
-              const d = obj as TourDate;
-              return `
-                <div class="glassmorphism p-4 border-l-4 border-pikoTeal bg-zinc-900/90 backdrop-blur-md rounded-lg">
-                  <div class="font-bold">${d.name}</div>
-                  <div class="text-sm">${d.date}</div>
-                  ${d.venue ? `<div class="text-xs">${d.venue}</div>` : ""}
-                  ${d.status ? `<div class="text-xs">${d.status}</div>` : ""}
-                </div>
-              `;
-            }}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            onPointClick={(obj: any) => {
-              const d = obj as TourDate;
-              handlePointClick(d);
-            }}
-            atmosphereColor="#ff006e"
-            atmosphereAltitude={0.15}
-            enablePointerInteraction={true}
-          />
+              globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
+              bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
+              backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
+              pointsData={tourDates}
+              pointColor={() => '#00f5d4'}
+              pointAltitude={0.07}
+              pointRadius={0.5}
+              // cast incoming object to any then to TourDate inside
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              pointLat={(obj: any) => (obj as TourDate).lat}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              pointLng={(obj: any) => (obj as TourDate).lng}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              pointLabel={(obj: any) => {
+                const d = obj as TourDate;
+                return `
+                  <div class="glassmorphism p-4 border-l-4 border-pikoTeal bg-zinc-900/90 backdrop-blur-md rounded-lg">
+                    <div class="font-bold">${d.name}</div>
+                    <div class="text-sm">${d.date}</div>
+                    ${d.venue ? `<div class="text-xs">${d.venue}</div>` : ""}
+                    ${d.status ? `<div class="text-xs">${d.status}</div>` : ""}
+                  </div>
+                `;
+              }}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              onPointClick={(obj: any) => {
+                const d = obj as TourDate;
+                handlePointClick(d);
+              }}
+              atmosphereColor="#ff006e"
+              atmosphereAltitude={0.15}
+              enablePointerInteraction={true}
+            />
         </motion.div>
 
         {/* Event List */}

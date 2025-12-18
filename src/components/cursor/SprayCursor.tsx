@@ -26,6 +26,7 @@ export default function SprayCursor() {
   const mousePosRef = useRef({ x: 0, y: 0 });
   const lastEmitTimeRef = useRef(0);
   const isHoverDeviceRef = useRef(false);
+  const prefersReducedMotionRef = useRef(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -36,7 +37,25 @@ export default function SprayCursor() {
 
     // Detect hover-capable device (disable on touch devices)
     const checkHoverDevice = () => {
+      const wasHoverDevice = isHoverDeviceRef.current;
       isHoverDeviceRef.current = window.matchMedia('(hover: hover)').matches;
+      prefersReducedMotionRef.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // If device changed from touch to hover, restart animation
+      if (!wasHoverDevice && isHoverDeviceRef.current && !prefersReducedMotionRef.current) {
+        if (animationFrameRef.current === null) {
+          animationFrameRef.current = requestAnimationFrame(animate);
+        }
+      }
+      // If device changed from hover to touch, stop animation completely
+      else if (wasHoverDevice && !isHoverDeviceRef.current) {
+        if (animationFrameRef.current !== null) {
+          cancelAnimationFrame(animationFrameRef.current);
+          animationFrameRef.current = null;
+        }
+        particlesRef.current = [];
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
     };
     checkHoverDevice();
     window.addEventListener('resize', checkHoverDevice);
@@ -51,7 +70,7 @@ export default function SprayCursor() {
 
     // Mouse move handler
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isHoverDeviceRef.current) return;
+      if (!isHoverDeviceRef.current || prefersReducedMotionRef.current) return;
 
       mousePosRef.current = { x: e.clientX, y: e.clientY };
 
@@ -89,12 +108,13 @@ export default function SprayCursor() {
 
     // Animation loop (runs outside React state)
     const animate = () => {
-      if (!isHoverDeviceRef.current) {
-        // Clear particles on touch devices
+      // CRITICAL: Stop the loop entirely on touch devices or if reduced motion is preferred
+      if (!isHoverDeviceRef.current || prefersReducedMotionRef.current) {
+        // Clear particles and stop the loop
         particlesRef.current = [];
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        animationFrameRef.current = requestAnimationFrame(animate);
-        return;
+        animationFrameRef.current = null;
+        return; // Exit the loop completely
       }
 
       // Clear with slight fade for trail effect
@@ -138,8 +158,10 @@ export default function SprayCursor() {
       animationFrameRef.current = requestAnimationFrame(animate);
     };
 
-    // Start animation
-    animationFrameRef.current = requestAnimationFrame(animate);
+    // Start animation only if hover device and not reduced motion
+    if (isHoverDeviceRef.current && !prefersReducedMotionRef.current) {
+      animationFrameRef.current = requestAnimationFrame(animate);
+    }
 
     // Event listeners
     window.addEventListener('mousemove', handleMouseMove);
@@ -151,6 +173,7 @@ export default function SprayCursor() {
       window.removeEventListener('resize', checkHoverDevice);
       if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
       }
     };
   }, []);

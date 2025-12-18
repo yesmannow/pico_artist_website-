@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
-import bundleAnalyzer from "@next/bundle-analyzer";
+// import bundleAnalyzer from "@next/bundle-analyzer"; // Commented out
 
-const withBundleAnalyzer = bundleAnalyzer({
-  enabled: process.env.ANALYZE === 'true',
-});
+// const withBundleAnalyzer = bundleAnalyzer({
+//   enabled: process.env.ANALYZE === 'true',
+// });
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -58,13 +58,7 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Note: If you see a "Multiple Lockfiles" warning, it's because Next.js detected
-  // a package-lock.json in your user home directory (C:\Users\hoosi\package-lock.json).
-  // This is informational only - Next.js will use the lockfile in this project directory.
-  // To suppress the warning, delete the unrelated lockfile at the user root if not needed.
-
   // Image optimization configuration
-  // CLOUDFLARE FIX: unoptimized: true required for Cloudflare Pages
   images: {
     unoptimized: true, // Cloudflare Pages cannot resize images dynamically
     formats: ['image/avif', 'image/webp'],
@@ -75,9 +69,10 @@ const nextConfig: NextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   typescript: {
-    // Temporary Cloudflare build unblocker; address underlying type errors before removing
-    ignoreBuildErrors: true,
+    // Type checking enabled for production stability
+    ignoreBuildErrors: false,
   },
 };
 
-export default withBundleAnalyzer(nextConfig);
+// Export the config directly without the wrapper
+export default nextConfig;

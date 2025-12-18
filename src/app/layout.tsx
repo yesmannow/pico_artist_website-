@@ -11,11 +11,39 @@ import SprayCursor from "@/components/cursor/SprayCursor";
 // No runtime export needed - defaults to nodejs
 
 export const metadata: Metadata = {
-  title: "Piko Artist Studio",
-  description: "Music, videos, and tour dates",
-  manifest: "/manifest.json",
+  title: {
+    default: "Piko FG - Digital Graffiti Artist",
+    template: "%s | Piko FG",
+  },
+  description: "Music, videos, and tour dates from Piko FG. Urban beats, digital graffiti aesthetic, and immersive audio experiences.",
   appleWebApp: {
     title: "Piko Studio",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://pikofg.com",
+    siteName: "Piko FG",
+    title: "Piko FG - Digital Graffiti Artist",
+    description: "Music, videos, and tour dates from Piko FG. Urban beats, digital graffiti aesthetic, and immersive audio experiences.",
+    images: [
+      {
+        url: "/piko-logo.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Piko FG",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Piko FG - Digital Graffiti Artist",
+    description: "Music, videos, and tour dates from Piko FG.",
+    images: ["/piko-logo.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
@@ -32,6 +60,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+      </head>
       <body className="antialiased bg-zinc-950 text-zinc-100">
         <ErrorBoundary>
           <SprayCursor />

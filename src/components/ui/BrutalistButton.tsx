@@ -29,7 +29,7 @@ export default function BrutalistButton({
   as: Component = 'button',
   href,
 }: BrutalistButtonProps) {
-  const baseClasses = 'rounded-none border-2 font-semibold transition-all duration-100 relative';
+  const baseClasses = 'rounded-none border-2 font-semibold transition-all duration-100 relative min-h-[44px] min-w-[44px] px-4 py-2';
 
   const variantClasses = {
     primary: 'bg-piko-teal border-zinc-100 text-zinc-950 shadow-[4px_4px_0px_#00f5d4] hover:shadow-[2px_2px_0px_#00f5d4]',

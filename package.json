@@ -5,9 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-
     "build:cloudflare": "npm run clean && npx @opennextjs/cloudflare build && node scripts/cf-pages-postbuild.mjs",
-
     "clean": "npx rimraf .next .open-next .vercel",
     "verify:cf": "node scripts/verify-cf-build.mjs",
     "start": "next start",
@@ -16,9 +14,6 @@
   },
   "dependencies": {
     "@next/bundle-analyzer": "^16.0.10",
-    "@tsparticles/engine": "^3.9.1",
-    "@tsparticles/react": "^3.0.0",
-    "@tsparticles/slim": "^3.9.1",
     "ffmpeg-static": "^5.2.0",
     "framer-motion": "^12.23.26",
     "howler": "^2.2.4",
@@ -28,7 +23,6 @@
     "react-dom": "^19.2.3",
     "react-globe.gl": "^2.37.0",
     "react-lite-youtube-embed": "^3.3.3",
-    "react-parallax-tilt": "^1.7.315",
     "sharp": "^0.34.5",
     "wavesurfer.js": "^7.12.1",
     "zustand": "^5.0.9"
@@ -44,7 +38,7 @@
     "eslint-config-next": "16.0.10",
     "rimraf": "^6.1.2",
     "tailwindcss": "^4",
-    "typescript": "^5",
+    "typescript": "5.9.3",
     "wrangler": "^4.55.0"
   }
 }

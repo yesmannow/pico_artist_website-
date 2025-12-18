@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { usePlayerStore } from '@/store/playerStore';
 import { howlerEngine } from '@/lib/player/howlerEngine';
@@ -54,6 +54,17 @@ export default function PlayerDock() {
   const timeUpdateRef = useRef<number | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const safeProgress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile for transition duration
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.matchMedia('(hover: none)').matches);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Initialize and sync with howler engine
   useEffect(() => {
@@ -137,7 +148,7 @@ export default function PlayerDock() {
 
   // Toggle source (only on track detail page and if full version exists)
   const canToggleSource = pathname?.includes('/music/') && current?.fullUrl;
-  
+
   const handleSourceToggle = () => {
     if (canToggleSource) {
       setSource(source === 'preview' ? 'full' : 'preview');
@@ -196,7 +207,22 @@ export default function PlayerDock() {
           <div className="flex items-center justify-between gap-4">
             {/* Track info */}
             <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="w-12 h-12 rounded bg-gradient-to-br from-piko-teal to-piko-pink flex-shrink-0" />
+              <div className="w-12 h-12 rounded overflow-hidden bg-gradient-to-br from-piko-teal to-piko-pink flex-shrink-0 relative">
+                {current.coverArt ? (
+                  <motion.img
+                    src={current.coverArt}
+                    alt={current.title}
+                    layoutId={`album-art-${current.id || 'unknown'}`}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    transition={{
+                      duration: isMobile ? 0.3 : 0.5,
+                      ease: [0.4, 0, 0.2, 1],
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-piko-teal to-piko-pink" />
+                )}
+              </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-zinc-100 truncate">
                   {current.title}
@@ -230,14 +256,14 @@ export default function PlayerDock() {
             <div className="flex items-center gap-2">
               <button
                 onClick={prev}
-                className="p-2 text-zinc-400 hover:text-piko-teal transition"
+                className="min-h-[44px] min-w-[44px] p-3 text-zinc-400 hover:text-piko-teal transition flex items-center justify-center"
                 aria-label="Previous track"
               >
                 <SkipBack className="w-5 h-5" />
               </button>
               <button
                 onClick={togglePlay}
-                className="p-3 rounded-full bg-piko-teal text-white hover:bg-piko-teal/80 transition"
+                className="min-h-[44px] min-w-[44px] p-3 rounded-full bg-piko-teal text-white hover:bg-piko-teal/80 transition flex items-center justify-center"
                 aria-label={isPlaying ? 'Pause' : 'Play'}
               >
                 {isPlaying ? (
@@ -248,7 +274,7 @@ export default function PlayerDock() {
               </button>
               <button
                 onClick={next}
-                className="p-2 text-zinc-400 hover:text-piko-teal transition"
+                className="min-h-[44px] min-w-[44px] p-3 text-zinc-400 hover:text-piko-teal transition flex items-center justify-center"
                 aria-label="Next track"
               >
                 <SkipForward className="w-5 h-5" />
@@ -263,7 +289,7 @@ export default function PlayerDock() {
                   href={youtubeMusicLink.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 text-zinc-400 hover:text-piko-pink transition"
+                  className="min-h-[44px] min-w-[44px] p-3 text-zinc-400 hover:text-piko-pink transition flex items-center justify-center"
                   aria-label="Listen on YouTube Music"
                   title="Listen on YouTube Music"
                 >
@@ -274,7 +300,7 @@ export default function PlayerDock() {
               {/* Visualizer button */}
               <button
                 onClick={() => router.push('/visualizer')}
-                className="p-2 text-zinc-400 hover:text-piko-teal transition"
+                className="min-h-[44px] min-w-[44px] p-3 text-zinc-400 hover:text-piko-teal transition flex items-center justify-center"
                 aria-label="Open visualizer"
                 title="Visualizer Mode"
               >
@@ -295,7 +321,7 @@ export default function PlayerDock() {
               <div className="hidden md:flex items-center gap-2">
                 <button
                   onClick={() => setVolume(volume > 0 ? 0 : 0.7)}
-                  className="text-zinc-400 hover:text-piko-teal transition"
+                  className="min-h-[44px] min-w-[44px] p-3 text-zinc-400 hover:text-piko-teal transition flex items-center justify-center"
                   aria-label={volume > 0 ? 'Mute' : 'Unmute'}
                 >
                   {volume > 0 ? (

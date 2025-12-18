@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { getTracks } from '@/data/tracks';
-import { getVideos, type Video } from '@/data/videos';
+import { getVideos, type Video as VideoType } from '@/data/videos';
 import TrackList from '@/components/player/TrackList';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
@@ -27,13 +27,13 @@ function MediaContent() {
   const searchParams = useSearchParams();
   const videos = getVideos();
   const tracks = getTracks();
-  
+
   // Get tab from URL, default to 'tracks'
   const tabParam = searchParams?.get('tab');
   const tabFromUrl = (tabParam === 'videos' ? 'videos' : 'tracks') as TabType;
-  
+
   const [activeTab, setActiveTab] = useState<TabType>(tabFromUrl);
-  const [featuredVideo, setFeaturedVideo] = useState<Video | null>(videos[0] || null);
+  const [featuredVideo, setFeaturedVideo] = useState<VideoType | null>(videos[0] || null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
   // Sync tab with URL params when they change
@@ -266,7 +266,7 @@ function MediaContent() {
                           alt={video.title}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
-                        
+
                         {/* Play overlay */}
                         <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                           <div className="w-12 h-12 rounded-full bg-piko-teal/90 flex items-center justify-center">

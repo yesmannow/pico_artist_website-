@@ -20,9 +20,9 @@ interface ShareButtonsProps {
   variant?: 'default' | 'minimal';
 }
 
-export default function ShareButtons({ 
-  title, 
-  url, 
+export default function ShareButtons({
+  title,
+  url,
   description,
   variant = 'default'
 }: ShareButtonsProps) {
@@ -49,7 +49,7 @@ export default function ShareButtons({
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-        
+
         try {
           document.execCommand('copy');
           setCopied(true);
@@ -57,7 +57,7 @@ export default function ShareButtons({
         } catch (err) {
           console.error('Fallback copy failed:', err);
         }
-        
+
         document.body.removeChild(textArea);
       }
     } catch (err) {
@@ -80,14 +80,14 @@ export default function ShareButtons({
       {/* Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`group flex items-center gap-2 transition-all ${
+        className={`group flex items-center gap-2 transition-all min-h-[44px] ${
           variant === 'minimal'
-            ? 'text-zinc-400 hover:text-piko-teal'
+            ? 'text-zinc-400 hover:text-piko-teal px-2'
             : 'px-4 py-2 rounded-full border border-zinc-700 bg-zinc-800/60 hover:border-piko-teal/50 hover:bg-zinc-800 text-zinc-300'
         }`}
         aria-label="Share"
       >
-        <Share2 className="w-4 h-4" />
+        <Share2 className="w-5 h-5" />
         {variant === 'default' && <span className="text-sm font-medium">Share</span>}
       </button>
 

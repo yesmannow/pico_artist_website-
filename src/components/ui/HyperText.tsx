@@ -83,7 +83,7 @@ export default function HyperText({
 
   // On mobile, show text immediately (no hover effect)
   if (isMobile || shouldReduceMotion) {
-    return <Component className={className}>{text}</Component>;
+    return <Component className={className} aria-label={text}>{text}</Component>;
   }
 
   return (
@@ -92,6 +92,7 @@ export default function HyperText({
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       style={{ display: 'inline-block' }}
+      aria-label={text}
     >
       <motion.span
         key={displayText}
@@ -99,6 +100,7 @@ export default function HyperText({
         animate={{ opacity: 1 }}
         transition={{ duration: 0.1 }}
         style={{ display: 'inline-block' }}
+        aria-hidden="true"
       >
         {displayText}
       </motion.span>

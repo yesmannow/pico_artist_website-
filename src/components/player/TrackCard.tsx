@@ -6,7 +6,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
@@ -36,6 +36,17 @@ export default function TrackCard({
   const { current, isPlaying } = usePlayerStore();
   const prefersReducedMotion = useReducedMotion();
   const [isHovered, setIsHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile for transition duration
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.matchMedia('(hover: none)').matches);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const isCurrentTrack = current?.id === track.id;
   const isCurrentPlaying = isCurrentTrack && isPlaying;
@@ -76,17 +87,21 @@ export default function TrackCard({
         >
           {/* Cover Art Background */}
           <div className="relative h-48 sm:h-56 overflow-hidden bg-zinc-900">
-            <Image
+            <motion.img
               src={track.coverArt || '/piko-logo.jpg'}
               alt={track.title}
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-110"
-              sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+              layoutId={`album-art-${track.id || 'unknown'}`}
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              transition={{
+                duration: isMobile ? 0.3 : 0.5,
+                ease: [0.4, 0, 0.2, 1],
+              }}
+              style={{ objectFit: 'cover' }}
             />
-            
+
             {/* Gradient Overlay for readability */}
             <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-zinc-950/20" />
-            
+
             {/* Animated glow on hover */}
             {isHovered && !prefersReducedMotion && (
               <motion.div
@@ -95,7 +110,7 @@ export default function TrackCard({
                 className="absolute inset-0 bg-gradient-to-br from-piko-teal/20 via-piko-pink/20 to-piko-orange/20"
               />
             )}
-            
+
             {/* Play button overlay */}
             <div className="absolute inset-0 flex items-center justify-center">
               <button
