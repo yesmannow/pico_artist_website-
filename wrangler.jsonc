@@ -1,6 +1,6 @@
 {
   "name": "pico-artist-portfolio-website",
-  "pages_build_output_dir": ".open-next/assets",
+  "pages_build_output_dir": ".open-next/output",
   "compatibility_date": "2025-12-18",
   "compatibility_flags": ["nodejs_compat"]
 }
