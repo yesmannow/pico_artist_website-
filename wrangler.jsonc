@@ -1,0 +1,10 @@
+{
+  // Cloudflare Pages configuration for Piko Artist Studio
+  "name": "pico-artist-studio",
+  "compatibility_date": "2025-11-17",
+  "compatibility_flags": ["nodejs_compat"],
+  "pages_build_output_dir": ".vercel/output/static",
+  "build": {
+    "command": "npm run build"
+  }
+}
