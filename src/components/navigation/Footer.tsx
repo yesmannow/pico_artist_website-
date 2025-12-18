@@ -3,12 +3,34 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import CloudRain from 'lucide-react/dist/esm/icons/cloud-rain';
+import Youtube from 'lucide-react/dist/esm/icons/youtube';
+import Facebook from 'lucide-react/dist/esm/icons/facebook';
+import Instagram from 'lucide-react/dist/esm/icons/instagram';
+import Music from 'lucide-react/dist/esm/icons/music';
 import { Howl } from 'howler';
 import { STUDIO_CONFIG } from '@/lib/studioConfig';
+import { getSocialLinks } from '@/data/socials';
 
 export default function Footer() {
   const [streetRainEnabled, setStreetRainEnabled] = useState(false);
   const rainSoundRef = useRef<Howl | null>(null);
+  const socialLinks = getSocialLinks();
+
+  // Map platform to icon component
+  const getSocialIcon = (platform: string) => {
+    switch (platform) {
+      case 'youtube-music':
+        return <Music className="h-5 w-5" />;
+      case 'youtube':
+        return <Youtube className="h-5 w-5" />;
+      case 'facebook':
+        return <Facebook className="h-5 w-5" />;
+      case 'instagram':
+        return <Instagram className="h-5 w-5" />;
+      default:
+        return null;
+    }
+  };
 
   useEffect(() => {
     // Initialize street rain sound
@@ -99,6 +121,9 @@ export default function Footer() {
             <Link href="/visualizer" className="text-sm text-zinc-400 hover:text-piko-orange transition">
               Visualizer
             </Link>
+            <Link href="/press" className="text-sm text-zinc-400 hover:text-piko-teal transition">
+              Press / EPK
+            </Link>
             {STUDIO_CONFIG.visible && (
               <Link
                 href="/studio"
@@ -111,8 +136,27 @@ export default function Footer() {
             )}
           </nav>
 
-          {/* Right: Street Rain Toggle */}
+          {/* Right: Social Links & Street Rain Toggle */}
           <div className="flex items-center gap-4">
+            {/* Social Media Links */}
+            <div className="flex items-center gap-3">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.platform}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-zinc-400 hover:text-piko-teal transition"
+                  aria-label={social.name}
+                  title={social.name}
+                >
+                  {getSocialIcon(social.platform)}
+                </a>
+              ))}
+            </div>
+
+            <div className="w-px h-6 bg-zinc-800" />
+
             {/* Street Rain Toggle */}
             <button
               onClick={() => setStreetRainEnabled(!streetRainEnabled)}

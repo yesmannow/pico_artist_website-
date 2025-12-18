@@ -7,48 +7,50 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import Play from "lucide-react/dist/esm/icons/play";
 import ArrowRight from "lucide-react/dist/esm/icons/arrow-right";
-import Calendar from "lucide-react/dist/esm/icons/calendar";
-import Users from "lucide-react/dist/esm/icons/users";
-import Headphones from "lucide-react/dist/esm/icons/headphones";
-import TrendingUp from "lucide-react/dist/esm/icons/trending-up";
-import MapPin from "lucide-react/dist/esm/icons/map-pin";
+import Youtube from "lucide-react/dist/esm/icons/youtube";
+import Facebook from "lucide-react/dist/esm/icons/facebook";
+import Instagram from "lucide-react/dist/esm/icons/instagram";
 import { getTracks, type Track } from "@/data/tracks";
 import { getVideos } from "@/data/videos";
 import { usePlayerStore } from "@/store/playerStore";
 import BackgroundTexture from "@/components/ui/BackgroundTexture";
 import TrackCard from "@/components/player/TrackCard";
-import StatCounter from "@/components/home/StatCounter";
-import StoryTimeline from "@/components/home/StoryTimeline";
+import MarqueeHeader from "@/components/ui/MarqueeHeader";
+import { getSocialLinks } from "@/data/socials";
 
 const ParticlesBackground = dynamic(
   () => import("@/components/background/ParticlesBackground"),
   { ssr: false }
 );
 
-// Simple event preview data (import from events page if needed)
-const upcomingEvents = [
-  {
-    id: 'event-1',
-    name: 'Mexico City',
-    venue: 'Palacio de los Deportes',
-    date: 'Jan 15, 2026',
-  },
-  {
-    id: 'event-2',
-    name: 'Los Angeles',
-    venue: 'The Wiltern',
-    date: 'Feb 02, 2026',
-  },
-];
+const TheDrop = dynamic(
+  () => import("@/components/hero/TheDrop"),
+  { ssr: false }
+);
+
+const SignTheWall = dynamic(
+  () => import("@/components/community/SignTheWall"),
+  { ssr: false }
+);
+
+const MerchLookbook = dynamic(
+  () => import("@/components/merch/MerchLookbook"),
+  { ssr: false }
+);
+
+const InstagramFeed = dynamic(
+  () => import("@/components/social/InstagramFeed"),
+  { ssr: false }
+);
 
 export default function HomeClient() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isHoveringLogo, setIsHoveringLogo] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ container: containerRef });
   const vinylRotation = useMotionValue(0);
   const prefersReducedMotion = useReducedMotion();
   const { playTrack, setQueue } = usePlayerStore();
+  const socialLinks = getSocialLinks();
 
   const tracks = getTracks().slice(0, 6); // Featured tracks
   const videos = getVideos().slice(0, 6); // Featured videos
@@ -70,8 +72,11 @@ export default function HomeClient() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  const backgroundParallax = useTransform(scrollYProgress, [0, 1], [0, -60]);
   const heroImageParallax = useTransform(scrollYProgress, [0, 1], [0, -40]);
+
+  // Keep vinylRotation for potential future use
+  void vinylRotation;
+  void heroImageParallax;
 
   const handleTrackPlay = (track: Track, index: number) => {
     setQueue(tracks, index);
@@ -89,152 +94,12 @@ export default function HomeClient() {
         <div
           className="fixed inset-0 pointer-events-none transition-opacity duration-300 z-0"
           style={{
-            background: `radial-gradient(600px at ${mousePosition.x}px ${mousePosition.y}px, rgba(255, 0, 110, 0.15), transparent 80%)`,
+            background: `radial-gradient(800px at ${mousePosition.x}px ${mousePosition.y}px, rgba(255, 0, 110, 0.20), transparent 80%)`,
           }}
         />
 
-        {/* Hero Section - Full Height */}
-        <section data-hero className="min-h-screen flex items-center px-4 relative z-10">
-          <motion.div
-            className="absolute inset-0"
-            style={{ y: prefersReducedMotion ? 0 : backgroundParallax }}
-          >
-            <BackgroundTexture
-              src="/assets/images/bg/graffiti_1874452_1280.jpg"
-              opacity={0.16}
-              blend="soft-light"
-            />
-          </motion.div>
-          <div className="relative max-w-6xl mx-auto w-full grid lg:grid-cols-[1.05fr_0.95fr] gap-10 items-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="space-y-6 text-center lg:text-left"
-            >
-              <motion.div
-                initial={{ scale: 0, rotate: -10 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{
-                  type: "spring",
-                  stiffness: 260,
-                  damping: 20,
-                  duration: 0.8
-                }}
-                className="relative mx-auto lg:mx-0 w-52 h-52 md:w-64 md:h-64"
-                onMouseEnter={() => setIsHoveringLogo(true)}
-                onMouseLeave={() => setIsHoveringLogo(false)}
-              >
-                {/* Floating 3D Vinyl Record */}
-                <motion.div
-                  style={{ rotate: vinylRotation }}
-                  className="relative w-full h-full"
-                >
-                  {/* RGB Glitch Layers */}
-                  {isHoveringLogo && (
-                    <>
-                      <div className="absolute inset-0 opacity-70 mix-blend-screen">
-                        <Image
-                          src="/piko-logo.jpg"
-                          alt="Piko FG Logo - Red Channel"
-                          fill
-                          className="object-contain rounded-full"
-                          style={{ filter: "grayscale(100%) sepia(100%) hue-rotate(-50deg) saturate(600%)", transform: "translate(-2px, 0)" }}
-                        />
-                      </div>
-                      <div className="absolute inset-0 opacity-70 mix-blend-screen">
-                        <Image
-                          src="/piko-logo.jpg"
-                          alt="Piko FG Logo - Blue Channel"
-                          fill
-                          className="object-contain rounded-full"
-                          style={{ filter: "grayscale(100%) sepia(100%) hue-rotate(180deg) saturate(600%)", transform: "translate(2px, 0)" }}
-                        />
-                      </div>
-                    </>
-                  )}
-                  <Image
-                    src="/piko-logo.jpg"
-                    alt="Piko FG Logo"
-                    fill
-                    className="object-contain relative z-10 rounded-full"
-                    priority
-                  />
-                  {/* Vinyl Grooves */}
-                  <div className="absolute inset-0 rounded-full border-8 border-zinc-800/50" />
-                  <div className="absolute inset-4 rounded-full border-2 border-zinc-700/30" />
-                  <div className="absolute inset-8 rounded-full border border-zinc-700/20" />
-                </motion.div>
-              </motion.div>
-
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.6 }}
-                className="text-4xl md:text-6xl font-bold leading-tight tracking-tight text-zinc-100"
-              >
-                Piko FG Studio
-              </motion.h1>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.35, duration: 0.6 }}
-                className="text-lg text-zinc-300 max-w-xl mx-auto lg:mx-0"
-              >
-                Digital Graffiti Collective — Cinematic Soundscapes
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.45, duration: 0.6 }}
-                className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start"
-              >
-                <Link
-                  href="/media?tab=tracks"
-                  className="group inline-flex items-center justify-center gap-2 rounded-full bg-piko-teal px-6 py-3 font-semibold text-zinc-950 shadow-lg shadow-piko-teal/30 transition hover:scale-[1.02]"
-                >
-                  Listen
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                </Link>
-                <Link
-                  href="/media?tab=videos"
-                  className="group inline-flex items-center justify-center gap-2 rounded-full border border-piko-pink/60 bg-piko-pink/10 px-6 py-3 font-semibold text-piko-pink shadow-lg shadow-piko-pink/20 transition hover:scale-[1.02]"
-                >
-                  Watch
-                  <Play className="h-4 w-4" fill="currentColor" />
-                </Link>
-              </motion.div>
-            </motion.div>
-
-            <motion.div
-              className="relative w-full h-[420px] md:h-[480px]"
-              style={{ y: prefersReducedMotion ? 0 : heroImageParallax }}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
-              <div className="absolute -inset-6 bg-gradient-to-br from-piko-teal/10 via-piko-pink/10 to-piko-orange/10 blur-3xl" />
-              <div className="relative h-full w-full overflow-hidden rounded-[28px] border border-zinc-800/70 bg-zinc-900/60 backdrop-blur-xl shadow-2xl shadow-piko-pink/10">
-                <Image
-                  src="/assets/images/hero/white_hero.jpg"
-                  alt="Piko FG Hero"
-                  fill
-                  priority
-                  className="object-cover"
-                  sizes="(min-width: 1024px) 45vw, 90vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/70 via-transparent to-transparent" />
-                <BackgroundTexture
-                  src="/assets/images/bg/wall_2602116_1280.jpg"
-                  opacity={0.14}
-                  blend="soft-light"
-                  grain={false}
-                />
-              </div>
-            </motion.div>
-          </div>
-        </section>
+        {/* "The Drop" - Hero Replacement */}
+        <TheDrop trackTitle="Te Prometo" />
 
         {/* Bio / Identity Section */}
         <section id="bio" className="min-h-screen flex items-center justify-center px-4 py-20 relative">
@@ -255,6 +120,30 @@ export default function HomeClient() {
                 smoky verses. The cinematic dark palette was born from street murals that glowed under
                 sodium lights.
               </p>
+              
+              {/* Social Pill Row */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2, duration: 0.6 }}
+                className="flex items-center justify-center gap-3 flex-wrap"
+              >
+                {socialLinks.map((social) => (
+                  <a
+                    key={social.platform}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-2 px-4 py-2 rounded-full border border-zinc-700 bg-zinc-900/50 hover:border-piko-teal hover:bg-piko-teal/10 transition text-sm font-medium text-zinc-300 hover:text-piko-teal"
+                  >
+                    {social.platform === 'youtube' && <Youtube className="w-4 h-4" />}
+                    {social.platform === 'facebook' && <Facebook className="w-4 h-4" />}
+                    {social.platform === 'instagram' && <Instagram className="w-4 h-4" />}
+                    <span>{social.name}</span>
+                  </a>
+                ))}
+              </motion.div>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -315,7 +204,7 @@ export default function HomeClient() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="relative rounded-3xl border border-piko-pink/30 bg-zinc-900/60 backdrop-blur-xl overflow-hidden shadow-[0_25px_70px_rgba(255,0,110,0.2)]"
+              className="relative rounded-3xl border border-piko-pink/30 bg-zinc-900/80 backdrop-blur-xl overflow-hidden shadow-[0_25px_70px_rgba(255,0,110,0.2)]"
             >
               <BackgroundTexture
                 src="/assets/images/bg/graffiti_1874452_1280.jpg"
@@ -355,12 +244,10 @@ export default function HomeClient() {
           </div>
         </section>
 
-        {/* Story Timeline Section */}
-        <StoryTimeline />
-
         {/* Featured Tracks Section */}
         <section className="min-h-screen flex items-center justify-center px-4 py-20 relative">
           <div className="max-w-6xl mx-auto w-full">
+            <MarqueeHeader text="FEATURED TRACKS" />
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -368,9 +255,6 @@ export default function HomeClient() {
               transition={{ duration: 0.8 }}
               className="text-center mb-12"
             >
-              <h2 className="text-4xl md:text-5xl font-bold text-zinc-100 mb-4">
-                Featured <span className="bg-gradient-to-r from-piko-teal to-piko-pink bg-clip-text text-transparent">Tracks</span>
-              </h2>
               <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
                 Explore curated tracks from the Digital Graffiti Collective
               </p>
@@ -408,6 +292,7 @@ export default function HomeClient() {
         {/* Featured Videos Section */}
         <section className="min-h-screen flex items-center justify-center px-4 py-20 relative">
           <div className="max-w-6xl mx-auto w-full">
+            <MarqueeHeader text="FEATURED VIDEOS" />
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -415,9 +300,6 @@ export default function HomeClient() {
               transition={{ duration: 0.8 }}
               className="text-center mb-12"
             >
-              <h2 className="text-4xl md:text-5xl font-bold text-zinc-100 mb-4">
-                Featured <span className="bg-gradient-to-r from-piko-pink to-piko-orange bg-clip-text text-transparent">Videos</span>
-              </h2>
               <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
                 Cinematic visuals and music videos
               </p>
@@ -518,147 +400,14 @@ export default function HomeClient() {
           </motion.div>
         </section>
 
-        {/* Live Stats Section */}
-        <section className="py-20 px-4 relative">
-          <div className="max-w-6xl mx-auto w-full">
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8 }}
-              className="text-center mb-12"
-            >
-              <p className="text-xs uppercase tracking-[0.3em] text-piko-teal mb-4">Digital Impact</p>
-              <h2 className="text-4xl md:text-5xl font-bold text-zinc-100 mb-4">
-                By The <span className="bg-gradient-to-r from-piko-teal to-piko-pink bg-clip-text text-transparent">Numbers</span>
-              </h2>
-              <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
-                Real-time stats from the Digital Graffiti movement
-              </p>
-            </motion.div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-              <StatCounter
-                end={125000}
-                label="Total Streams"
-                suffix="+"
-                icon={<Headphones className="w-6 h-6 text-white" />}
-              />
-              <StatCounter
-                end={8500}
-                label="Followers"
-                suffix="+"
-                icon={<Users className="w-6 h-6 text-white" />}
-              />
-              <StatCounter
-                end={26}
-                label="Tracks Released"
-                icon={<Play className="w-6 h-6 text-white" fill="currentColor" />}
-              />
-              <StatCounter
-                end={94.7}
-                label="Fan Rating"
-                suffix="%"
-                decimals={1}
-                icon={<TrendingUp className="w-6 h-6 text-white" />}
-              />
-            </div>
-          </div>
-        </section>
+        {/* Sign The Wall - Community Feature */}
+        <SignTheWall />
 
-        {/* Events Preview Section with Interactive Timeline */}
-        <section className="min-h-screen flex items-center justify-center px-4 py-20 relative">
-          <div className="max-w-6xl mx-auto w-full">
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8 }}
-              className="text-center mb-12"
-            >
-              <p className="text-xs uppercase tracking-[0.3em] text-piko-orange mb-4">Tour Dates</p>
-              <h2 className="text-4xl md:text-5xl font-bold text-zinc-100 mb-4">
-                Upcoming <span className="bg-gradient-to-r from-piko-pink to-piko-orange bg-clip-text text-transparent">Events</span>
-              </h2>
-              <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
-                Catch us live at these upcoming shows and performances
-              </p>
-            </motion.div>
-            
-            {/* Interactive Timeline */}
-            <div className="relative max-w-3xl mx-auto">
-              {/* Timeline Line */}
-              <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-piko-teal via-piko-pink to-piko-orange hidden md:block" />
-              
-              {upcomingEvents.map((event, idx) => (
-                <motion.div
-                  key={event.id}
-                  initial={{ opacity: 0, x: idx % 2 === 0 ? -50 : 50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.2 * idx, duration: 0.6 }}
-                  className={`relative mb-8 md:mb-12 md:grid md:grid-cols-2 md:gap-8 ${
-                    idx % 2 === 0 ? '' : 'md:grid-flow-dense'
-                  }`}
-                >
-                  {/* Event Card */}
-                  <div className={idx % 2 === 0 ? 'md:col-start-1' : 'md:col-start-2'}>
-                    <div className="group relative rounded-2xl border border-zinc-800 bg-zinc-900/60 backdrop-blur-md p-6 hover:border-piko-orange/50 transition-all hover:-translate-y-1 hover:shadow-[0_22px_46px_-28px_rgba(255,158,0,0.35)]">
-                      <div className="absolute inset-0 bg-gradient-to-br from-piko-orange/10 to-piko-pink/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
-                      <div className="relative z-10">
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-piko-orange to-piko-pink flex items-center justify-center shadow-lg shadow-piko-orange/30">
-                              <Calendar className="h-6 w-6 text-white" />
-                            </div>
-                            <div>
-                              <p className="text-xs uppercase tracking-[0.24em] text-piko-orange font-semibold">
-                                {event.date}
-                              </p>
-                              <div className="flex items-center gap-1 mt-1">
-                                <MapPin className="w-3 h-3 text-zinc-500" />
-                                <p className="text-xs text-zinc-500">Live Show</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <h3 className="text-2xl font-bold text-zinc-100 mb-2 group-hover:text-piko-orange transition">
-                          {event.name}
-                        </h3>
-                        <p className="text-zinc-400 mb-4">{event.venue}</p>
-                        <div className="flex gap-2">
-                          <span className="px-3 py-1 text-xs rounded-full bg-piko-orange/10 text-piko-orange border border-piko-orange/30">
-                            Tickets Available
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Timeline Node (Desktop only) */}
-                  <div className="hidden md:block absolute left-1/2 top-8 w-4 h-4 -ml-2 rounded-full bg-gradient-to-br from-piko-teal to-piko-pink shadow-lg shadow-piko-pink/50 ring-4 ring-zinc-950" />
-                </motion.div>
-              ))}
-            </div>
+        {/* Merch Lookbook */}
+        <MerchLookbook />
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-              className="text-center mt-12"
-            >
-              <Link href="/events">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-8 py-3 rounded-full border border-piko-orange/50 bg-piko-orange/10 text-piko-orange font-semibold hover:bg-piko-orange/20 transition"
-                >
-                  View All Events
-                </motion.button>
-              </Link>
-            </motion.div>
-          </div>
-        </section>
+        {/* Instagram Feed */}
+        <InstagramFeed />
       </div>
     </>
   );
