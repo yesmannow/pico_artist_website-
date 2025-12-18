@@ -105,8 +105,8 @@ export function createEngine(options: EngineOptions) {
   let isVisible = true;
 
   const quality = calculateQualitySettings();
-  // MANDATORY: Clamp DPR to max 1.5 to prevent VRAM exhaustion
-  const dpr = Math.min(window.devicePixelRatio || 1, 1.5) * quality.scale;
+  // MANDATORY: Smart DPR clamping - min 1 (prevent blur on standard monitors), max 1.5 (prevent VRAM exhaustion)
+  const dpr = Math.min(Math.max(window.devicePixelRatio || 1, 1), 1.5) * quality.scale;
 
   // State that will be passed to render function
   const state: EngineState = {

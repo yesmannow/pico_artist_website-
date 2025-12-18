@@ -44,6 +44,20 @@ const nextConfig: NextConfig = {
     ];
   },
 
+  // Headers for media file caching and byte-range requests
+  async headers() {
+    return [
+      {
+        source: '/:all*(mp3|wav|m4a|mp4|webm)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+          { key: 'Accept-Ranges', value: 'bytes' },
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+        ],
+      },
+    ];
+  },
+
   // Note: If you see a "Multiple Lockfiles" warning, it's because Next.js detected
   // a package-lock.json in your user home directory (C:\Users\hoosi\package-lock.json).
   // This is informational only - Next.js will use the lockfile in this project directory.

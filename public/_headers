@@ -1,0 +1,14 @@
+/*.mp3
+  Cache-Control: public, max-age=31536000, immutable
+  Accept-Ranges: bytes
+  Access-Control-Allow-Origin: *
+
+/*.wav
+  Cache-Control: public, max-age=31536000, immutable
+  Accept-Ranges: bytes
+  Access-Control-Allow-Origin: *
+
+/*.mp4
+  Cache-Control: public, max-age=31536000, immutable
+  Accept-Ranges: bytes
+  Access-Control-Allow-Origin: *

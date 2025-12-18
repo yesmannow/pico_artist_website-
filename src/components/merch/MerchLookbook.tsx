@@ -5,8 +5,8 @@
 
 'use client';
 
-import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useCallback } from 'react';
 import Lock from 'lucide-react/dist/esm/icons/lock';
 
 interface MerchItem {
@@ -43,9 +43,29 @@ const merchItems: MerchItem[] = [
 
 export default function MerchLookbook() {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const showLockedToast = useCallback(() => {
+    setToast('🔒 Verified members only. Sign the wall to get access code.');
+    setTimeout(() => setToast(null), 3000);
+  }, []);
 
   return (
     <section className="py-20 px-4 relative overflow-hidden">
+      {/* Toast notification */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-full bg-zinc-900/90 border border-piko-orange/50 backdrop-blur-md shadow-lg"
+          >
+            <p className="text-sm font-medium text-zinc-100">{toast}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -108,7 +128,13 @@ export default function MerchLookbook() {
                       )}
 
                       {/* Locked overlay */}
-                      <div className="absolute inset-0 bg-zinc-950/80 flex items-center justify-center group-hover:bg-zinc-950/60 transition">
+                      <div 
+                        className="absolute inset-0 bg-zinc-950/80 flex items-center justify-center group-hover:bg-zinc-950/60 transition cursor-pointer"
+                        onClick={showLockedToast}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => e.key === 'Enter' && showLockedToast()}
+                      >
                         <motion.div
                           className="text-center"
                           animate={{
