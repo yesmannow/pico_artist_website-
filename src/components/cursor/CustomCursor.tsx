@@ -7,8 +7,31 @@ export default function CustomCursor() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isClicking, setIsClicking] = useState(false);
   const [trails, setTrails] = useState<Array<{ x: number; y: number; id: number }>>([]);
+  const [isEnabled, setIsEnabled] = useState(false);
+
+  // Device capability detection
+  useEffect(() => {
+    // Only enable custom cursor if:
+    // 1. Device has fine pointer (mouse)
+    // 2. Device supports hover
+    // 3. User hasn't enabled prefers-reduced-motion
+    const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+    const supportsHover = window.matchMedia('(hover: hover)').matches;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    const shouldEnable = hasFinePointer && supportsHover && !prefersReducedMotion;
+    setIsEnabled(shouldEnable);
+    
+    if (!shouldEnable) {
+      // Ensure default cursor is restored on unsupported devices
+      document.body.style.cursor = 'auto';
+    }
+  }, []);
 
   useEffect(() => {
+    // Only add event listeners if cursor is enabled
+    if (!isEnabled) return;
+
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
@@ -35,23 +58,47 @@ export default function CustomCursor() {
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [mousePosition]);
+  }, [mousePosition, isEnabled]);
 
   // Remove old trails
   useEffect(() => {
+    if (!isEnabled) return;
+    
     const interval = setInterval(() => {
       setTrails((prev) => prev.filter((trail) => Date.now() - trail.id < 1000));
     }, 100);
     return () => clearInterval(interval);
-  }, []);
+  }, [isEnabled]);
 
   useEffect(() => {
-    // Hide default cursor
-    document.body.style.cursor = 'none';
+    // Only hide default cursor if custom cursor is enabled
+    if (!isEnabled) return;
+    
+    // Add CSS rule to hide cursor globally, but allow normal cursor on interactive elements
+    const style = document.createElement('style');
+    style.id = 'custom-cursor-style';
+    style.textContent = `
+      body { cursor: none !important; }
+      input, textarea, select, button, a, [role="button"], [contenteditable="true"] {
+        cursor: auto !important;
+      }
+    `;
+    document.head.appendChild(style);
+    
     return () => {
+      // Clean up on unmount or when disabled
+      const existingStyle = document.getElementById('custom-cursor-style');
+      if (existingStyle) {
+        existingStyle.remove();
+      }
       document.body.style.cursor = 'auto';
     };
-  }, []);
+  }, [isEnabled]);
+
+  // Don't render custom cursor if device doesn't support it
+  if (!isEnabled) {
+    return null;
+  }
 
   return (
     <>
