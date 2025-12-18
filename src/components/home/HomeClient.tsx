@@ -17,15 +17,31 @@ import { getVideos } from "@/data/videos";
 import { usePlayerStore } from "@/store/playerStore";
 import BackgroundTexture from "@/components/ui/BackgroundTexture";
 import TrackCard from "@/components/player/TrackCard";
-import TheDrop from "@/components/hero/TheDrop";
-import SignTheWall from "@/components/community/SignTheWall";
-import MerchLookbook from "@/components/merch/MerchLookbook";
-import InstagramFeed from "@/components/social/InstagramFeed";
 import MarqueeHeader from "@/components/ui/MarqueeHeader";
 import { getSocialLinks } from "@/data/socials";
 
 const ParticlesBackground = dynamic(
   () => import("@/components/background/ParticlesBackground"),
+  { ssr: false }
+);
+
+const TheDrop = dynamic(
+  () => import("@/components/hero/TheDrop"),
+  { ssr: false }
+);
+
+const SignTheWall = dynamic(
+  () => import("@/components/community/SignTheWall"),
+  { ssr: false }
+);
+
+const MerchLookbook = dynamic(
+  () => import("@/components/merch/MerchLookbook"),
+  { ssr: false }
+);
+
+const InstagramFeed = dynamic(
+  () => import("@/components/social/InstagramFeed"),
   { ssr: false }
 );
 
@@ -231,6 +247,7 @@ export default function HomeClient() {
         {/* Featured Tracks Section */}
         <section className="min-h-screen flex items-center justify-center px-4 py-20 relative">
           <div className="max-w-6xl mx-auto w-full">
+            <MarqueeHeader text="FEATURED TRACKS" />
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -238,9 +255,6 @@ export default function HomeClient() {
               transition={{ duration: 0.8 }}
               className="text-center mb-12"
             >
-              <h2 className="text-4xl md:text-5xl font-bold text-zinc-100 mb-4">
-                Featured <span className="bg-gradient-to-r from-piko-teal to-piko-pink bg-clip-text text-transparent">Tracks</span>
-              </h2>
               <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
                 Explore curated tracks from the Digital Graffiti Collective
               </p>
@@ -278,6 +292,7 @@ export default function HomeClient() {
         {/* Featured Videos Section */}
         <section className="min-h-screen flex items-center justify-center px-4 py-20 relative">
           <div className="max-w-6xl mx-auto w-full">
+            <MarqueeHeader text="FEATURED VIDEOS" />
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -285,9 +300,6 @@ export default function HomeClient() {
               transition={{ duration: 0.8 }}
               className="text-center mb-12"
             >
-              <h2 className="text-4xl md:text-5xl font-bold text-zinc-100 mb-4">
-                Featured <span className="bg-gradient-to-r from-piko-pink to-piko-orange bg-clip-text text-transparent">Videos</span>
-              </h2>
               <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
                 Cinematic visuals and music videos
               </p>
