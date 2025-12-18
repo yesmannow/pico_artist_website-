@@ -1,0 +1,297 @@
+/**
+ * Track Detail Page
+ * Shows individual track with waveform, full playback option, and links
+ */
+
+'use client';
+
+import { use } from 'react';
+import { notFound } from 'next/navigation';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import Link from 'next/link';
+import { getTrackBySlug, getTracks } from '@/data/tracks';
+import { usePlayerStore } from '@/store/playerStore';
+import Waveform from '@/components/player/Waveform';
+import Play from 'lucide-react/dist/esm/icons/play';
+import Pause from 'lucide-react/dist/esm/icons/pause';
+import ExternalLink from 'lucide-react/dist/esm/icons/external-link';
+import Music from 'lucide-react/dist/esm/icons/music';
+import ChevronLeft from 'lucide-react/dist/esm/icons/chevron-left';
+
+interface TrackDetailPageProps {
+  params: Promise<{
+    slug: string;
+  }>;
+}
+
+export default function TrackDetailPage({ params }: TrackDetailPageProps) {
+  const { slug } = use(params);
+  const track = getTrackBySlug(slug);
+
+  if (!track) {
+    notFound();
+  }
+
+  const {
+    current,
+    isPlaying,
+    currentTime,
+    source,
+    playTrack,
+    togglePlay,
+    seek,
+    queue,
+  } = usePlayerStore();
+
+  const isCurrentTrack = current?.id === track.id;
+  const isCurrentPlaying = isCurrentTrack && isPlaying;
+
+  // Get next tracks from queue
+  const currentIndex = queue.findIndex((t) => t.id === track.id);
+  const nextTracks = currentIndex >= 0 ? queue.slice(currentIndex + 1, currentIndex + 4) : getTracks().slice(0, 3);
+
+  const handlePlay = () => {
+    if (isCurrentTrack) {
+      togglePlay();
+    } else {
+      playTrack(track, 'preview');
+    }
+  };
+
+  const handlePlayFull = () => {
+    if (!track.fullUrl) return;
+    
+    if (isCurrentTrack && source === 'full') {
+      togglePlay();
+    } else {
+      playTrack(track, 'full');
+    }
+  };
+
+  const handleWaveformSeek = (time: number) => {
+    seek(time);
+  };
+
+  const currentUrl = isCurrentTrack
+    ? source === 'full' && track.fullUrl
+      ? track.fullUrl
+      : track.previewUrl
+    : track.previewUrl;
+
+  return (
+    <div className="min-h-screen">
+      {/* Back Button */}
+      <div className="max-w-6xl mx-auto px-4 pt-8">
+        <Link
+          href="/music"
+          className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-piko-teal transition"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          Back to Music
+        </Link>
+      </div>
+
+      {/* Hero Section */}
+      <div className="relative h-[50vh] overflow-hidden">
+        <div className="absolute inset-0">
+          {track.coverArt ? (
+            <Image
+              src={track.coverArt}
+              alt={track.title}
+              fill
+              className="object-cover"
+              priority
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-piko-teal/20 via-piko-pink/20 to-piko-orange/20" />
+          )}
+          {/* Dark overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/60 via-zinc-950/80 to-zinc-950" />
+        </div>
+
+        {/* Hero Content */}
+        <div className="relative h-full flex items-end pb-12">
+          <div className="max-w-6xl mx-auto px-4 w-full">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="space-y-4"
+            >
+              <p className="text-xs uppercase tracking-[0.3em] text-piko-teal">
+                {track.releaseYear || 'Track'}
+              </p>
+              <h1 className="text-5xl md:text-7xl font-bold text-zinc-100">
+                {track.title}
+              </h1>
+              <p className="text-xl text-zinc-300">{track.artist}</p>
+
+              {/* Play Buttons */}
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={handlePlay}
+                  className="flex items-center gap-2 px-6 py-3 rounded-full bg-piko-teal text-white font-semibold hover:bg-piko-teal/80 transition"
+                >
+                  {isCurrentPlaying && source === 'preview' ? (
+                    <>
+                      <Pause className="w-5 h-5" fill="currentColor" />
+                      Pause Preview
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-5 h-5 ml-0.5" fill="currentColor" />
+                      Play Preview
+                    </>
+                  )}
+                </button>
+
+                {track.fullUrl && (
+                  <button
+                    onClick={handlePlayFull}
+                    className="flex items-center gap-2 px-6 py-3 rounded-full border border-piko-pink bg-piko-pink/10 text-piko-pink font-semibold hover:bg-piko-pink/20 transition"
+                  >
+                    {isCurrentPlaying && source === 'full' ? (
+                      <>
+                        <Pause className="w-5 h-5" fill="currentColor" />
+                        Pause Full Track
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-5 h-5 ml-0.5" fill="currentColor" />
+                        Play Full Track
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto px-4 py-12">
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Left Column - Waveform */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 backdrop-blur-xl p-6">
+              <h2 className="text-lg font-semibold text-zinc-100 mb-4">
+                {isCurrentTrack && source === 'full' && track.fullUrl
+                  ? 'Full Track'
+                  : 'Preview'}
+              </h2>
+              {isCurrentTrack ? (
+                <Waveform
+                  url={currentUrl}
+                  currentTime={currentTime}
+                  onSeek={handleWaveformSeek}
+                  height={120}
+                  className="mb-4"
+                />
+              ) : (
+                <div className="h-[120px] rounded-lg bg-zinc-950/50 flex items-center justify-center text-zinc-500">
+                  Click play to load waveform
+                </div>
+              )}
+            </div>
+
+            {/* External Links */}
+            {track.links && Object.values(track.links).some((link) => link) && (
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 backdrop-blur-xl p-6">
+                <h2 className="text-lg font-semibold text-zinc-100 mb-4">
+                  Listen Elsewhere
+                </h2>
+                <div className="flex flex-wrap gap-3">
+                  {track.links.spotify && (
+                    <a
+                      href={track.links.spotify}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 rounded-full border border-zinc-700 bg-zinc-800/50 text-zinc-300 hover:border-green-500 hover:text-green-500 transition"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      Spotify
+                    </a>
+                  )}
+                  {track.links.youtubeMusic && (
+                    <a
+                      href={track.links.youtubeMusic}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 rounded-full border border-zinc-700 bg-zinc-800/50 text-zinc-300 hover:border-red-500 hover:text-red-500 transition"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      YouTube Music
+                    </a>
+                  )}
+                  {track.links.youtube && (
+                    <a
+                      href={track.links.youtube}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 rounded-full border border-zinc-700 bg-zinc-800/50 text-zinc-300 hover:border-red-500 hover:text-red-500 transition"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      YouTube
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right Column - Next Up */}
+          <div className="space-y-4">
+            {nextTracks.length > 0 && (
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 backdrop-blur-xl p-6">
+                <h2 className="text-lg font-semibold text-zinc-100 mb-4">Next Up</h2>
+                <div className="space-y-3">
+                  {nextTracks.map((nextTrack) => (
+                    <Link
+                      key={nextTrack.id}
+                      href={`/music/${nextTrack.slug}`}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-zinc-800/30 hover:bg-zinc-800/60 transition group"
+                    >
+                      <div className="w-10 h-10 rounded bg-gradient-to-br from-piko-teal to-piko-pink flex items-center justify-center flex-shrink-0">
+                        <Music className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-zinc-100 truncate group-hover:text-piko-teal transition">
+                          {nextTrack.title}
+                        </p>
+                        <p className="text-xs text-zinc-400 truncate">
+                          {nextTrack.artist}
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Tags */}
+            {track.tags && track.tags.length > 0 && (
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 backdrop-blur-xl p-6">
+                <h2 className="text-lg font-semibold text-zinc-100 mb-4">Tags</h2>
+                <div className="flex flex-wrap gap-2">
+                  {track.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-3 py-1 text-sm rounded-full bg-zinc-800/80 text-zinc-300"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Add bottom padding to account for PlayerDock */}
+      <div className="h-32" />
+    </div>
+  );
+}
