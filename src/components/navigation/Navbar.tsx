@@ -59,6 +59,7 @@ const NeonHomeIcon = ({ className, ...props }: IconProps) => (
   </svg>
 );
 
+// Slide-out is used when menu count exceeds this to keep items readable on mobile
 const SLIDE_OUT_THRESHOLD = 5;
 const HERO_ROOT_MARGIN = '-72px 0px 0px 0px';
 

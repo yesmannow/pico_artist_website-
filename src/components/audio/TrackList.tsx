@@ -6,6 +6,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getTracks, likeTrack, type Track } from '@/lib/supabase';
 import { Howl } from 'howler';
 
+const PREVIEW_DURATION_MS = 5000;
+const PREVIEW_FALLBACK_SRC = '/lofi-teaser.wav';
+
 interface TrackCardProps {
   track: Track;
   isPlaying: boolean;
@@ -13,8 +16,6 @@ interface TrackCardProps {
 }
 
 function TrackCard({ track, isPlaying, onPlay }: TrackCardProps) {
-  const PREVIEW_DURATION_MS = 5000;
-  const PREVIEW_FALLBACK_SRC = '/lofi-teaser.wav';
   const waveformRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(track.likes);
