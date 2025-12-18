@@ -39,6 +39,6 @@
     "rimraf": "^6.1.2",
     "tailwindcss": "^4",
     "typescript": "5.9.3",
-    "wrangler": "^4.55.0"
+    "wrangler": "^3.114.0"
   }
 }
