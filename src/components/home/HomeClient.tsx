@@ -19,6 +19,7 @@ import { usePlayerStore } from "@/store/playerStore";
 import BackgroundTexture from "@/components/ui/BackgroundTexture";
 import TrackCard from "@/components/player/TrackCard";
 import StatCounter from "@/components/home/StatCounter";
+import StoryTimeline from "@/components/home/StoryTimeline";
 
 const ParticlesBackground = dynamic(
   () => import("@/components/background/ParticlesBackground"),
@@ -354,6 +355,9 @@ export default function HomeClient() {
             </motion.div>
           </div>
         </section>
+
+        {/* Story Timeline Section */}
+        <StoryTimeline />
 
         {/* Featured Tracks Section */}
         <section className="min-h-screen flex items-center justify-center px-4 py-20 relative">
