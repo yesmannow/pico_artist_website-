@@ -44,4 +44,5 @@ next-env.d.ts
 # media processing and local data
 cookies.txt
 downloads/
+!downloads/README.md
 .env.local
