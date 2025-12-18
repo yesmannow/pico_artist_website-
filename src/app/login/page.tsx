@@ -6,14 +6,13 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { signIn } from '@/lib/supabase';
 
-function LoginForm() {
+function LoginForm({ onSystemOverride }: { onSystemOverride: () => void }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [screenShake, setScreenShake] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,8 +31,7 @@ function LoginForm() {
   };
 
   const handleSystemOverride = () => {
-    setScreenShake(true);
-    setTimeout(() => setScreenShake(false), 500);
+    onSystemOverride();
     // Could add special access logic here
   };
 
@@ -124,9 +122,9 @@ function LoginForm() {
         transition={{ delay: 0.8 }}
         type="button"
         onClick={handleSystemOverride}
-        className={`w-full py-2 px-4 rounded-lg border border-zinc-700 bg-zinc-900/50 text-zinc-400 hover:border-red-500/50 hover:text-red-400 transition-all font-mono text-xs ${
-          screenShake ? 'animate-pulse' : ''
-        }`}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        className="w-full py-2 px-4 rounded-lg border border-zinc-700 bg-zinc-900/50 text-zinc-400 hover:border-red-500/50 hover:text-red-400 transition-all font-mono text-xs"
       >
         [SYSTEM OVERRIDE]
       </motion.button>
@@ -137,6 +135,7 @@ function LoginForm() {
 export default function LoginPage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [flicker, setFlicker] = useState(0);
+  const [screenShake, setScreenShake] = useState(false);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -155,7 +154,17 @@ export default function LoginPage() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4 relative overflow-hidden">
+    <motion.div
+      className="flex min-h-screen flex-col items-center justify-center px-4 relative overflow-hidden"
+      animate={{
+        x: screenShake ? [0, -10, 10, -10, 10, 0] : 0,
+        y: screenShake ? [0, 10, -10, 10, -10, 0] : 0,
+      }}
+      transition={{
+        duration: 0.5,
+        ease: 'easeInOut',
+      }}
+    >
       {/* CRT Scanlines Overlay */}
       <div
         className="fixed inset-0 pointer-events-none z-20"
@@ -263,7 +272,7 @@ export default function LoginPage() {
           </motion.p>
 
           <Suspense fallback={<div className="text-center text-zinc-400 font-mono">[LOADING...]</div>}>
-            <LoginForm />
+            <LoginForm onSystemOverride={() => setScreenShake(true)} />
           </Suspense>
 
           <motion.div
@@ -276,6 +285,6 @@ export default function LoginPage() {
           </motion.div>
         </div>
       </motion.div>
-    </div>
+    </motion.div>
   );
 }

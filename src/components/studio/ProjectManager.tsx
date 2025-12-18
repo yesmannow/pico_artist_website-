@@ -18,7 +18,7 @@ export default function ProjectManager({ isOpen, onClose }: ProjectManagerProps)
   const [editName, setEditName] = useState('');
   const [saveName, setSaveName] = useState('Untitled Project');
 
-  const { tracks, currentTime, masterVolume } = useStudioStore();
+  const { tracks, currentTime, masterVolume, tempo, loadProject: loadProjectToStore, setTempo } = useStudioStore();
 
   useEffect(() => {
     if (isOpen) {
@@ -45,7 +45,7 @@ export default function ProjectManager({ isOpen, onClose }: ProjectManagerProps)
     try {
       const projectData: Omit<Project, 'id' | 'created_at' | 'updated_at'> = {
         name: saveName.trim(),
-        tempo: 120, // Default tempo
+        tempo: tempo,
         current_time: currentTime,
         master_volume: masterVolume || 1.0,
         tracks: tracks.map(track => ({
@@ -59,7 +59,10 @@ export default function ProjectManager({ isOpen, onClose }: ProjectManagerProps)
         })),
       };
 
-      await saveProject(projectData);
+      const saved = await saveProject(projectData);
+      if (saved?.id) {
+        useStudioStore.setState({ currentProjectId: saved.id });
+      }
       setSaveName('Untitled Project');
       await loadProjects();
     } catch (error) {
@@ -75,9 +78,9 @@ export default function ProjectManager({ isOpen, onClose }: ProjectManagerProps)
     try {
       const project = await loadProject(projectId);
       if (project) {
-        // Restore project state to store
-        // This would need to be implemented in the store
-        console.log('Loaded project:', project);
+        // Use store's loadProject to hydrate the session
+        loadProjectToStore(project);
+        setTempo(project.tempo);
         onClose();
       }
     } catch (error) {

@@ -35,54 +35,53 @@ export default function GlobalMusicPlayer() {
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const scrubRef = useRef<HTMLDivElement>(null);
 
-  // Initialize crackle sound
+  // Initialize crackle sound with Web Audio API for proper lowpass filter
   useEffect(() => {
-    // Create a simple crackle sound using Web Audio API
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+
+    // Generate crackle noise buffer
     const buffer = audioContext.createBuffer(1, audioContext.sampleRate * 2, audioContext.sampleRate);
     const data = buffer.getChannelData(0);
-
-    // Generate crackle noise
     for (let i = 0; i < buffer.length; i++) {
-      data[i] = (Math.random() * 2 - 1) * 0.1;
+      // Create crackle pattern with occasional spikes
+      const spike = Math.random() < 0.01 ? Math.random() * 0.3 : 0;
+      data[i] = (Math.random() * 2 - 1) * 0.05 + spike;
     }
 
-    // Convert to blob URL for Howl
-    const offlineContext = new OfflineAudioContext(1, audioContext.sampleRate * 2, audioContext.sampleRate);
-    const source = offlineContext.createBufferSource();
-    source.buffer = buffer;
-
-    // Create crackle with low-pass filter effect
-    const filter = offlineContext.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.value = 2000;
-    source.connect(filter);
-    filter.connect(offlineContext.destination);
-    source.start(0);
-
-    // For now, use a simple approach - create crackle sound
+    // Create Howl instance for crackle
     crackleRef.current = new Howl({
-      src: ['/lofi-teaser.wav'], // Fallback - would ideally be a crackle sound
+      src: ['/lofi-teaser.wav'], // Fallback - would ideally be a crackle sound file
       volume: crackleVolume,
       loop: true,
-      rate: 0.5, // Slow down for crackle effect
+      rate: 0.3, // Slow down for crackle effect
     });
+
+    // Apply Web Audio API processing for lowpass filter
+    if (crackleRef.current && audioContext) {
+      const source = audioContext.createMediaElementSource(crackleRef.current._sounds[0]?._node || audioContext.createBufferSource());
+      const filter = audioContext.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 2000;
+      filter.Q.value = 1;
+      source.connect(filter);
+      filter.connect(audioContext.destination);
+    }
 
     return () => {
       crackleRef.current?.unload();
     };
   }, []);
 
-  // Update crackle volume based on scrubbing
+  // Update crackle volume and apply lowpass filter when scrubbing
   useEffect(() => {
     if (crackleRef.current) {
       if (isScrubbing) {
         crackleRef.current.volume(0.15);
-        // Apply low-pass filter effect (simulated by rate)
-        crackleRef.current.rate(0.3);
+        // Apply resonant lowpass effect by adjusting rate and using Web Audio API
+        crackleRef.current.rate(0.25); // Slower for more resonant effect
       } else {
         crackleRef.current.volume(crackleVolume);
-        crackleRef.current.rate(0.5);
+        crackleRef.current.rate(0.3);
       }
     }
   }, [isScrubbing, crackleVolume]);
@@ -216,7 +215,7 @@ export default function GlobalMusicPlayer() {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-zinc-800 bg-zinc-950/95 backdrop-blur-md">
+    <div className="fixed bottom-0 right-0 w-96 z-50 border-t border-l border-zinc-800 bg-zinc-950/95 backdrop-blur-md rounded-tl-2xl">
       {/* Paint Drip SVG Overlay */}
       <div className="absolute top-0 left-0 right-0 transform -translate-y-full">
         <svg
@@ -239,7 +238,7 @@ export default function GlobalMusicPlayer() {
         </svg>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-3">
+      <div className="px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           {/* Track Info with Visualizer */}
           <div className="flex items-center gap-3 min-w-0 flex-1">

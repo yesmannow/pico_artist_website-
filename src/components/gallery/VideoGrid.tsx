@@ -9,7 +9,7 @@ import { Music, Video, Radio } from 'lucide-react';
 type VideoItem = {
   id: string;
   title: string;
-  category?: 'music-video' | 'live-session' | 'vlog';
+  category?: 'music-video' | 'live-session' | 'vlog' | string;
 };
 
 type VideoGridProps = {

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Marquee from 'react-fast-marquee';
 import { CloudRain } from 'lucide-react';
 import { Howl } from 'howler';
+import { motion } from 'framer-motion';
 
 export default function Footer() {
   const [streetRainEnabled, setStreetRainEnabled] = useState(false);
@@ -38,18 +39,29 @@ export default function Footer() {
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-900/40 via-zinc-950/60 to-zinc-950/80" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,245,212,0.05),transparent_70%)]" />
 
-      {/* Infinite Marquee */}
+      {/* Infinite CSS Marquee */}
       <div className="relative z-10 py-4 border-b border-zinc-800/50 overflow-hidden">
-        <Marquee speed={50} gradient={false} className="text-sm font-semibold">
-          <span className="text-piko-teal mx-8">PIKO FG</span>
-          <span className="text-zinc-400 mx-8">—</span>
-          <span className="text-piko-pink mx-8">NEW ALBUM 2026</span>
-          <span className="text-zinc-400 mx-8">—</span>
-          <span className="text-piko-orange mx-8">STAY TUNED</span>
-          <span className="text-zinc-400 mx-8">—</span>
-          <span className="text-piko-teal mx-8">DIGITAL GRAFFITI COLLECTIVE</span>
-          <span className="text-zinc-400 mx-8">—</span>
-        </Marquee>
+        <div className="marquee-container">
+          <div className="marquee-content">
+            <span className="text-piko-teal mx-8 text-sm font-semibold">PIKO FG</span>
+            <span className="text-zinc-400 mx-8 text-sm font-semibold">—</span>
+            <span className="text-piko-pink mx-8 text-sm font-semibold">NEW ALBUM 2026</span>
+            <span className="text-zinc-400 mx-8 text-sm font-semibold">—</span>
+            <span className="text-piko-orange mx-8 text-sm font-semibold">STAY TUNED</span>
+            <span className="text-zinc-400 mx-8 text-sm font-semibold">—</span>
+            <span className="text-piko-teal mx-8 text-sm font-semibold">DIGITAL GRAFFITI COLLECTIVE</span>
+            <span className="text-zinc-400 mx-8 text-sm font-semibold">—</span>
+            {/* Duplicate for seamless loop */}
+            <span className="text-piko-teal mx-8 text-sm font-semibold">PIKO FG</span>
+            <span className="text-zinc-400 mx-8 text-sm font-semibold">—</span>
+            <span className="text-piko-pink mx-8 text-sm font-semibold">NEW ALBUM 2026</span>
+            <span className="text-zinc-400 mx-8 text-sm font-semibold">—</span>
+            <span className="text-piko-orange mx-8 text-sm font-semibold">STAY TUNED</span>
+            <span className="text-zinc-400 mx-8 text-sm font-semibold">—</span>
+            <span className="text-piko-teal mx-8 text-sm font-semibold">DIGITAL GRAFFITI COLLECTIVE</span>
+            <span className="text-zinc-400 mx-8 text-sm font-semibold">—</span>
+          </div>
+        </div>
       </div>
 
       {/* Footer Content */}
@@ -92,13 +104,27 @@ export default function Footer() {
               <span className="text-xs font-medium">Rain</span>
             </button>
 
-            {/* Stealth Artist Entry Link */}
+            {/* Stealth Artist Portal Link */}
             <Link
               href="/login"
               className="text-xs text-zinc-500 opacity-30 hover:opacity-100 hover:text-piko-teal transition-all duration-300 relative group"
             >
-              <span className="relative z-10">Artist Entry</span>
-              <span className="absolute inset-0 bg-piko-teal/10 blur-md opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
+              <span className="relative z-10">Artist Portal</span>
+              <motion.span
+                className="absolute inset-0 bg-piko-teal/10 blur-md opacity-0 group-hover:opacity-100 transition-opacity -z-10"
+                animate={{
+                  boxShadow: [
+                    '0 0 0px rgba(0, 245, 212, 0)',
+                    '0 0 20px rgba(0, 245, 212, 0.5)',
+                    '0 0 0px rgba(0, 245, 212, 0)',
+                  ],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              />
             </Link>
           </div>
         </div>

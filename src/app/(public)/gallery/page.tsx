@@ -6,6 +6,18 @@ import Gallery from '@/components/Gallery';
 import VideoGrid from '@/components/gallery/VideoGrid';
 import manifest from '@/data/media-manifest.json';
 
+// Type assertion for manifest videos
+type VideoItem = {
+  id: string;
+  title: string;
+  category?: 'music-video' | 'live-session' | 'vlog' | string;
+};
+
+type MediaManifest = {
+  videos: VideoItem[];
+  images: string[];
+};
+
 export default function GalleryPage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
@@ -52,7 +64,7 @@ export default function GalleryPage() {
           transition={{ delay: 0.2, duration: 0.6 }}
           className="mb-12"
         >
-          <VideoGrid videos={manifest.videos} />
+          <VideoGrid videos={(manifest as MediaManifest).videos as VideoItem[]} />
         </motion.div>
 
         {/* Image Gallery */}

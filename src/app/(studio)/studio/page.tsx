@@ -5,14 +5,24 @@ import { motion } from 'framer-motion';
 import StudioRecorder from '@/components/studio/StudioRecorder';
 import MultitrackTimeline from '@/components/studio/MultitrackTimeline';
 import ProjectManager from '@/components/studio/ProjectManager';
+import StudioHeader from '@/components/studio/StudioHeader';
 import { getTracks, type Track } from '@/lib/supabase';
 import { FolderOpen } from 'lucide-react';
+import { useStudioStore } from '@/store/studioStore';
 
 export default function StudioPage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [backingTracks, setBackingTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState(true);
   const [projectManagerOpen, setProjectManagerOpen] = useState(false);
+  const { tracks, tempo, saveProject } = useStudioStore();
+
+  // Auto-save when tracks or tempo change
+  useEffect(() => {
+    if (tracks.length > 0 || tempo !== 120) {
+      saveProject();
+    }
+  }, [tracks, tempo, saveProject]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -37,7 +47,8 @@ export default function StudioPage() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12 relative overflow-hidden">
+    <div className="flex min-h-screen flex-col items-center justify-center px-4 pt-24 pb-12 relative overflow-hidden">
+      <StudioHeader />
       {/* Interactive Mouse Spotlight */}
       <div
         className="fixed inset-0 pointer-events-none transition-opacity duration-300"

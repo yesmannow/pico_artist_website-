@@ -9,6 +9,7 @@ import ParticlesBackground from "@/components/background/ParticlesBackground";
 import CustomCursor from "@/components/cursor/CustomCursor";
 import { Play, ArrowRight } from "lucide-react";
 import { Howl } from "howler";
+import { getTracks, type Track as SupabaseTrack } from "@/lib/supabase";
 
 export default function HomeClient() {
   const router = useRouter();
@@ -20,6 +21,9 @@ export default function HomeClient() {
   const vinylRotation = useMotionValue(0);
   const [teaserPlaying, setTeaserPlaying] = useState(false);
   const teaserSoundRef = useRef<Howl | null>(null);
+  const [featuredTracks, setFeaturedTracks] = useState<SupabaseTrack[]>([]);
+  const [hoveredTrackId, setHoveredTrackId] = useState<string | null>(null);
+  const trackTeaserRefs = useRef<Map<string, Howl>>(new Map());
 
   // Scroll-based vinyl rotation
   useEffect(() => {
@@ -45,6 +49,57 @@ export default function HomeClient() {
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
+
+  // Load featured tracks
+  useEffect(() => {
+    async function loadTracks() {
+      try {
+        const tracks = await getTracks();
+        setFeaturedTracks(tracks.slice(0, 3)); // Get first 3 tracks
+      } catch (error) {
+        console.error('Failed to load tracks:', error);
+      }
+    }
+    loadTracks();
+  }, []);
+
+  // Handle track hover teaser
+  const handleTrackHover = (track: SupabaseTrack) => {
+    if (!track.audio_url) return;
+
+    setHoveredTrackId(track.id);
+
+    // Stop any existing teaser
+    trackTeaserRefs.current.forEach((howl, id) => {
+      if (id !== track.id) {
+        howl.stop();
+      }
+    });
+
+    // Play 5s teaser
+    const howl = new Howl({
+      src: [track.audio_url],
+      volume: 0.5,
+      onend: () => {
+        setHoveredTrackId(null);
+      },
+    });
+
+    howl.play();
+    setTimeout(() => {
+      howl.stop();
+      setHoveredTrackId(null);
+    }, 5000);
+
+    trackTeaserRefs.current.set(track.id, howl);
+  };
+
+  const handleTrackLeave = () => {
+    trackTeaserRefs.current.forEach((howl) => {
+      howl.stop();
+    });
+    setHoveredTrackId(null);
+  };
 
   const handlePlayTeaser = () => {
     if (teaserPlaying) {
@@ -247,6 +302,87 @@ export default function HomeClient() {
             </div>
           </motion.div>
         </section>
+
+        {/* Featured Tracks - Hover Teasers */}
+        {featuredTracks.length > 0 && (
+          <section className="min-h-screen flex items-center justify-center px-4 py-20 relative">
+            <div className="max-w-6xl mx-auto w-full">
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.8 }}
+                className="text-center mb-12"
+              >
+                <h2 className="text-4xl md:text-5xl font-bold text-zinc-100 mb-4">
+                  Featured <span className="bg-gradient-to-r from-piko-teal to-piko-pink bg-clip-text text-transparent">Tracks</span>
+                </h2>
+                <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
+                  Hover over tracks to preview — 5s teaser snippets
+                </p>
+              </motion.div>
+              <div className="grid md:grid-cols-3 gap-6">
+                {featuredTracks.map((track, idx) => (
+                  <motion.div
+                    key={track.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.1 * idx, duration: 0.6 }}
+                    onMouseEnter={() => handleTrackHover(track)}
+                    onMouseLeave={handleTrackLeave}
+                    className="group relative rounded-2xl border border-zinc-800 bg-zinc-900/50 backdrop-blur-md p-6 hover:border-piko-teal/50 transition-all cursor-pointer overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-piko-teal/10 to-piko-pink/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative z-10">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-piko-teal to-piko-pink flex items-center justify-center">
+                          <Play className="h-6 w-6 text-white" fill="currentColor" />
+                        </div>
+                        {hoveredTrackId === track.id && (
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="w-3 h-3 rounded-full bg-piko-teal animate-pulse"
+                          />
+                        )}
+                      </div>
+                      <h3 className="text-xl font-semibold text-zinc-100 mb-1">{track.title}</h3>
+                      <p className="text-sm text-zinc-400 mb-2">{track.artist}</p>
+                      <p className="text-xs text-zinc-500">{track.duration}</p>
+                      {hoveredTrackId === track.id && (
+                        <motion.p
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="mt-3 text-xs text-piko-teal font-medium"
+                        >
+                          Playing teaser...
+                        </motion.p>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+                className="text-center mt-8"
+              >
+                <Link href="/music">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-8 py-3 rounded-full border border-piko-teal/50 bg-piko-teal/10 text-piko-teal font-semibold hover:bg-piko-teal/20 transition"
+                  >
+                    View All Tracks
+                  </motion.button>
+                </Link>
+              </motion.div>
+            </div>
+          </section>
+        )}
 
         {/* The Supply - Merch Section - Full Height */}
         <section className="min-h-screen flex items-center justify-center px-4 py-20 relative">
