@@ -6,13 +6,8 @@ import Footer from "@/components/navigation/Footer";
 import PWARegister from "@/components/PWARegister";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
-<<<<<<< Updated upstream
-// Edge runtime removed entirely; middleware was deleted to keep the worker lean
-// export const runtime = 'nodejs'; // CLOUDFLARE FIX: leave undefined unless edge support is restored
-=======
 // CLOUDFLARE FIX: Edge runtime removed entirely to keep the worker lean
 // No runtime export needed - defaults to nodejs
->>>>>>> Stashed changes
 
 export const metadata: Metadata = {
   title: "Pico Artist Studio - Private SoundCloud Experience",

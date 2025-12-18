@@ -1,7 +1,6 @@
 {
-  // Cloudflare Pages configuration for Piko Artist Studio
-  "name": "pico-artist-studio",
+  // Wrangler configuration for Cloudflare Pages + OpenNext
+  "pages_build_output_dir": ".open-next/output",
   "compatibility_date": "2025-11-17",
-  "compatibility_flags": ["nodejs_compat"],
-  "pages_build_output_dir": ".vercel/output/static"
+  "compatibility_flags": ["nodejs_compat"]
 }
