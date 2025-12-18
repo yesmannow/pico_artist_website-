@@ -15,7 +15,8 @@ import SkipBack from 'lucide-react/dist/esm/icons/skip-back';
 import SkipForward from 'lucide-react/dist/esm/icons/skip-forward';
 import Volume2 from 'lucide-react/dist/esm/icons/volume-2';
 import VolumeX from 'lucide-react/dist/esm/icons/volume-x';
-import { usePathname } from 'next/navigation';
+import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
+import { usePathname, useRouter } from 'next/navigation';
 
 /**
  * Format seconds to mm:ss
@@ -28,6 +29,7 @@ function formatTime(seconds: number): string {
 
 export default function PlayerDock() {
   const pathname = usePathname();
+  const router = useRouter();
   const {
     current,
     isPlaying,
@@ -252,6 +254,16 @@ export default function PlayerDock() {
 
             {/* Volume and source toggle */}
             <div className="flex items-center gap-4 flex-1 justify-end">
+              {/* Visualizer button */}
+              <button
+                onClick={() => router.push('/visualizer')}
+                className="p-2 text-zinc-400 hover:text-piko-teal transition"
+                aria-label="Open visualizer"
+                title="Visualizer Mode"
+              >
+                <Sparkles className="w-5 h-5" />
+              </button>
+
               {/* Source toggle (only on detail page with full version) */}
               {canToggleSource && (
                 <button

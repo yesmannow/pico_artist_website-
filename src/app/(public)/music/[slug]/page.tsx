@@ -19,6 +19,7 @@ import Pause from 'lucide-react/dist/esm/icons/pause';
 import ExternalLink from 'lucide-react/dist/esm/icons/external-link';
 import Music from 'lucide-react/dist/esm/icons/music';
 import ChevronLeft from 'lucide-react/dist/esm/icons/chevron-left';
+import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
 
 interface TrackDetailPageProps {
   params: Promise<{
@@ -166,6 +167,14 @@ export default function TrackDetailPage({ params }: TrackDetailPageProps) {
             <span className="inline-block h-2 w-2 rounded-full bg-piko-teal animate-pulse" />
             Stage Mode
           </button>
+
+          <Link
+            href="/visualizer"
+            className="flex items-center gap-2 px-4 py-2 rounded-full border border-zinc-700 bg-zinc-900/70 text-zinc-300 hover:border-piko-teal hover:text-piko-teal transition text-sm"
+          >
+            <Sparkles className="w-4 h-4" />
+            Visualizer Mode
+          </Link>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
