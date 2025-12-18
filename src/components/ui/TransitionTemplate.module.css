@@ -1,0 +1,19 @@
+.glitchOverlay {
+  background-image: repeating-linear-gradient(
+      0deg,
+      rgba(0, 245, 212, 0.03) 0px,
+      transparent 1px,
+      transparent 2px,
+      rgba(255, 0, 110, 0.03) 3px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 245, 212, 0.03) 0px,
+      transparent 1px,
+      transparent 2px,
+      rgba(255, 0, 110, 0.03) 3px
+    );
+  background-size: 4px 4px;
+  mix-blend-mode: screen;
+}
+

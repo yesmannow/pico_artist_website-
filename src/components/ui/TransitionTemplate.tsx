@@ -9,10 +9,18 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
+import styles from './TransitionTemplate.module.css';
 
 interface TransitionTemplateProps {
   children: React.ReactNode;
 }
+
+type BatteryManager = {
+  charging: boolean;
+  level: number;
+  addEventListener: (type: 'levelchange' | 'chargingchange', listener: () => void) => void;
+  removeEventListener: (type: 'levelchange' | 'chargingchange', listener: () => void) => void;
+};
 
 export default function TransitionTemplate({ children }: TransitionTemplateProps) {
   const pathname = usePathname();
@@ -32,7 +40,7 @@ export default function TransitionTemplate({ children }: TransitionTemplateProps
 
   // Check battery level (where supported)
   useEffect(() => {
-    let batteryManager: any = null;
+    let batteryManager: BatteryManager | null = null;
 
     const checkBattery = () => {
       if (batteryManager) {
@@ -44,10 +52,15 @@ export default function TransitionTemplate({ children }: TransitionTemplateProps
     const setupBattery = async () => {
       if (typeof navigator !== 'undefined' && 'getBattery' in navigator) {
         try {
-          batteryManager = await (navigator as any).getBattery();
-          checkBattery(); // Initial check
-          batteryManager.addEventListener('levelchange', checkBattery);
-          batteryManager.addEventListener('chargingchange', checkBattery);
+          const navWithBattery = navigator as Navigator & {
+            getBattery?: () => Promise<BatteryManager>;
+          };
+          batteryManager = (await navWithBattery.getBattery?.()) ?? null;
+          if (batteryManager) {
+            checkBattery(); // Initial check
+            batteryManager.addEventListener('levelchange', checkBattery);
+            batteryManager.addEventListener('chargingchange', checkBattery);
+          }
         } catch {
           // Battery API not supported or failed, ignore
         }
@@ -86,7 +99,7 @@ export default function TransitionTemplate({ children }: TransitionTemplateProps
         {!useSimpleTransition && (
           <motion.div
             aria-hidden
-            className="pointer-events-none absolute inset-0 z-50 opacity-0"
+            className={`pointer-events-none absolute inset-0 z-50 opacity-0 ${styles.glitchOverlay}`}
             initial={{ opacity: 0 }}
             animate={{
               opacity: [0, 0.15, 0, 0.1, 0],
@@ -94,26 +107,6 @@ export default function TransitionTemplate({ children }: TransitionTemplateProps
             transition={{
               duration: 0.6,
               times: [0, 0.2, 0.4, 0.6, 1],
-            }}
-            style={{
-              backgroundImage: `
-                repeating-linear-gradient(
-                  0deg,
-                  rgba(0, 245, 212, 0.03) 0px,
-                  transparent 1px,
-                  transparent 2px,
-                  rgba(255, 0, 110, 0.03) 3px
-                ),
-                repeating-linear-gradient(
-                  90deg,
-                  rgba(0, 245, 212, 0.03) 0px,
-                  transparent 1px,
-                  transparent 2px,
-                  rgba(255, 0, 110, 0.03) 3px
-                )
-              `,
-              backgroundSize: '4px 4px',
-              mixBlendMode: 'screen',
             }}
           />
         )}

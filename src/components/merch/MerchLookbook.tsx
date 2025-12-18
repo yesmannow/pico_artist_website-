@@ -8,6 +8,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useCallback } from 'react';
 import Lock from 'lucide-react/dist/esm/icons/lock';
+import styles from './MerchLookbook.module.css';
 
 interface MerchItem {
   id: string;
@@ -105,30 +106,27 @@ export default function MerchLookbook() {
                     <div className="relative aspect-square overflow-hidden">
                       {/* Background gradient as placeholder */}
                       <div className="absolute inset-0 bg-gradient-to-br from-zinc-800 to-zinc-900" />
-                      
+
                       {/* Noise texture overlay */}
                       {item.image && (
                         <div
                           className="absolute inset-0 bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-500"
                           style={{
                             backgroundImage: `url(${item.image})`,
-                            filter: hoveredItem === item.id 
-                              ? 'grayscale(0) brightness(1.1)' 
+                            filter: hoveredItem === item.id
+                              ? 'grayscale(0) brightness(1.1)'
                               : 'grayscale(1) brightness(0.6)',
                           }}
                         >
                           {/* Heavy noise filter */}
-                          <div 
-                            className="absolute inset-0 opacity-40 group-hover:opacity-10 transition-opacity duration-500"
-                            style={{
-                              backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
-                            }}
+                          <div
+                            className={`absolute inset-0 opacity-40 group-hover:opacity-10 transition-opacity duration-500 ${styles.noiseOverlay}`}
                           />
                         </div>
                       )}
 
                       {/* Locked overlay */}
-                      <div 
+                      <div
                         className="absolute inset-0 bg-zinc-950/80 flex items-center justify-center group-hover:bg-zinc-950/60 transition cursor-pointer"
                         onClick={showLockedToast}
                         role="button"
