@@ -151,8 +151,7 @@ class HowlerEngine {
     
     const update = () => {
       if (this.howl && this.howl.playing()) {
-        const time = this.howl.seek() as number;
-        // Call onSeek to notify about time update
+        // Call onSeek to notify about time update - the player dock reads time via getCurrentTime()
         this.callbacks.onSeek?.();
         this.animationFrame = requestAnimationFrame(update);
       }

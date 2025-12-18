@@ -269,7 +269,7 @@ export default function TrackDetailPage({ params }: TrackDetailPageProps) {
               <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 backdrop-blur-xl p-6">
                 <h2 className="text-lg font-semibold text-zinc-100 mb-4">Related Tracks</h2>
                 <div className="space-y-3">
-                  {relatedTracks.map((relatedTrack, index) => (
+                  {relatedTracks.map((relatedTrack) => (
                     <Link
                       key={relatedTrack.id}
                       href={`/music/${relatedTrack.slug}`}
