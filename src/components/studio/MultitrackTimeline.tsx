@@ -6,9 +6,6 @@ import Volume2 from 'lucide-react/dist/esm/icons/volume-2';
 import VolumeX from 'lucide-react/dist/esm/icons/volume-x';
 import Headphones from 'lucide-react/dist/esm/icons/headphones';
 import Trash2 from 'lucide-react/dist/esm/icons/trash-2';
-import Play from 'lucide-react/dist/esm/icons/play';
-import Pause from 'lucide-react/dist/esm/icons/pause';
-import Square from 'lucide-react/dist/esm/icons/square';
 import { useStudioLocalStore } from '@/store/studioLocalStore';
 import WaveSurfer from 'wavesurfer.js';
 
@@ -22,8 +19,8 @@ export default function MultitrackTimeline({ className }: MultitrackTimelineProp
     isPlaying,
     isRecording,
     selectedTrackId,
+    currentTime,
     setCurrentTime,
-    setIsPlaying,
     removeTrack,
     toggleMute,
     toggleSolo,
@@ -58,9 +55,7 @@ export default function MultitrackTimeline({ className }: MultitrackTimelineProp
       }
 
       wavesurfer.on('timeupdate', (time) => {
-        if (track.id === selectedTrackId) {
-          setCurrentTime(time);
-        }
+        setCurrentTime(time);
       });
 
       waveSurferMap.set(track.id, wavesurfer);
@@ -70,7 +65,7 @@ export default function MultitrackTimeline({ className }: MultitrackTimelineProp
       waveSurferMap.forEach((ws) => ws.destroy());
       waveSurferMap.clear();
     };
-  }, [tracks, selectedTrackId, setCurrentTime]);
+  }, [tracks, setCurrentTime]);
 
   // Sync playback
   useEffect(() => {
@@ -81,18 +76,15 @@ export default function MultitrackTimeline({ className }: MultitrackTimelineProp
     }
   }, [isPlaying]);
 
-  const handlePlayPause = () => {
-    setIsPlaying(!isPlaying);
-  };
-
-  const handleStop = () => {
-    setIsPlaying(false);
-    wavesurfers.current.forEach((ws) => {
-      ws.stop();
-      ws.seekTo(0);
-    });
-    setCurrentTime(0);
-  };
+  // Sync current time to all wavesurfers when changed externally (e.g., stop button)
+  useEffect(() => {
+    if (currentTime === 0) {
+      wavesurfers.current.forEach((ws) => {
+        ws.stop();
+        ws.seekTo(0);
+      });
+    }
+  }, [currentTime]);
 
   if (tracks.length === 0) {
     return (
@@ -104,35 +96,13 @@ export default function MultitrackTimeline({ className }: MultitrackTimelineProp
 
   return (
     <div className={`rounded-2xl border border-zinc-800 bg-zinc-900/60 backdrop-blur-xl overflow-hidden ${className}`}>
-      {/* Transport Controls */}
-      <div className="flex items-center gap-4 p-4 border-b border-zinc-800 bg-zinc-950/50">
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={handlePlayPause}
-          className={`p-3 rounded-full ${
-            isPlaying
-              ? 'bg-piko-pink/20 border border-piko-pink/50 text-piko-pink'
-              : 'bg-piko-teal/20 border border-piko-teal/50 text-piko-teal'
-          }`}
-        >
-          {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={handleStop}
-          className="p-3 rounded-full bg-zinc-800 border border-zinc-700 text-zinc-400 hover:text-zinc-100"
-        >
-          <Square className="h-5 w-5" />
-        </motion.button>
-        {isRecording && (
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/20 border border-red-500/50">
-            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-            <span className="text-sm font-semibold text-red-400">Recording</span>
-          </div>
-        )}
-      </div>
+      {/* Recording Indicator */}
+      {isRecording && (
+        <div className="flex items-center gap-2 px-4 py-2 bg-red-500/20 border-b border-red-500/50">
+          <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+          <span className="text-sm font-semibold text-red-400">Recording</span>
+        </div>
+      )}
 
       {/* Track List */}
       <div className="divide-y divide-zinc-800" ref={containerRef}>
@@ -205,6 +175,9 @@ export default function MultitrackTimeline({ className }: MultitrackTimelineProp
             <div className="min-w-[150px] text-right">
               <p className="text-sm font-semibold text-zinc-100">{track.name}</p>
               <p className="text-xs text-zinc-400">{track.duration.toFixed(2)}s</p>
+              {track.clips.length > 0 && (
+                <p className="text-xs text-piko-teal mt-1">{track.clips.length} clip{track.clips.length > 1 ? 's' : ''}</p>
+              )}
               <div className="mt-2 flex items-center justify-end gap-2">
                 <div className="w-16 h-1 bg-zinc-800 rounded-full overflow-hidden">
                   <div

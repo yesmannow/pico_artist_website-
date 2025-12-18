@@ -1,5 +1,13 @@
 import { create } from 'zustand';
 
+export interface Clip {
+  id: string;
+  startTime: number; // in seconds
+  duration: number; // length in seconds
+  gain: number; // per-clip gain adjustment
+  isMuted: boolean; // mute per clip
+}
+
 export interface Track {
   id: string;
   name: string;
@@ -10,6 +18,7 @@ export interface Track {
   volume: number;
   muted: boolean;
   solo: boolean;
+  clips: Clip[];
 }
 
 export interface Project {
@@ -28,6 +37,7 @@ interface StudioLocalState {
   currentTime: number;
   isPlaying: boolean;
   isRecording: boolean;
+  isLooping: boolean;
   selectedTrackId: string | null;
   masterVolume: number;
   tempo: number;
@@ -39,11 +49,15 @@ interface StudioLocalState {
   setCurrentTime: (time: number) => void;
   setIsPlaying: (playing: boolean) => void;
   setIsRecording: (recording: boolean) => void;
+  setIsLooping: (looping: boolean) => void;
   setSelectedTrack: (id: string | null) => void;
   toggleMute: (id: string) => void;
   toggleSolo: (id: string) => void;
   setMasterVolume: (volume: number) => void;
   setTempo: (tempo: number) => void;
+  addClip: (trackId: string, clip: Omit<Clip, 'id'>) => void;
+  updateClip: (trackId: string, clipId: string, updates: Partial<Clip>) => void;
+  removeClip: (trackId: string, clipId: string) => void;
   saveProject: (name?: string) => void;
   loadProject: (projectId: string) => void;
   deleteProject: (projectId: string) => void;
@@ -59,7 +73,30 @@ const loadFromStorage = (): Partial<StudioLocalState> => {
   if (typeof window === 'undefined') return {};
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : {};
+    if (!stored) return {};
+    
+    const data = JSON.parse(stored);
+    
+    // Ensure all tracks have a clips array for backward compatibility
+    if (data.tracks) {
+      data.tracks = data.tracks.map((track: Track) => ({
+        ...track,
+        clips: track.clips || [],
+      }));
+    }
+    
+    // Ensure all projects have tracks with clips arrays
+    if (data.projects) {
+      data.projects = data.projects.map((project: Project) => ({
+        ...project,
+        tracks: project.tracks.map((track: Track) => ({
+          ...track,
+          clips: track.clips || [],
+        })),
+      }));
+    }
+    
+    return data;
   } catch {
     return {};
   }
@@ -88,6 +125,7 @@ export const useStudioLocalStore = create<StudioLocalState>()((set, get) => ({
       currentTime: 0,
       isPlaying: false,
       isRecording: false,
+      isLooping: false,
       selectedTrackId: null,
       masterVolume: initialState.masterVolume ?? 1.0,
       tempo: initialState.tempo ?? 120,
@@ -101,7 +139,8 @@ export const useStudioLocalStore = create<StudioLocalState>()((set, get) => ({
               ...state.tracks,
               {
                 ...track,
-                id: `track-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                id: `track-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
+                clips: track.clips || [],
               },
             ],
           };
@@ -130,6 +169,7 @@ export const useStudioLocalStore = create<StudioLocalState>()((set, get) => ({
       setCurrentTime: (time) => set({ currentTime: time }),
       setIsPlaying: (playing) => set({ isPlaying: playing }),
       setIsRecording: (recording) => set({ isRecording: recording }),
+      setIsLooping: (looping) => set({ isLooping: looping }),
       setSelectedTrack: (id) => set({ selectedTrackId: id }),
 
       toggleMute: (id) =>
@@ -150,6 +190,59 @@ export const useStudioLocalStore = create<StudioLocalState>()((set, get) => ({
         set({ tempo });
         saveToStorage({ tempo });
       },
+
+      addClip: (trackId, clip) =>
+        set((state) => {
+          const newState = {
+            tracks: state.tracks.map((t) =>
+              t.id === trackId
+                ? {
+                    ...t,
+                    clips: [
+                      ...t.clips,
+                      {
+                        ...clip,
+                        id: `clip-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
+                      },
+                    ],
+                  }
+                : t
+            ),
+          };
+          saveToStorage(newState);
+          return newState;
+        }),
+
+      updateClip: (trackId, clipId, updates) =>
+        set((state) => {
+          const newState = {
+            tracks: state.tracks.map((t) =>
+              t.id === trackId
+                ? {
+                    ...t,
+                    clips: t.clips.map((c) =>
+                      c.id === clipId ? { ...c, ...updates } : c
+                    ),
+                  }
+                : t
+            ),
+          };
+          saveToStorage(newState);
+          return newState;
+        }),
+
+      removeClip: (trackId, clipId) =>
+        set((state) => {
+          const newState = {
+            tracks: state.tracks.map((t) =>
+              t.id === trackId
+                ? { ...t, clips: t.clips.filter((c) => c.id !== clipId) }
+                : t
+            ),
+          };
+          saveToStorage(newState);
+          return newState;
+        }),
 
       saveProject: (name) => {
         const state = get();
