@@ -1,7 +1,11 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react';
+import Play from 'lucide-react/dist/esm/icons/play';
+import Pause from 'lucide-react/dist/esm/icons/pause';
+import SkipBack from 'lucide-react/dist/esm/icons/skip-back';
+import SkipForward from 'lucide-react/dist/esm/icons/skip-forward';
+import Volume2 from 'lucide-react/dist/esm/icons/volume-2';
 import { Howl } from 'howler';
 
 interface GlobalMusicPlayerState {

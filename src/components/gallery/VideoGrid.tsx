@@ -4,7 +4,9 @@ import { useState, useMemo } from 'react';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
 import { motion } from 'framer-motion';
-import { Music, Video, Radio } from 'lucide-react';
+import Music from 'lucide-react/dist/esm/icons/music';
+import Video from 'lucide-react/dist/esm/icons/video';
+import Radio from 'lucide-react/dist/esm/icons/radio';
 
 type VideoItem = {
   id: string;
@@ -100,4 +102,3 @@ export default function VideoGrid({ videos }: VideoGridProps) {
     </div>
   );
 }
-

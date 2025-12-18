@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Music2, Play, ExternalLink } from 'lucide-react';
+import Music2 from 'lucide-react/dist/esm/icons/music-2';
+import Play from 'lucide-react/dist/esm/icons/play';
+import ExternalLink from 'lucide-react/dist/esm/icons/external-link';
 
 // Sample discography data - replace with actual YouTube Music channel data
 const albums = [
@@ -152,4 +154,3 @@ export default function DiscographyPage() {
     </div>
   );
 }
-

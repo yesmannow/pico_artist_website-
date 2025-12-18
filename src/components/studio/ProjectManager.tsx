@@ -2,7 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Save, FolderOpen, Trash2, Edit2, Check } from 'lucide-react';
+import X from 'lucide-react/dist/esm/icons/x';
+import Save from 'lucide-react/dist/esm/icons/save';
+import FolderOpen from 'lucide-react/dist/esm/icons/folder-open';
+import Trash2 from 'lucide-react/dist/esm/icons/trash-2';
+import Edit2 from 'lucide-react/dist/esm/icons/edit-2';
+import Check from 'lucide-react/dist/esm/icons/check';
 import { saveProject, getProjects, loadProject, deleteProject, updateProject, type Project } from '@/lib/supabase';
 import { useStudioStore } from '@/store/studioStore';
 
@@ -265,4 +270,3 @@ export default function ProjectManager({ isOpen, onClose }: ProjectManagerProps)
     </AnimatePresence>
   );
 }
-

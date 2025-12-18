@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import Globe from 'react-globe.gl';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ExternalLink } from 'lucide-react';
+import X from 'lucide-react/dist/esm/icons/x';
+import ExternalLink from 'lucide-react/dist/esm/icons/external-link';
 
 type TourDate = {
   lat: number;

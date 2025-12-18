@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Activity, ChevronDown, ChevronUp } from 'lucide-react';
+import Activity from 'lucide-react/dist/esm/icons/activity';
+import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down';
+import ChevronUp from 'lucide-react/dist/esm/icons/chevron-up';
 import { supabase } from '@/lib/supabase';
 
 interface ActivityItem {
@@ -297,4 +299,3 @@ export default function SharedActivityLog() {
     </div>
   );
 }
-

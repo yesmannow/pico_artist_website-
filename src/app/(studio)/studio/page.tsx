@@ -1,15 +1,30 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import StudioRecorder from '@/components/studio/StudioRecorder';
-import MultitrackTimeline from '@/components/studio/MultitrackTimeline';
-import ProjectManager from '@/components/studio/ProjectManager';
 import StudioHeader from '@/components/studio/StudioHeader';
-import SharedActivityLog from '@/components/studio/SharedActivityLog';
 import { getTracks, type Track } from '@/lib/supabase';
-import { FolderOpen } from 'lucide-react';
+import FolderOpen from 'lucide-react/dist/esm/icons/folder-open';
 import { useStudioStore } from '@/store/studioStore';
+
+const StudioRecorder = dynamic(() => import('@/components/studio/StudioRecorder'), {
+  ssr: false,
+});
+
+const MultitrackTimeline = dynamic(
+  () => import('@/components/studio/MultitrackTimeline'),
+  { ssr: false }
+);
+
+const ProjectManager = dynamic(() => import('@/components/studio/ProjectManager'), {
+  ssr: false,
+});
+
+const SharedActivityLog = dynamic(
+  () => import('@/components/studio/SharedActivityLog'),
+  { ssr: false }
+);
 
 export default function StudioPage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });

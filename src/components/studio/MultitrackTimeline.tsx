@@ -2,7 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Volume2, VolumeX, Headphones, Trash2, Play, Pause, Square } from 'lucide-react';
+import Volume2 from 'lucide-react/dist/esm/icons/volume-2';
+import VolumeX from 'lucide-react/dist/esm/icons/volume-x';
+import Headphones from 'lucide-react/dist/esm/icons/headphones';
+import Trash2 from 'lucide-react/dist/esm/icons/trash-2';
+import Play from 'lucide-react/dist/esm/icons/play';
+import Pause from 'lucide-react/dist/esm/icons/pause';
+import Square from 'lucide-react/dist/esm/icons/square';
 import { useStudioStore, type Track } from '@/store/studioStore';
 import WaveSurfer from 'wavesurfer.js';
 

@@ -4,12 +4,18 @@ import { motion, useScroll, useTransform, useMotionValue } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import ParticlesBackground from "@/components/background/ParticlesBackground";
 import CustomCursor from "@/components/cursor/CustomCursor";
-import { Play, ArrowRight } from "lucide-react";
+import Play from "lucide-react/dist/esm/icons/play";
+import ArrowRight from "lucide-react/dist/esm/icons/arrow-right";
 import { Howl } from "howler";
 import { getTracks, type Track as SupabaseTrack } from "@/lib/supabase";
+
+const ParticlesBackground = dynamic(
+  () => import("@/components/background/ParticlesBackground"),
+  { ssr: false }
+);
 
 export default function HomeClient() {
   const router = useRouter();
