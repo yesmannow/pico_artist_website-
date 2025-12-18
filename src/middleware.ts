@@ -1,7 +1,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-export const runtime = 'edge';
+export const runtime = 'experimental-edge';
 
 export async function middleware(req: NextRequest) {
   // Validate environment variables
@@ -96,4 +96,3 @@ export async function middleware(req: NextRequest) {
 export const config = {
   matcher: ['/studio/:path*'],
 };
-

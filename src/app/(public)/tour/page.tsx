@@ -61,7 +61,7 @@ const tourDates: TourDate[] = [
 ];
 
 export default function TourPage() {
-  const globeEl = useRef<any>();
+  const globeEl = useRef<any>(null);
   const [selectedEvent, setSelectedEvent] = useState<TourDate | null>(null);
   const [globeReady, setGlobeReady] = useState(false);
 
@@ -73,8 +73,8 @@ export default function TourPage() {
     }
   }, []);
 
-  const handlePointClick = (point: TourDate) => {
-    setSelectedEvent(point);
+  const handlePointClick = (point: object, _event?: any, _coords?: any) => {
+    setSelectedEvent(point as TourDate);
   };
 
   return (

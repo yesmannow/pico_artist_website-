@@ -58,7 +58,9 @@ export default function GlobalMusicPlayer() {
 
     // Apply Web Audio API processing for lowpass filter
     if (crackleRef.current && audioContext) {
-      const source = audioContext.createMediaElementSource(crackleRef.current._sounds[0]?._node || audioContext.createBufferSource());
+      const rawNode = (crackleRef.current as any)._sounds?.[0]?._node;
+      const mediaElement = rawNode instanceof HTMLMediaElement ? rawNode : new Audio();
+      const source = audioContext.createMediaElementSource(mediaElement);
       const filter = audioContext.createBiquadFilter();
       filter.type = 'lowpass';
       filter.frequency.value = 2000;
