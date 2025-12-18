@@ -18,10 +18,16 @@ interface StaticWaveformProps {
   seed?: string; // For consistent random patterns per track
 }
 
-// Simple seeded random for consistent waveform generation
+/**
+ * Simple seeded random number generator using Linear Congruential Generator (LCG).
+ * Uses the Numerical Recipes parameters for generating pseudo-random numbers.
+ * The multiplier (9301), increment (49297), and modulus (233280) are standard LCG constants.
+ * This ensures consistent waveform patterns for each track based on its ID.
+ */
 function seededRandom(seed: string): () => number {
   let value = Array.from(seed).reduce((acc, char) => acc + char.charCodeAt(0), 0);
   return () => {
+    // LCG formula: next = (multiplier * current + increment) % modulus
     value = (value * 9301 + 49297) % 233280;
     return value / 233280;
   };

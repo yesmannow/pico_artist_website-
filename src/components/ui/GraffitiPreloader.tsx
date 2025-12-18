@@ -116,54 +116,13 @@ export default function GraffitiPreloader({
           </p>
         </div>
 
-        {/* Loading dots */}
+        {/* Loading dots - using CSS animation delays via inline style (Tailwind doesn't support arbitrary animation-delay) */}
         <div className="flex gap-1">
           <span className="preloader-dot w-2 h-2 rounded-full bg-piko-pink" style={{ animationDelay: '0ms' }} />
           <span className="preloader-dot w-2 h-2 rounded-full bg-piko-teal" style={{ animationDelay: '150ms' }} />
           <span className="preloader-dot w-2 h-2 rounded-full bg-piko-orange" style={{ animationDelay: '300ms' }} />
         </div>
       </div>
-
-      <style jsx>{`
-        .preloader-stroke {
-          stroke-dasharray: 300;
-          stroke-dashoffset: 300;
-          animation: drawStroke 1.2s ease-out forwards;
-        }
-
-        .preloader-circle {
-          stroke-dasharray: 314;
-          stroke-dashoffset: 314;
-          animation: drawCircle 1.5s ease-in-out forwards;
-        }
-
-        .preloader-dot {
-          animation: dotPulse 1s ease-in-out infinite;
-        }
-
-        @keyframes drawStroke {
-          to {
-            stroke-dashoffset: 0;
-          }
-        }
-
-        @keyframes drawCircle {
-          to {
-            stroke-dashoffset: 0;
-          }
-        }
-
-        @keyframes dotPulse {
-          0%, 100% {
-            opacity: 0.3;
-            transform: scale(0.8);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-      `}</style>
     </div>
   );
 }
