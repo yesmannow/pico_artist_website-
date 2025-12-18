@@ -187,9 +187,11 @@ export function render(
   ctx.globalAlpha = 1;
 }
 
-export default {
+const neonFieldPreset = {
   id: 'neonField',
   name: 'Neon Field',
   render,
   reset,
 };
+
+export default neonFieldPreset;

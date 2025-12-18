@@ -19,7 +19,24 @@ import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
 
 export default function VisualizerPage() {
   const router = useRouter();
-  const [lastRoute, setLastRoute] = useState('/music');
+  
+  // Determine last route from referrer on mount
+  const [lastRoute] = useState(() => {
+    if (typeof window === 'undefined') return '/music';
+    const referrer = document.referrer;
+    if (referrer) {
+      try {
+        const url = new URL(referrer);
+        if (url.pathname !== '/visualizer') {
+          return url.pathname;
+        }
+      } catch {
+        // Invalid referrer, use default
+      }
+    }
+    return '/music';
+  });
+  
   const [presetId, setPresetId] = useState(presets[0].id);
   const [intensity, setIntensity] = useState(1);
   const [audioReactive, setAudioReactive] = useState(true);
@@ -27,21 +44,6 @@ export default function VisualizerPage() {
   const [hideTimeout, setHideTimeout] = useState<NodeJS.Timeout | null>(null);
 
   const { isPlaying, togglePlay, current, seek, currentTime } = usePlayerStore();
-
-  // Store last route from referrer
-  useEffect(() => {
-    const referrer = document.referrer;
-    if (referrer) {
-      try {
-        const url = new URL(referrer);
-        if (url.pathname !== '/visualizer') {
-          setLastRoute(url.pathname);
-        }
-      } catch (e) {
-        // Invalid referrer, use default
-      }
-    }
-  }, []);
 
   // Auto-hide controls after 3 seconds of no mouse movement
   useEffect(() => {
@@ -64,7 +66,7 @@ export default function VisualizerPage() {
     const handleKeyDown = (e: KeyboardEvent) => {
       switch (e.key) {
         case 'Escape':
-          handleExit();
+          router.push(lastRoute);
           break;
         case ' ':
           e.preventDefault();
@@ -85,7 +87,7 @@ export default function VisualizerPage() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [togglePlay, currentTime, seek]);
+  }, [togglePlay, currentTime, seek, router, lastRoute]);
 
   const handleExit = () => {
     router.push(lastRoute);

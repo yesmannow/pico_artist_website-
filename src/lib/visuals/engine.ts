@@ -69,7 +69,7 @@ function calculateQualitySettings(): QualitySettings {
   }
 
   // Check device memory if available (Chrome feature)
-  const deviceMemory = (navigator as any).deviceMemory;
+  const deviceMemory = (navigator as { deviceMemory?: number }).deviceMemory;
   if (deviceMemory && deviceMemory < 4) {
     scale = 0.75;
     particleLimit = 200;
@@ -91,7 +91,7 @@ function calculateQualitySettings(): QualitySettings {
  * Create and manage a visual engine
  */
 export function createEngine(options: EngineOptions) {
-  const { canvas, render, targetFPS = 60 } = options;
+  const { canvas, render } = options;
   const ctx = canvas.getContext('2d', { alpha: false });
 
   if (!ctx) {
@@ -100,7 +100,7 @@ export function createEngine(options: EngineOptions) {
 
   let rafId: number | null = null;
   let lastTime = 0;
-  let startTime = performance.now();
+  const startTime = performance.now();
   let isPaused = false;
   let isVisible = true;
 

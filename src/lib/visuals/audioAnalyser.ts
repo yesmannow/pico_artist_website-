@@ -31,7 +31,8 @@ export class AudioAnalyser {
   init(): boolean {
     try {
       // Howler uses a global audio context
-      const ctx = (Howl as any)._audioContext;
+      const ctx = (Howl as unknown as { _audioContext: AudioContext }).
+        _audioContext;
       
       if (!ctx || !(ctx instanceof AudioContext)) {
         if (process.env.NODE_ENV === 'development') {
@@ -41,7 +42,7 @@ export class AudioAnalyser {
       }
 
       // Try to get master gain node from Howler
-      const masterGain = (Howl as any)._masterGain;
+      const masterGain = (Howl as unknown as { _masterGain: GainNode })._masterGain;
       
       if (!masterGain) {
         if (process.env.NODE_ENV === 'development') {
@@ -145,7 +146,7 @@ export class AudioAnalyser {
     if (this.analyser) {
       try {
         this.analyser.disconnect();
-      } catch (e) {
+      } catch {
         // Ignore errors on disconnect
       }
       this.analyser = null;

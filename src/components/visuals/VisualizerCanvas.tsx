@@ -35,7 +35,7 @@ export default function VisualizerCanvas({
   
   const [bgImage] = useState(() => backgroundMode !== 'none' ? getRandomBg() : null);
   
-  const { isPlaying, currentTime, duration, current } = usePlayerStore();
+  const { isPlaying, currentTime, duration } = usePlayerStore();
 
   // Initialize engine and preset
   useEffect(() => {

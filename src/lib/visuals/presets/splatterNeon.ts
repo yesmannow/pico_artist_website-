@@ -190,9 +190,11 @@ export function render(
   ctx.globalAlpha = 1;
 }
 
-export default {
+const splatterNeonPreset = {
   id: 'splatterNeon',
   name: 'Splatter Neon',
   render,
   reset,
 };
+
+export default splatterNeonPreset;

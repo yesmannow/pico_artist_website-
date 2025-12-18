@@ -46,7 +46,7 @@ export function render(
   state: EngineState,
   dt: number
 ) {
-  const { width, height, colors, intensity, trackProgress, isPlaying, audio } = state;
+  const { width, height, colors, intensity, trackProgress, audio } = state;
 
   // Fade existing content instead of clearing (creates trailing effect)
   ctx.fillStyle = 'rgba(9, 9, 11, 0.05)'; // Very subtle fade
@@ -206,9 +206,11 @@ export function render(
   ctx.globalAlpha = 1;
 }
 
-export default {
+const inkDripPulsePreset = {
   id: 'inkDripPulse',
   name: 'Ink Drip Pulse',
   render,
   reset,
 };
+
+export default inkDripPulsePreset;
