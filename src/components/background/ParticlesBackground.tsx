@@ -94,6 +94,7 @@ export default function ParticlesBackground() {
 
   return (
     <div className="fixed inset-0 -z-10 pointer-events-none">
+      {/* @ts-expect-error - react-tsparticles has type compatibility issues with React 19 */}
       <Particles
         id="tsparticles"
         init={async (engine: Engine) => {
