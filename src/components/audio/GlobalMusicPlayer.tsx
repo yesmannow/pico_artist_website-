@@ -95,7 +95,7 @@ export default function GlobalMusicPlayer() {
     }
   }, [state.isPlaying]);
 
-  // Canvas visualizer animation
+  // Canvas visualizer animation - only animate when playing
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -103,16 +103,26 @@ export default function GlobalMusicPlayer() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Don't animate if not playing
+    if (!state.isPlaying) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
+
     const bars = 32;
     const barWidth = canvas.width / bars;
 
     const animate = () => {
+      // Check if still playing before animating
+      if (!state.isPlaying) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        return;
+      }
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       for (let i = 0; i < bars; i++) {
-        const height = state.isPlaying
-          ? Math.random() * canvas.height * 0.8 + canvas.height * 0.1
-          : canvas.height * 0.1;
+        const height = Math.random() * canvas.height * 0.8 + canvas.height * 0.1;
 
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         gradient.addColorStop(0, '#00f5d4');

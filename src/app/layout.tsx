@@ -4,6 +4,7 @@ import GlobalMusicPlayer from "@/components/audio/GlobalMusicPlayer";
 import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
 import PWARegister from "@/components/PWARegister";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export const runtime = "edge";
 
@@ -27,13 +28,15 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className="antialiased bg-zinc-950 text-zinc-100">
-        <PWARegister />
-        <Navbar />
-        <div className="min-h-screen pb-24 pt-16">
-          {children}
-        </div>
-        <Footer />
-        <GlobalMusicPlayer />
+        <ErrorBoundary>
+          <PWARegister />
+          <Navbar />
+          <div className="min-h-screen pb-24 pt-16">
+            {children}
+          </div>
+          <Footer />
+          <GlobalMusicPlayer />
+        </ErrorBoundary>
       </body>
     </html>
   );
