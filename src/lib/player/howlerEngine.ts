@@ -152,10 +152,8 @@ class HowlerEngine {
     const update = () => {
       if (this.howl && this.howl.playing()) {
         const time = this.howl.seek() as number;
-        // This will be connected to the store in the player component
-        if (this.callbacks.onSeek) {
-          // Use onSeek callback to update time
-        }
+        // Call onSeek to notify about time update
+        this.callbacks.onSeek?.();
         this.animationFrame = requestAnimationFrame(update);
       }
     };

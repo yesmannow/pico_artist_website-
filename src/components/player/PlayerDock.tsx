@@ -68,13 +68,15 @@ export default function PlayerDock() {
       },
     });
 
-    // Set initial volume
-    howlerEngine.setVolume(volume);
-
     return () => {
       howlerEngine.cleanup();
     };
-  }, [current, source, setDuration, setIsPlaying, next, volume]);
+  }, [current, source, setDuration, setIsPlaying, next]);
+
+  // Set volume separately to avoid re-initialization
+  useEffect(() => {
+    howlerEngine.setVolume(volume);
+  }, [volume]);
 
   // Handle play/pause state changes
   useEffect(() => {

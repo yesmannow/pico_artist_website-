@@ -47,9 +47,15 @@ export default function TrackDetailPage({ params }: TrackDetailPageProps) {
   const isCurrentTrack = current?.id === track.id;
   const isCurrentPlaying = isCurrentTrack && isPlaying;
 
+  // Constants for queue display
+  const MAX_NEXT_TRACKS = 4;
+  const FALLBACK_TRACKS_COUNT = 3;
+
   // Get next tracks from queue
   const currentIndex = queue.findIndex((t) => t.id === track.id);
-  const nextTracks = currentIndex >= 0 ? queue.slice(currentIndex + 1, currentIndex + 4) : getTracks().slice(0, 3);
+  const nextTracks = currentIndex >= 0 
+    ? queue.slice(currentIndex + 1, currentIndex + MAX_NEXT_TRACKS) 
+    : getTracks().slice(0, FALLBACK_TRACKS_COUNT);
 
   const handlePlay = () => {
     if (isCurrentTrack) {

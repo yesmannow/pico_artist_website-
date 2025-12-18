@@ -49,7 +49,7 @@ export const VIDEOS: Video[] = [
     id: 'video-3',
     slug: 'placeholder-3',
     title: 'Behind The Scenes',
-    youtubeVideoId: 'dQw4w9WgXcQ', // Placeholder - replace with actual video ID
+    youtubeVideoId: 'jNQXAC9IVRw', // Placeholder - replace with actual video ID
     releaseYear: '2024',
     tags: ['bts'],
   },
@@ -57,7 +57,7 @@ export const VIDEOS: Video[] = [
     id: 'video-4',
     slug: 'placeholder-4',
     title: 'Studio Session',
-    youtubeVideoId: 'dQw4w9WgXcQ', // Placeholder - replace with actual video ID
+    youtubeVideoId: 'kJQP7kiw5Fk', // Placeholder - replace with actual video ID
     releaseYear: '2024',
     tags: ['studio'],
   },
@@ -65,7 +65,7 @@ export const VIDEOS: Video[] = [
     id: 'video-5',
     slug: 'placeholder-5',
     title: 'Live Performance',
-    youtubeVideoId: 'dQw4w9WgXcQ', // Placeholder - replace with actual video ID
+    youtubeVideoId: 'L_jWHffIx5E', // Placeholder - replace with actual video ID
     releaseYear: '2023',
     tags: ['live'],
   },
@@ -73,7 +73,7 @@ export const VIDEOS: Video[] = [
     id: 'video-6',
     slug: 'placeholder-6',
     title: 'Music Video 2',
-    youtubeVideoId: 'dQw4w9WgXcQ', // Placeholder - replace with actual video ID
+    youtubeVideoId: '9bZkp7q19f0', // Placeholder - replace with actual video ID
     releaseYear: '2023',
     tags: ['music-video'],
   },
@@ -81,7 +81,7 @@ export const VIDEOS: Video[] = [
     id: 'video-7',
     slug: 'placeholder-7',
     title: 'Freestyle Session',
-    youtubeVideoId: 'dQw4w9WgXcQ', // Placeholder - replace with actual video ID
+    youtubeVideoId: 'YQHsXMglC9A', // Placeholder - replace with actual video ID
     releaseYear: '2023',
     tags: ['freestyle'],
   },
@@ -89,7 +89,7 @@ export const VIDEOS: Video[] = [
     id: 'video-8',
     slug: 'placeholder-8',
     title: 'Documentary',
-    youtubeVideoId: 'dQw4w9WgXcQ', // Placeholder - replace with actual video ID
+    youtubeVideoId: 'fJ9rUzIMcZQ', // Placeholder - replace with actual video ID
     releaseYear: '2024',
     tags: ['documentary'],
   },
