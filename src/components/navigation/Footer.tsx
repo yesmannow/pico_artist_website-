@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Marquee from 'react-fast-marquee';
-import { CloudRain } from 'lucide-react';
+import CloudRain from 'lucide-react/dist/esm/icons/cloud-rain';
 import { Howl } from 'howler';
 import { motion } from 'framer-motion';
 
@@ -112,4 +112,3 @@ export default function Footer() {
     </footer>
   );
 }
-

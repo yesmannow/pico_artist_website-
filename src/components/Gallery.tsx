@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Play } from 'lucide-react';
+import X from 'lucide-react/dist/esm/icons/x';
+import Play from 'lucide-react/dist/esm/icons/play';
 import Image from 'next/image';
 
 interface MediaItem {

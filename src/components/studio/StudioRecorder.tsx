@@ -2,17 +2,15 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Mic,
-  Square,
-  Play,
-  Pause,
-  Download,
-  Upload,
-  Trash2,
-  Music,
-  Settings,
-} from 'lucide-react';
+import Mic from 'lucide-react/dist/esm/icons/mic';
+import Square from 'lucide-react/dist/esm/icons/square';
+import Play from 'lucide-react/dist/esm/icons/play';
+import Pause from 'lucide-react/dist/esm/icons/pause';
+import Download from 'lucide-react/dist/esm/icons/download';
+import Upload from 'lucide-react/dist/esm/icons/upload';
+import Trash2 from 'lucide-react/dist/esm/icons/trash-2';
+import Music from 'lucide-react/dist/esm/icons/music';
+import Settings from 'lucide-react/dist/esm/icons/settings';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import CanvasVisualizer from './CanvasVisualizer';
 import { uploadTrack, type Track } from '@/lib/supabase';

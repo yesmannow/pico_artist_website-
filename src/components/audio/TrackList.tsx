@@ -1,7 +1,10 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
-import { Play, Pause, Heart, Share2 } from 'lucide-react';
+import Play from 'lucide-react/dist/esm/icons/play';
+import Pause from 'lucide-react/dist/esm/icons/pause';
+import Heart from 'lucide-react/dist/esm/icons/heart';
+import Share2 from 'lucide-react/dist/esm/icons/share-2';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getTracks, likeTrack, type Track } from '@/lib/supabase';
 import { Howl } from 'howler';

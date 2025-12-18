@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "pages:build": "npx @cloudflare/next-on-pages",
+    "pages:build": "npx @cloudflare/next-on-pages@1 --minify",
     "start": "next start",
     "lint": "eslint",
     "optimize-media": "node scripts/optimize-media.js"

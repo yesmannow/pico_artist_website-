@@ -1,6 +1,6 @@
 'use client';
 
-import { RefreshCw } from 'lucide-react';
+import RefreshCw from 'lucide-react/dist/esm/icons/refresh-cw';
 import { useStudioStore } from '@/store/studioStore';
 import { motion } from 'framer-motion';
 
@@ -51,4 +51,3 @@ export default function StudioHeader() {
     </header>
   );
 }
-
