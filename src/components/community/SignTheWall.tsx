@@ -57,8 +57,8 @@ export default function SignTheWall() {
       setShowSuccess(false);
     }, 3000);
 
-    // TODO: Actual email capture logic (Supabase, etc.)
-    console.log('Email captured:', email);
+    // TODO: Implement actual email capture logic (Supabase, etc.)
+    // Example: await supabase.from('subscribers').insert({ email });
   };
 
   return (

@@ -7,8 +7,6 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import Play from "lucide-react/dist/esm/icons/play";
 import ArrowRight from "lucide-react/dist/esm/icons/arrow-right";
-import Calendar from "lucide-react/dist/esm/icons/calendar";
-import MapPin from "lucide-react/dist/esm/icons/map-pin";
 import Youtube from "lucide-react/dist/esm/icons/youtube";
 import Facebook from "lucide-react/dist/esm/icons/facebook";
 import Instagram from "lucide-react/dist/esm/icons/instagram";
@@ -47,7 +45,6 @@ const InstagramFeed = dynamic(
 
 export default function HomeClient() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isHoveringLogo, setIsHoveringLogo] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ container: containerRef });
   const vinylRotation = useMotionValue(0);
@@ -75,8 +72,11 @@ export default function HomeClient() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  const backgroundParallax = useTransform(scrollYProgress, [0, 1], [0, -60]);
   const heroImageParallax = useTransform(scrollYProgress, [0, 1], [0, -40]);
+
+  // Keep vinylRotation for potential future use
+  void vinylRotation;
+  void heroImageParallax;
 
   const handleTrackPlay = (track: Track, index: number) => {
     setQueue(tracks, index);
@@ -99,7 +99,7 @@ export default function HomeClient() {
         />
 
         {/* "The Drop" - Hero Replacement */}
-        <TheDrop trackTitle="Te Prometo" trackSlug="te-prometo" />
+        <TheDrop trackTitle="Te Prometo" />
 
         {/* Bio / Identity Section */}
         <section id="bio" className="min-h-screen flex items-center justify-center px-4 py-20 relative">

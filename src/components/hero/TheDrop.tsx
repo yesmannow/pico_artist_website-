@@ -12,12 +12,10 @@ import { getSocialLink } from '@/data/socials';
 
 interface TheDropProps {
   trackTitle?: string;
-  trackSlug?: string;
 }
 
 export default function TheDrop({ 
   trackTitle = 'Te Prometo',
-  trackSlug = 'te-prometo'
 }: TheDropProps) {
   const youtubeMusicLink = getSocialLink('youtube-music');
 

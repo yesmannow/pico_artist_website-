@@ -22,6 +22,22 @@ export interface YouTubeVideo {
   videoUrl: string;
 }
 
+interface YouTubeAPIItem {
+  id: {
+    videoId: string;
+  };
+  snippet: {
+    title: string;
+    description: string;
+    publishedAt: string;
+    thumbnails: {
+      high: {
+        url: string;
+      };
+    };
+  };
+}
+
 /**
  * Fetch latest videos from the channel
  * @param maxResults Number of videos to fetch (default: 3)
@@ -55,9 +71,9 @@ export async function fetchLatestYouTubeVideos(
       throw new Error(`YouTube API error: ${response.status}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as { items: YouTubeAPIItem[] };
 
-    return data.items.map((item: any) => ({
+    return data.items.map((item) => ({
       id: item.id.videoId,
       title: item.snippet.title,
       description: item.snippet.description,

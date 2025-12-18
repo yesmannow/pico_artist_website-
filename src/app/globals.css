@@ -157,3 +157,14 @@ html {
   color: #f5f5f6;
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
 }
+
+/* Hide scrollbar utility - used for horizontal scroll containers */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+

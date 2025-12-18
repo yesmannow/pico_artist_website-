@@ -21,9 +21,11 @@ export default function MarqueeHeader({ text, className = '' }: MarqueeHeaderPro
       const currentScrollY = window.scrollY;
       const scrollDelta = Math.abs(currentScrollY - lastScrollY.current);
       
-      // Increase speed when scrolling down
+      // Increase speed when scrolling down, with max limit to prevent motion sickness
       if (scrollDelta > 0) {
-        setScrollSpeed(1 + Math.min(scrollDelta / 100, 2));
+        const calculatedSpeed = 1 + Math.min(scrollDelta / 100, 2);
+        // Cap max speed at 2x to prevent excessively fast animations
+        setScrollSpeed(Math.min(calculatedSpeed, 2));
       } else {
         setScrollSpeed(1);
       }
@@ -35,12 +37,15 @@ export default function MarqueeHeader({ text, className = '' }: MarqueeHeaderPro
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Ensure minimum duration to prevent excessively fast animations
+  const animationDuration = Math.max(20 / scrollSpeed, 10); // Minimum 10s duration
+
   return (
     <div className={`relative overflow-hidden py-4 ${className}`}>
       <div
         className="marquee-container"
         style={{
-          animationDuration: `${20 / scrollSpeed}s`,
+          animationDuration: `${animationDuration}s`,
         }}
       >
         <div className="marquee-content">

@@ -35,14 +35,14 @@ const pressAssets: PressAsset[] = [
     description: 'PNG format, transparent background, 4000x4000px',
     type: 'logo',
     downloadUrl: '/piko-logo.jpg',
-    icon: <Image className="w-6 h-6" />,
+    icon: <Image className="w-6 h-6" alt="" aria-hidden="true" />,
   },
   {
     id: 'press-photos',
     title: 'Press Photos Pack',
     description: 'Collection of high-resolution promotional photos',
     type: 'photo',
-    icon: <Image className="w-6 h-6" />,
+    icon: <Image className="w-6 h-6" alt="" aria-hidden="true" />,
   },
   {
     id: 'tech-rider',
@@ -58,11 +58,16 @@ const artistBio = `Piko FG is a visionary artist blending urban soundscapes with
 export default function PressPage() {
   const handleDownload = (asset: PressAsset) => {
     if (asset.downloadUrl) {
-      // Trigger download
-      window.open(asset.downloadUrl, '_blank');
+      // Create a temporary link and trigger download
+      const link = document.createElement('a');
+      link.href = asset.downloadUrl;
+      link.download = asset.downloadUrl.split('/').pop() || asset.title;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } else {
-      console.log('Download:', asset.title);
-      // TODO: Implement actual download logic
+      // For assets without downloadUrl, show a message or handle differently
+      alert(`${asset.title} download will be available soon. Please contact us for immediate access.`);
     }
   };
 
