@@ -16,7 +16,9 @@ import SkipForward from 'lucide-react/dist/esm/icons/skip-forward';
 import Volume2 from 'lucide-react/dist/esm/icons/volume-2';
 import VolumeX from 'lucide-react/dist/esm/icons/volume-x';
 import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
+import Music from 'lucide-react/dist/esm/icons/music';
 import { usePathname, useRouter } from 'next/navigation';
+import { getSocialLink } from '@/data/socials';
 
 /**
  * Format seconds to mm:ss
@@ -30,6 +32,7 @@ function formatTime(seconds: number): string {
 export default function PlayerDock() {
   const pathname = usePathname();
   const router = useRouter();
+  const youtubeMusicLink = getSocialLink('youtube-music');
   const {
     current,
     isPlaying,
@@ -254,6 +257,20 @@ export default function PlayerDock() {
 
             {/* Volume and source toggle */}
             <div className="flex items-center gap-4 flex-1 justify-end">
+              {/* YouTube Music Link */}
+              {youtubeMusicLink && (
+                <a
+                  href={youtubeMusicLink.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 text-zinc-400 hover:text-piko-pink transition"
+                  aria-label="Listen on YouTube Music"
+                  title="Listen on YouTube Music"
+                >
+                  <Music className="w-5 h-5" />
+                </a>
+              )}
+
               {/* Visualizer button */}
               <button
                 onClick={() => router.push('/visualizer')}
