@@ -88,9 +88,10 @@ export default function MiniVisualizer({ trackId, className = '' }: MiniVisualiz
     };
 
     // Start animation loop
-    draw();
     if (shouldAnimate) {
       animationRef.current = requestAnimationFrame(draw);
+    } else {
+      draw(); // Draw once for static state
     }
 
     return () => {
@@ -101,22 +102,34 @@ export default function MiniVisualizer({ trackId, className = '' }: MiniVisualiz
     };
   }, [shouldAnimate]);
 
-  // Set canvas size
+  // Set canvas size and handle resizing
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Use device pixel ratio for sharp rendering
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      ctx.scale(dpr, dpr);
-    }
+    const updateCanvasSize = () => {
+      // Use device pixel ratio for sharp rendering
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.scale(dpr, dpr);
+      }
+    };
+
+    // Initial size
+    updateCanvasSize();
+
+    // Handle window resize
+    window.addEventListener('resize', updateCanvasSize);
+
+    return () => {
+      window.removeEventListener('resize', updateCanvasSize);
+    };
   }, []);
 
   return (

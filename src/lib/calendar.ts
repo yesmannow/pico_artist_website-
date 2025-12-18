@@ -68,6 +68,14 @@ export function downloadICS(event: CalendarEvent, filename?: string): void {
  */
 export function parseEventDate(dateStr: string): Date {
   const date = new Date(dateStr);
+  
+  // Validate the date
+  if (isNaN(date.getTime())) {
+    // Fallback to current date if invalid
+    console.warn(`Invalid date string: "${dateStr}". Using current date as fallback.`);
+    return new Date();
+  }
+  
   // Set a default time if not specified (8pm)
   date.setHours(20, 0, 0, 0);
   return date;
