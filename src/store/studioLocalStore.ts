@@ -73,7 +73,30 @@ const loadFromStorage = (): Partial<StudioLocalState> => {
   if (typeof window === 'undefined') return {};
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : {};
+    if (!stored) return {};
+    
+    const data = JSON.parse(stored);
+    
+    // Ensure all tracks have a clips array for backward compatibility
+    if (data.tracks) {
+      data.tracks = data.tracks.map((track: Track) => ({
+        ...track,
+        clips: track.clips || [],
+      }));
+    }
+    
+    // Ensure all projects have tracks with clips arrays
+    if (data.projects) {
+      data.projects = data.projects.map((project: Project) => ({
+        ...project,
+        tracks: project.tracks.map((track: Track) => ({
+          ...track,
+          clips: track.clips || [],
+        })),
+      }));
+    }
+    
+    return data;
   } catch {
     return {};
   }
