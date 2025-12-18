@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Gallery from '@/components/Gallery';
+import VideoGrid from '@/components/gallery/VideoGrid';
+import manifest from '@/data/media-manifest.json';
 
 export default function GalleryPage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -43,7 +45,17 @@ export default function GalleryPage() {
           </p>
         </motion.div>
 
-        {/* Gallery Grid */}
+        {/* Video Gallery */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.6 }}
+          className="mb-12"
+        >
+          <VideoGrid videos={manifest.videos} />
+        </motion.div>
+
+        {/* Image Gallery */}
         <Gallery />
       </main>
     </div>

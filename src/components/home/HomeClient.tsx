@@ -6,6 +6,8 @@ import Image from "next/image";
 import TrackList from "@/components/audio/TrackList";
 import TourSection from "@/components/home/TourSection";
 import MerchGrid from "@/components/home/MerchGrid";
+import ParticlesBackground from "@/components/background/ParticlesBackground";
+import CustomCursor from "@/components/cursor/CustomCursor";
 import { Music, Mic, Radio } from "lucide-react";
 
 export default function HomeClient() {
@@ -21,7 +23,10 @@ export default function HomeClient() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4 relative overflow-hidden">
+    <>
+      <ParticlesBackground />
+      <CustomCursor />
+      <div className="flex min-h-screen flex-col items-center justify-center px-4 relative overflow-hidden">
       <motion.div
         className="absolute inset-0 -z-10"
         aria-hidden="true"
@@ -49,7 +54,7 @@ export default function HomeClient() {
           background: `radial-gradient(600px at ${mousePosition.x}px ${mousePosition.y}px, rgba(255, 0, 110, 0.15), transparent 80%)`,
         }}
       />
-      
+
       <main className="flex flex-col items-center gap-8 text-center relative z-10">
         {/* Hero Section with Logo */}
         <div className="flex flex-col items-center gap-4" data-hero>
@@ -57,11 +62,11 @@ export default function HomeClient() {
           <motion.div
             initial={{ scale: 0, rotate: -10 }}
             animate={{ scale: 1, rotate: 0 }}
-            transition={{ 
-              type: "spring", 
-              stiffness: 260, 
+            transition={{
+              type: "spring",
+              stiffness: 260,
               damping: 20,
-              duration: 0.8 
+              duration: 0.8
             }}
             className="relative"
             onMouseEnter={() => setIsHoveringLogo(true)}
@@ -100,8 +105,8 @@ export default function HomeClient() {
               />
             </div>
           </motion.div>
-          
-          <motion.h1 
+
+          <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
@@ -109,7 +114,7 @@ export default function HomeClient() {
           >
             Piko FG Studio
           </motion.h1>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
@@ -120,7 +125,7 @@ export default function HomeClient() {
         </div>
 
         {/* Feature Cards */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 0.6 }}
@@ -164,7 +169,7 @@ export default function HomeClient() {
         </motion.div>
 
         {/* CTA */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9, duration: 0.6 }}
@@ -188,9 +193,9 @@ export default function HomeClient() {
           <TourSection />
           <MerchGrid condensed />
         </motion.div>
-        
+
         {/* Track List Section */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.1, duration: 0.6 }}
@@ -200,5 +205,6 @@ export default function HomeClient() {
         </motion.div>
       </main>
     </div>
+    </>
   );
 }

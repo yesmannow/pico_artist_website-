@@ -1,7 +1,7 @@
 {
   "videos": [
-    { "id": "1sH88Y0DgWo", "title": "Te Prometo" },
-    { "id": "CdcXTfvAjns", "title": "El Don" }
+    { "id": "1sH88Y0DgWo", "title": "Te Prometo", "category": "music-video" },
+    { "id": "CdcXTfvAjns", "title": "El Don", "category": "music-video" }
   ],
   "images": [
     "piko_graffiti_01.webp",

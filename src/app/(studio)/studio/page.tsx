@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import StudioRecorder from '@/components/studio/StudioRecorder';
+import MultitrackTimeline from '@/components/studio/MultitrackTimeline';
 import { getTracks, type Track } from '@/lib/supabase';
 
 export default function StudioPage() {
@@ -63,14 +64,17 @@ export default function StudioPage() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.6 }}
-          className="w-full"
+          className="w-full space-y-6"
         >
           {loading ? (
             <div className="flex justify-center items-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-piko-teal"></div>
             </div>
           ) : (
-            <StudioRecorder backingTracks={backingTracks} />
+            <>
+              <StudioRecorder backingTracks={backingTracks} />
+              <MultitrackTimeline className="mt-8" />
+            </>
           )}
         </motion.div>
 

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { supabase } from '@/lib/supabase';
 
 type IconProps = React.SVGProps<SVGSVGElement>;
 
@@ -93,6 +94,13 @@ const menuItems = [
     blurb: 'Meet Piko FG',
   },
   {
+    title: 'Music',
+    href: '/music',
+    icon: RecordIcon,
+    gradient: 'from-piko-pink to-piko-orange',
+    blurb: 'Discography & albums',
+  },
+  {
     title: 'Tour',
     href: '/tour',
     icon: TicketIcon,
@@ -117,9 +125,25 @@ const studioLink = {
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [pastHero, setPastHero] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const isSlideOut = menuItems.length > SLIDE_OUT_THRESHOLD;
+
+  useEffect(() => {
+    async function checkAuth() {
+      const { data: { user } } = await supabase.auth.getUser();
+      setIsAuthenticated(!!user);
+    }
+    checkAuth();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session?.user);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     const hero = document.querySelector('[data-hero]');
@@ -300,29 +324,31 @@ export default function Navbar() {
                       {menuItems.map(renderMenuCard)}
                     </motion.div>
 
-                    <div className="px-6 pb-6 pt-2">
-                      <Link
-                        href={studioLink.href}
-                        onClick={toggleMenu}
-                        className="group block rounded-2xl border border-piko-teal/50 bg-gradient-to-r from-piko-teal/15 via-piko-teal/10 to-transparent p-5 shadow-[0_0_30px_rgba(0,245,212,0.2)] backdrop-blur-md"
-                      >
-                        <div className="flex items-center justify-between gap-3">
-                          <div>
-                            <p className="text-sm uppercase tracking-[0.18em] text-piko-teal">Member Studio</p>
-                            <p className="text-xl font-semibold text-zinc-100">Enter Workspace</p>
-                            <p className="text-sm text-zinc-400 mt-1">{studioLink.blurb}</p>
+                    {isAuthenticated && (
+                      <div className="px-6 pb-6 pt-2">
+                        <Link
+                          href={studioLink.href}
+                          onClick={toggleMenu}
+                          className="group block rounded-2xl border border-piko-teal/50 bg-gradient-to-r from-piko-teal/15 via-piko-teal/10 to-transparent p-5 shadow-[0_0_30px_rgba(0,245,212,0.2)] backdrop-blur-md"
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <div>
+                              <p className="text-sm uppercase tracking-[0.18em] text-piko-teal">Member Studio</p>
+                              <p className="text-xl font-semibold text-zinc-100">Enter Workspace</p>
+                              <p className="text-sm text-zinc-400 mt-1">{studioLink.blurb}</p>
+                            </div>
+                            <motion.span
+                              className="text-piko-teal text-2xl"
+                              animate={{ x: [0, 6, 0] }}
+                              transition={{ repeat: Infinity, duration: 1.6 }}
+                            >
+                              →
+                            </motion.span>
                           </div>
-                          <motion.span
-                            className="text-piko-teal text-2xl"
-                            animate={{ x: [0, 6, 0] }}
-                            transition={{ repeat: Infinity, duration: 1.6 }}
-                          >
-                            →
-                          </motion.span>
-                        </div>
-                        <div className="mt-4 h-[2px] bg-gradient-to-r from-piko-teal via-piko-pink to-piko-orange blur-[2px] opacity-80" />
-                      </Link>
-                    </div>
+                          <div className="mt-4 h-[2px] bg-gradient-to-r from-piko-teal via-piko-pink to-piko-orange blur-[2px] opacity-80" />
+                        </Link>
+                      </div>
+                    )}
                   </div>
                 </motion.aside>
               ) : (
