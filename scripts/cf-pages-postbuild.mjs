@@ -20,6 +20,38 @@ const ROOT_DIR = path.join(__dirname, '..');
 const OPEN_NEXT_DIR = path.join(ROOT_DIR, '.open-next');
 const OUTPUT_DIR = path.join(OPEN_NEXT_DIR, 'output');
 
+// Static asset patterns to exclude from Worker routing
+const STATIC_ASSET_EXCLUSIONS = [
+  // Next.js static assets
+  '/_next/static/*',
+  '/_next/image*',
+  
+  // Common static files
+  '/favicon.ico',
+  '/manifest.json',
+  '/robots.txt',
+  '/sitemap.xml',
+  '/sw.js',
+  
+  // Image formats
+  '/*.png',
+  '/*.jpg',
+  '/*.jpeg',
+  '/*.webp',
+  '/*.svg',
+  '/*.ico',
+  '/*.avif',
+  
+  // Other static assets
+  '/*.wav',
+  '/*.mp3',
+  '/*.woff',
+  '/*.woff2',
+  '/*.ttf',
+  '/*.eot',
+  '/*.otf',
+];
+
 // Colors for console output
 const colors = {
   reset: '\x1b[0m',
@@ -84,36 +116,7 @@ async function generateRoutesJson() {
   const routesConfig = {
     version: 1,
     include: ['/*'],
-    exclude: [
-      // Next.js static assets
-      '/_next/static/*',
-      '/_next/image*',
-      
-      // Common static files
-      '/favicon.ico',
-      '/manifest.json',
-      '/robots.txt',
-      '/sitemap.xml',
-      '/sw.js',
-      
-      // Image formats
-      '/*.png',
-      '/*.jpg',
-      '/*.jpeg',
-      '/*.webp',
-      '/*.svg',
-      '/*.ico',
-      '/*.avif',
-      
-      // Other static assets
-      '/*.wav',
-      '/*.mp3',
-      '/*.woff',
-      '/*.woff2',
-      '/*.ttf',
-      '/*.eot',
-      '/*.otf',
-    ],
+    exclude: STATIC_ASSET_EXCLUSIONS,
   };
 
   const routesPath = path.join(OUTPUT_DIR, '_routes.json');
@@ -129,7 +132,7 @@ async function prepareOutputDirectory() {
 
   // Clean and create output directory
   if (await exists(OUTPUT_DIR)) {
-    await fs.rm(OUTPUT_DIR, { recursive: true });
+    await fs.rm(OUTPUT_DIR, { recursive: true, force: true });
     logInfo('Removed existing output directory');
   }
   await fs.mkdir(OUTPUT_DIR, { recursive: true });
