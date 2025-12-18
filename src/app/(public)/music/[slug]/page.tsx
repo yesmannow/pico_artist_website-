@@ -84,6 +84,13 @@ export default function TrackDetailPage({ params }: TrackDetailPageProps) {
     [track.coverArt]
   );
 
+  // Get related tracks (other tracks excluding current one, limited to 5)
+  const relatedTracks = useMemo(() => {
+    return getTracks()
+      .filter((t) => t.id !== track.id)
+      .slice(0, 5);
+  }, [track.id]);
+
   const dimUI = isIdle && isCurrentPlaying;
 
   return (
