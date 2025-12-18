@@ -6,7 +6,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
@@ -23,7 +23,7 @@ import CinematicHero from '@/components/media/CinematicHero';
 
 type TabType = 'tracks' | 'videos';
 
-export default function MediaPage() {
+function MediaContent() {
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabType>('tracks');
   const [featuredVideo, setFeaturedVideo] = useState<Video | null>(null);
@@ -323,5 +323,17 @@ export default function MediaPage() {
         <div className="h-32" />
       </div>
     </div>
+  );
+}
+
+export default function MediaPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950">
+        <div className="text-zinc-400">Loading...</div>
+      </div>
+    }>
+      <MediaContent />
+    </Suspense>
   );
 }
