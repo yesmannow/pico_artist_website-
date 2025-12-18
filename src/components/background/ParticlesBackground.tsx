@@ -1,12 +1,27 @@
 'use client';
 
-import { useMemo } from 'react';
-import Particles from 'react-tsparticles';
-import { loadSlim } from 'tsparticles-slim';
-import type { ISourceOptions } from 'tsparticles-engine';
-import type { Engine } from 'tsparticles-engine';
+import { useMemo, useEffect, useState } from 'react';
+import Particles, { initParticlesEngine } from '@tsparticles/react';
+import { loadSlim } from '@tsparticles/slim';
+import type { ISourceOptions } from '@tsparticles/engine';
 
 export default function ParticlesBackground() {
+  const [init, setInit] = useState(false);
+
+  useEffect(() => {
+    initParticlesEngine(async (engine) => {
+      await loadSlim(engine);
+    })
+      .then(() => {
+        setInit(true);
+      })
+      .catch((error) => {
+        console.error('Failed to initialize particles engine:', error);
+        // Set init to true to allow component to render without particles
+        setInit(true);
+      });
+  }, []);
+
   const options: ISourceOptions = useMemo(
     () => ({
       background: {
@@ -65,12 +80,11 @@ export default function ParticlesBackground() {
         },
         opacity: {
           value: 0.3,
-          random: true,
           animation: {
             enable: true,
             speed: 0.5,
-            minimumValue: 0.1,
-            sync: false,
+            startValue: 'random',
+            mode: 'random',
           },
         },
         shape: {
@@ -78,12 +92,11 @@ export default function ParticlesBackground() {
         },
         size: {
           value: { min: 1, max: 3 },
-          random: true,
           animation: {
             enable: true,
             speed: 2,
-            minimumValue: 0.5,
-            sync: false,
+            startValue: 'random',
+            mode: 'random',
           },
         },
       },
@@ -92,14 +105,14 @@ export default function ParticlesBackground() {
     []
   );
 
+  if (!init) {
+    return null;
+  }
+
   return (
     <div className="fixed inset-0 -z-10 pointer-events-none">
-      {/* @ts-expect-error - react-tsparticles has type compatibility issues with React 19 */}
       <Particles
         id="tsparticles"
-        init={async (engine: Engine) => {
-          await loadSlim(engine);
-        }}
         options={options}
       />
     </div>

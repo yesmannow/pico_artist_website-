@@ -46,3 +46,6 @@ cookies.txt
 downloads/
 !downloads/README.md
 .env.local
+
+# OpenNext build output
+.open-next/
