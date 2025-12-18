@@ -57,7 +57,7 @@ export default function Waveform({
     if (!containerRef.current || !isVisible) return;
 
     // MANDATORY: Force MediaElement backend to prevent full audio decode into RAM
-    const backend: 'WebAudio' | 'MediaElement' = 'MediaElement';
+    const backend = 'MediaElement' as const;
     
     try {
       // Create wavesurfer instance

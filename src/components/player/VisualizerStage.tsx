@@ -50,9 +50,17 @@ export default function VisualizerStage({
       // MANDATORY: Clamp DPR to max 1.5 to prevent VRAM exhaustion
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       const rect = canvas.getBoundingClientRect();
+      
+      // Set internal canvas resolution
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
+      
+      // Scale context for DPR
       ctx.scale(dpr, dpr);
+      
+      // Maintain original display size
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
     };
 
     resize();
