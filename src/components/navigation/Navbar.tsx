@@ -127,7 +127,7 @@ export default function Navbar() {
                   }}
                   className="grid grid-cols-1 sm:grid-cols-2 gap-6"
                 >
-                  {menuItems.map((item, index) => {
+                  {menuItems.map((item) => {
                     const Icon = item.icon;
                     return (
                       <motion.div
