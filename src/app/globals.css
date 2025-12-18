@@ -93,10 +93,10 @@ html {
 /* Glassmorphism utility class for globe labels */
 .glassmorphism {
   background: rgba(24, 24, 27, 0.9);
-  /* ISOLATED: GPU-heavy backdrop-filter with explicit transform */
+  /* ISOLATED: GPU-heavy backdrop-filter with will-change for better memory usage */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  transform: translateZ(0);
+  will-change: transform, opacity;
   border-radius: 0.5rem;
 }
 
@@ -145,9 +145,9 @@ html {
   inset: 0;
   pointer-events: none;
   opacity: 0.07;
-  /* ISOLATED: GPU-heavy effect with explicit transform */
+  /* ISOLATED: GPU-heavy effect with will-change for better memory usage */
   mix-blend-mode: soft-light;
-  transform: translateZ(0);
+  will-change: transform, opacity;
   z-index: 1;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
@@ -171,5 +171,13 @@ html {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Mobile scroll lock - prevent swipe-back navigation on visualizer canvas */
+canvas.visualizer-canvas,
+#visualizer-canvas-container {
+  touch-action: none;
+  user-select: none;
+  outline: none;
 }
 

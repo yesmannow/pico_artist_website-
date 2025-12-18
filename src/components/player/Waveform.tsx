@@ -17,6 +17,9 @@ interface WaveformProps {
   isPlaying?: boolean;
 }
 
+// How far ahead to preload waveforms (affects when they initialize before entering viewport)
+const WAVEFORM_PRELOAD_MARGIN = '300px 0px';
+
 export default function Waveform({
   url,
   currentTime = 0,
@@ -32,17 +35,26 @@ export default function Waveform({
   const [isVisible, setIsVisible] = useState(false);
   const playheadGlow = '0 0 20px rgba(0,245,212,0.35)'; // aligns with piko-teal brand
 
-  // Lazy initialization with IntersectionObserver
+  // Lazy initialization with IntersectionObserver - destroy on viewport leave
   useEffect(() => {
     if (!containerRef.current) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          setIsVisible(entry.isIntersecting);
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          } else {
+            // Destroy wavesurfer when leaving viewport for memory cleanup
+            if (wavesurferRef.current) {
+              wavesurferRef.current.destroy();
+              wavesurferRef.current = null;
+            }
+            setIsVisible(false);
+          }
         });
       },
-      { threshold: 0.1 }
+      { rootMargin: WAVEFORM_PRELOAD_MARGIN, threshold: 0 }
     );
 
     observer.observe(containerRef.current);

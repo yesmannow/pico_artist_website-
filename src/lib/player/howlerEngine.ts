@@ -193,6 +193,31 @@ class HowlerEngine {
       source: this.currentSource,
     };
   }
+
+  /**
+   * Get the internal audio element when using html5 mode
+   * Returns null if not using html5 or if Howl is not initialized
+   */
+  getMediaElement(): HTMLMediaElement | null {
+    if (!this.howl) return null;
+    
+    try {
+      // Howler stores sounds internally - when using html5 mode, each sound has an audio element
+      // WARNING: Accessing private API - may break in future Howler versions
+      const sounds = (this.howl as unknown as { _sounds?: Array<{ _node?: unknown }> })._sounds;
+      if (sounds && sounds.length > 0 && sounds[0]._node) {
+        const node = sounds[0]._node;
+        // Validate that the node is actually an HTMLMediaElement (Audio or Video element)
+        if (node instanceof HTMLMediaElement) {
+          return node;
+        }
+      }
+    } catch {
+      // Ignore errors when accessing private API
+    }
+    
+    return null;
+  }
 }
 
 // Export singleton instance

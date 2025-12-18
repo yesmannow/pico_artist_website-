@@ -11,6 +11,7 @@ import { createEngine } from '@/lib/visuals/engine';
 import { createAudioAnalyser, AudioAnalyser } from '@/lib/visuals/audioAnalyser';
 import { getPresetById, getDefaultPreset, type Preset } from '@/lib/visuals/presets';
 import { getRandomBg } from '@/data/images';
+import { howlerEngine } from '@/lib/player/howlerEngine';
 
 interface VisualizerCanvasProps {
   presetId?: string;
@@ -32,10 +33,18 @@ export default function VisualizerCanvas({
   const engineRef = useRef<ReturnType<typeof createEngine> | null>(null);
   const analyserRef = useRef<AudioAnalyser | null>(null);
   const currentPresetRef = useRef<Preset | null>(null);
+  const mediaElementConnectedRef = useRef(false);
   
   const [bgImage] = useState(() => backgroundMode !== 'none' ? getRandomBg() : null);
   
-  const { isPlaying, currentTime, duration } = usePlayerStore();
+  const { isPlaying, currentTime, duration, current } = usePlayerStore();
+
+  // Reset media element connection when track changes
+  useEffect(() => {
+    // When the current track changes, reset the connection flag
+    // so we can connect to the new media element
+    mediaElementConnectedRef.current = false;
+  }, [current?.id]);
 
   // Initialize engine and preset
   useEffect(() => {
@@ -109,6 +118,7 @@ export default function VisualizerCanvas({
         analyserRef.current.destroy();
         analyserRef.current = null;
       }
+      mediaElementConnectedRef.current = false;
     };
   }, [presetId, audioReactive]);
 
@@ -119,6 +129,18 @@ export default function VisualizerCanvas({
 
     // Calculate safe track progress
     const trackProgress = duration > 0 ? Math.min(1, Math.max(0, currentTime / duration)) : 0;
+
+    // Try to connect media element to analyser when playing starts
+    // This handles the html5 mode where Howler uses an Audio element
+    if (isPlaying && analyserRef.current && !mediaElementConnectedRef.current) {
+      const mediaElement = howlerEngine.getMediaElement();
+      if (mediaElement) {
+        const connected = analyserRef.current.connectMediaElement(mediaElement);
+        if (connected) {
+          mediaElementConnectedRef.current = true;
+        }
+      }
+    }
 
     // Get audio data if available
     const audioData = analyserRef.current?.getAudioFrame();
@@ -145,7 +167,7 @@ export default function VisualizerCanvas({
   }, [presetId]);
 
   return (
-    <div ref={containerRef} className={`relative w-full h-full ${className}`}>
+    <div ref={containerRef} id="visualizer-canvas-container" className={`relative w-full h-full ${className}`}>
       {/* Background image layer */}
       {bgImage && (
         <div
@@ -157,7 +179,7 @@ export default function VisualizerCanvas({
       {/* Canvas layer */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 w-full h-full"
+        className="visualizer-canvas absolute inset-0 w-full h-full"
         style={{ imageRendering: 'auto' }}
       />
     </div>
