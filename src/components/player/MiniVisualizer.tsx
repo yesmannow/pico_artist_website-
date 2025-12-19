@@ -17,7 +17,7 @@ export default function MiniVisualizer({ trackId, className = '' }: MiniVisualiz
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | null>(null);
   const barsRef = useRef<number[]>([]);
-  
+
   const { current, isPlaying } = usePlayerStore();
   const isCurrentTrack = current?.id === trackId;
   const shouldAnimate = isCurrentTrack && isPlaying;
@@ -37,6 +37,7 @@ export default function MiniVisualizer({ trackId, className = '' }: MiniVisualiz
     const draw = () => {
       // MANDATORY: Visibility kill-switch at TOP of render loop
       if (document.hidden || !canvasRef.current) {
+        animationRef.current = null;
         return;
       }
 
@@ -72,12 +73,12 @@ export default function MiniVisualizer({ trackId, className = '' }: MiniVisualiz
         barsRef.current[i] += (targetHeight - barsRef.current[i]) * 0.2;
 
         const height = canvas.height * barsRef.current[i];
-        
+
         // Create gradient for bars
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         gradient.addColorStop(0, 'rgba(0, 245, 212, 0.8)');
         gradient.addColorStop(1, 'rgba(255, 0, 110, 0.8)');
-        
+
         ctx.fillStyle = gradient;
         ctx.fillRect(
           i * barWidth + barWidth * 0.2,
@@ -116,10 +117,10 @@ export default function MiniVisualizer({ trackId, className = '' }: MiniVisualiz
       // MANDATORY: Clamp DPR to max 1.5 to prevent VRAM exhaustion
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       const rect = canvas.getBoundingClientRect();
-      
+
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
-      
+
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.scale(dpr, dpr);

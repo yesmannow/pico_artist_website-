@@ -14,24 +14,34 @@ interface TheDropProps {
   trackTitle?: string;
 }
 
-export default function TheDrop({ 
+export default function TheDrop({
   trackTitle = 'Te Prometo',
 }: TheDropProps) {
   const youtubeMusicLink = getSocialLink('youtube-music');
 
   return (
     <section className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
-      {/* Background Video Effect - Using static gradient for now */}
-      <div className="absolute inset-0 bg-gradient-to-br from-piko-pink/20 via-zinc-950 to-piko-teal/20">
-        {/* Animated gradient overlay for "glitch" effect */}
+      {/* Glitch background video with safety overlays for contrast */}
+      <div className="absolute inset-0 overflow-hidden">
+        <video
+          className="absolute inset-0 h-full w-full object-cover scale-105"
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="/assets/images/hero/white_hero.jpg"
+        >
+          <source src="https://cdn.coverr.co/videos/coverr-glitch-abstract-6891/1080p.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/60 to-black/70" />
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-piko-orange/10 via-transparent to-piko-pink/10"
+          className="absolute inset-0 bg-gradient-to-r from-piko-orange/15 via-transparent to-piko-pink/15 mix-blend-screen"
           animate={{
-            x: ['-100%', '100%'],
-            opacity: [0.3, 0.6, 0.3],
+            x: ['-120%', '120%'],
+            opacity: [0.25, 0.55, 0.25],
           }}
           transition={{
-            duration: 8,
+            duration: 10,
             repeat: Infinity,
             ease: 'linear',
           }}
@@ -73,7 +83,7 @@ export default function TheDrop({
             transition={{ delay: 0.2, duration: 0.6 }}
           >
             {/* Main title with CSS glitch animation */}
-            <span 
+            <span
               className="glitch-text bg-gradient-to-r from-piko-pink via-piko-teal to-piko-orange bg-clip-text text-transparent"
               data-text={trackTitle}
             >
@@ -83,12 +93,12 @@ export default function TheDrop({
 
           {/* Subtitle */}
           <motion.p
-            className="text-xl md:text-2xl text-zinc-300 mb-12 max-w-2xl mx-auto"
+            className="text-xl md:text-2xl text-zinc-100/90 mb-12 max-w-2xl mx-auto"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.6 }}
           >
-            The latest single from Piko FG — Available on all platforms
+            The latest single from Piko FG — mastered for neon sound systems and live visualizers.
           </motion.p>
 
           {/* CTA Buttons */}
@@ -103,25 +113,25 @@ export default function TheDrop({
               href={youtubeMusicLink?.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative inline-flex items-center gap-3 px-10 py-5 text-lg font-bold rounded-full bg-gradient-to-r from-piko-pink to-piko-teal text-white shadow-2xl overflow-hidden"
+              className="group relative inline-flex items-center gap-3 px-10 py-5 text-lg font-bold rounded-full bg-white text-zinc-900 shadow-2xl overflow-hidden"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               {/* Glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-piko-pink to-piko-teal blur-xl opacity-0 group-hover:opacity-75 transition-opacity -z-10" />
-              
-              STREAM NOW
+              <div className="absolute inset-0 bg-gradient-to-r from-piko-pink/40 to-piko-teal/40 blur-xl opacity-0 group-hover:opacity-80 transition-opacity -z-10" />
+
+              OUT NOW · STREAM
               <ExternalLink className="w-5 h-5" />
-              
+
               {/* Animated border */}
               <motion.div
-                className="absolute inset-0 rounded-full border-2 border-white/50"
+                className="absolute inset-0 rounded-full border-2 border-white/60"
                 animate={{
-                  scale: [1, 1.1, 1],
-                  opacity: [0.5, 0, 0.5],
+                  scale: [1, 1.08, 1],
+                  opacity: [0.55, 0, 0.55],
                 }}
                 transition={{
-                  duration: 2,
+                  duration: 1.6,
                   repeat: Infinity,
                   ease: 'easeInOut',
                 }}
@@ -131,7 +141,7 @@ export default function TheDrop({
             {/* Listen on Site */}
             <Link
               href={`/media?tab=tracks`}
-              className="group inline-flex items-center gap-3 px-10 py-5 text-lg font-bold rounded-full border-2 border-piko-orange bg-piko-orange/10 text-piko-orange hover:bg-piko-orange/20 transition shadow-lg shadow-piko-orange/20"
+              className="group inline-flex items-center gap-3 px-10 py-5 text-lg font-bold rounded-full border-2 border-piko-orange bg-piko-orange text-zinc-950 hover:bg-piko-orange/90 transition shadow-lg shadow-piko-orange/30"
             >
               LISTEN HERE
             </Link>

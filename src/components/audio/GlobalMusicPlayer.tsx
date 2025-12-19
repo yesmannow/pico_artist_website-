@@ -135,6 +135,10 @@ export default function GlobalMusicPlayer() {
     const barWidth = canvas.width / bars;
 
     const animate = () => {
+      if (document.hidden) {
+        animationRef.current = undefined;
+        return;
+      }
       // Check if still playing before animating
       if (!state.isPlaying) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);

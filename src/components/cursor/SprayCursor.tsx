@@ -108,6 +108,12 @@ export default function SprayCursor() {
 
     // Animation loop (runs outside React state)
     const animate = () => {
+      if (document.hidden) {
+        particlesRef.current = [];
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        animationFrameRef.current = null;
+        return;
+      }
       // CRITICAL: Stop the loop entirely on touch devices or if reduced motion is preferred
       if (!isHoverDeviceRef.current || prefersReducedMotionRef.current) {
         // Clear particles and stop the loop

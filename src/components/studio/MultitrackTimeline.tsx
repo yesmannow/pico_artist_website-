@@ -47,7 +47,8 @@ export default function MultitrackTimeline({ className }: MultitrackTimelineProp
         barRadius: 1,
         height: 60,
         normalize: true,
-        backend: 'WebAudio',
+        // Force MediaElement backend to avoid excessive decode/CPU spikes
+        backend: 'MediaElement',
       });
 
       if (track.audioUrl) {

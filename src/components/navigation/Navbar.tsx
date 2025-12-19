@@ -7,6 +7,11 @@ import X from 'lucide-react/dist/esm/icons/x';
 import Link from 'next/link';
 import Image from 'next/image';
 import HyperText from '@/components/ui/HyperText';
+import Youtube from 'lucide-react/dist/esm/icons/youtube';
+import Facebook from 'lucide-react/dist/esm/icons/facebook';
+import Instagram from 'lucide-react/dist/esm/icons/instagram';
+import Music from 'lucide-react/dist/esm/icons/music';
+import { getSocialLinks } from '@/data/socials';
 // AUTHENTICATION DISABLED - supabase import no longer needed
 // import { supabase } from '@/lib/supabase';
 
@@ -121,6 +126,7 @@ const studioLink = {
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [pastHero, setPastHero] = useState(true);
+  const socialLinks = getSocialLinks();
   // AUTHENTICATION DISABLED - Studio is now publicly accessible
   // const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -237,6 +243,35 @@ export default function Navbar() {
                 className="text-xl font-bold text-zinc-100 hidden sm:block"
               />
             </Link>
+
+            {/* Social shortcuts */}
+            <div className="hidden md:flex items-center gap-3">
+              {socialLinks.map((social) => {
+                const icon =
+                  social.platform === 'youtube-music' ? (
+                    <Music className="h-4 w-4" />
+                  ) : social.platform === 'youtube' ? (
+                    <Youtube className="h-4 w-4" />
+                  ) : social.platform === 'facebook' ? (
+                    <Facebook className="h-4 w-4" />
+                  ) : social.platform === 'instagram' ? (
+                    <Instagram className="h-4 w-4" />
+                  ) : null;
+
+                return (
+                  <Link
+                    key={social.platform}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-full border border-zinc-800 bg-zinc-900/60 p-2 text-zinc-200 hover:border-piko-teal hover:text-piko-teal transition"
+                    aria-label={social.name}
+                  >
+                    {icon}
+                  </Link>
+                );
+              })}
+            </div>
 
             {/* Hamburger Menu Button */}
             <button

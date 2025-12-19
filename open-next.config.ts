@@ -1,26 +1,12 @@
-const config = {
-  default: {
-    override: {
-      wrapper: "cloudflare-node",
-      converter: "edge",
-      proxyExternalRequest: "fetch",
-      incrementalCache: "dummy",
-      tagCache: "dummy",
-      queue: "dummy",
-    },
-  },
-  edgeExternals: ["node:crypto"],
-  middleware: {
-    external: true,
-    override: {
-      wrapper: "cloudflare-edge",
-      converter: "edge",
-      proxyExternalRequest: "fetch",
-      incrementalCache: "dummy",
-      tagCache: "dummy",
-      queue: "dummy",
-    },
-  },
-};
+import { defineConfig } from "@opennextjs/cloudflare";
 
-export default config;
+export default defineConfig({
+  // Keep defaults explicit so the Cloudflare build matches local builds
+  default: {
+    buildCommand: "next build",
+  },
+  output: {
+    directory: ".open-next",
+  },
+});
+

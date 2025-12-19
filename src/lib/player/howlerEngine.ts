@@ -148,15 +148,19 @@ class HowlerEngine {
    */
   private startTimeUpdates(): void {
     this.stopTimeUpdates();
-    
+
     const update = () => {
+      if (document.hidden) {
+        this.stopTimeUpdates();
+        return;
+      }
       if (this.howl && this.howl.playing()) {
         // Call onSeek to notify about time update - the player dock reads time via getCurrentTime()
         this.callbacks.onSeek?.();
         this.animationFrame = requestAnimationFrame(update);
       }
     };
-    
+
     this.animationFrame = requestAnimationFrame(update);
   }
 
@@ -199,7 +203,7 @@ class HowlerEngine {
    */
   getMediaElement(): HTMLMediaElement | null {
     if (!this.howl) return null;
-    
+
     try {
       // Howler stores sounds internally - when using html5 mode, each sound has an audio element
       // WARNING: Accessing private API - may break in future Howler versions
@@ -214,7 +218,7 @@ class HowlerEngine {
     } catch {
       // Ignore errors when accessing private API
     }
-    
+
     return null;
   }
 }

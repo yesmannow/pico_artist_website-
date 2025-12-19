@@ -49,6 +49,16 @@ const InstagramFeed = dynamic(
   { ssr: false }
 );
 
+const YouTubeFeed = dynamic(
+  () => import("@/components/social/YouTubeFeed"),
+  { ssr: false }
+);
+
+const InstagramGrid = dynamic(
+  () => import("@/components/social/InstagramGrid"),
+  { ssr: false }
+);
+
 export default function HomeClient() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isLoading, setIsLoading] = useState(true);
@@ -417,13 +427,17 @@ export default function HomeClient() {
           </motion.div>
         </section>
 
+        {/* Social Automation */}
+        <YouTubeFeed />
+        <InstagramGrid />
+
         {/* Sign The Wall - Community Feature */}
         <SignTheWall />
 
         {/* Merch Lookbook */}
         <MerchLookbook />
 
-        {/* Instagram Feed */}
+        {/* Instagram Feed (legacy embed) */}
         <InstagramFeed />
       </div>
     </>

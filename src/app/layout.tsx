@@ -7,9 +7,12 @@ import Footer from "@/components/navigation/Footer";
 import PWARegister from "@/components/PWARegister";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import SprayCursor from "@/components/cursor/SprayCursor";
+import { SOCIAL_LINKS } from "@/data/socials";
 
 // CLOUDFLARE FIX: Edge runtime removed entirely to keep the worker lean
 // No runtime export needed - defaults to nodejs
+
+const socialProfileLinks = SOCIAL_LINKS.map((link) => link.url);
 
 export const metadata: Metadata = {
   title: {
@@ -45,6 +48,11 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+  },
+  other: {
+    // Surface social profiles to crawlers via OpenGraph/Twitter compatible meta
+    "og:see_also": socialProfileLinks,
+    "twitter:see_also": socialProfileLinks,
   },
 };
 

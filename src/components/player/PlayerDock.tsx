@@ -114,6 +114,10 @@ export default function PlayerDock() {
   useEffect(() => {
     if (isPlaying) {
       const updateTime = () => {
+        if (document.hidden) {
+          timeUpdateRef.current = null;
+          return;
+        }
         const time = howlerEngine.getCurrentTime();
         setCurrentTime(time);
         timeUpdateRef.current = requestAnimationFrame(updateTime);

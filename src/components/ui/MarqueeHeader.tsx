@@ -1,67 +1,59 @@
 /**
  * MarqueeHeader - Kinetic Typography Component
- * Scrolling header text that increases speed on scroll
+ * Framer Motion marquee that scrolls section titles infinitely
  */
 
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 
 interface MarqueeHeaderProps {
   text: string;
   className?: string;
 }
 
+const marqueeCopies = Array.from({ length: 6 });
+
 export default function MarqueeHeader({ text, className = '' }: MarqueeHeaderProps) {
-  const [scrollSpeed, setScrollSpeed] = useState(1);
-  const lastScrollY = useRef(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const scrollDelta = Math.abs(currentScrollY - lastScrollY.current);
-      
-      // Increase speed when scrolling down, with max limit to prevent motion sickness
-      if (scrollDelta > 0) {
-        const calculatedSpeed = 1 + Math.min(scrollDelta / 100, 2);
-        // Cap max speed at 2x to prevent excessively fast animations
-        setScrollSpeed(Math.min(calculatedSpeed, 2));
-      } else {
-        setScrollSpeed(1);
-      }
-      
-      lastScrollY.current = currentScrollY;
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Ensure minimum duration to prevent excessively fast animations
-  const animationDuration = Math.max(20 / scrollSpeed, 10); // Minimum 10s duration
+  const prefersReducedMotion = useReducedMotion();
 
   return (
     <div className={`relative overflow-hidden py-4 ${className}`}>
-      <div
-        className="marquee-container"
-        style={{
-          animationDuration: `${animationDuration}s`,
-        }}
-      >
-        <div className="marquee-content">
-          <span className="text-3xl md:text-4xl font-bold text-zinc-100 mx-8 whitespace-nowrap">
-            {text}
-          </span>
-          <span className="text-3xl md:text-4xl font-bold text-zinc-100 mx-8 whitespace-nowrap">
-            {text}
-          </span>
-          <span className="text-3xl md:text-4xl font-bold text-zinc-100 mx-8 whitespace-nowrap">
-            {text}
-          </span>
-          <span className="text-3xl md:text-4xl font-bold text-zinc-100 mx-8 whitespace-nowrap">
-            {text}
-          </span>
-        </div>
+      <div className="pointer-events-none">
+        <motion.div
+          className="flex"
+          aria-hidden
+          initial={false}
+          animate={
+            prefersReducedMotion
+              ? undefined
+              : {
+                  x: ['0%', '-50%'],
+                }
+          }
+          transition={
+            prefersReducedMotion
+              ? undefined
+              : {
+                  duration: 16,
+                  ease: 'linear',
+                  repeat: Infinity,
+                }
+          }
+        >
+          {[0, 1].map((index) => (
+            <div key={index} className="flex min-w-full shrink-0">
+              {marqueeCopies.map((_, idx) => (
+                <span
+                  key={`${index}-${idx}`}
+                  className="text-3xl md:text-4xl font-bold text-zinc-100 mx-8 whitespace-nowrap tracking-[0.08em]"
+                >
+                  {text || 'PIKO FG'}
+                </span>
+              ))}
+            </div>
+          ))}
+        </motion.div>
       </div>
     </div>
   );
