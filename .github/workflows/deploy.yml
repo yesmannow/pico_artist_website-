@@ -7,7 +7,7 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
 
 env:
-  NODE_VERSION: 20
+  NODE_VERSION: 20.19.2
   PROJECT_NAME: pico-artist-portfolio-website
 
 jobs:
@@ -35,7 +35,7 @@ jobs:
         env:
           NEXT_SKIP_TYPECHECK: 1
           NEXT_SKIP_LINT: 1
-          NODE_VERSION: 20.18.0
+          NODE_VERSION: 20.19.2
 
       - name: Deploy to Cloudflare Pages
         id: cloudflare_deploy
@@ -69,7 +69,7 @@ jobs:
         env:
           NEXT_SKIP_TYPECHECK: 1
           NEXT_SKIP_LINT: 1
-          NODE_VERSION: 20.18.0
+          NODE_VERSION: 20.19.2
 
       - name: Deploy preview to Cloudflare Pages
         id: deploy
