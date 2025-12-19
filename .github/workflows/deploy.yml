@@ -43,7 +43,8 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy .open-next/output --project-name=${{ env.PROJECT_NAME }} --branch=${{ github.head_ref || github.ref_name }}
+          # Flags must precede the positional path for Wrangler CLI parsing
+          command: pages deploy --project-name=pico-artist-portfolio-website --branch=${{ github.head_ref || github.ref_name }} .open-next/output
 
   preview:
     if: github.event_name == 'pull_request'
@@ -76,7 +77,8 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy .open-next/output --project-name=${{ env.PROJECT_NAME }} --branch=${{ github.head_ref || github.ref_name }}
+          # Flags must precede the positional path for Wrangler CLI parsing
+          command: pages deploy --project-name=pico-artist-portfolio-website --branch=${{ github.head_ref || github.ref_name }} .open-next/output
 
       - name: Capture preview URL
         id: preview-url
