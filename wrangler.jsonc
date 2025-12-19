@@ -1,14 +1,10 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "pico-artist-portfolio-website",
-  "compatibility_date": "2025-12-18",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
-  "pages_build_output_dir": ".open-next/output",
-  "vars": {
-    "NODE_VERSION": "20.19.2",
-    "NEXT_SKIP_TYPECHECK": "1",
-    "NEXT_SKIP_LINT": "1"
+  "name": "piko-artist-website",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2024-12-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
   }
 }

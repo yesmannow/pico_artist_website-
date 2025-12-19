@@ -1,12 +1,11 @@
-import { defineConfig } from "@opennextjs/cloudflare";
+import { defineCloudflareConfig } from "@opennextjs/cloudflare";
+import kvIncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cache/kv-incremental-cache";
+import doShardedTagCache from "@opennextjs/cloudflare/overrides/tag-cache/do-sharded-tag-cache";
 
-export default defineConfig({
-  // Keep defaults explicit so the Cloudflare build matches local builds
-  default: {
-    buildCommand: "next build",
-  },
-  output: {
-    directory: ".open-next",
-  },
+export default defineCloudflareConfig({
+  incrementalCache: kvIncrementalCache,
+  tagCache: doShardedTagCache({
+    baseShardSize: 12,
+    regionalCache: true,
+  }),
 });
-

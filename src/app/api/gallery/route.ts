@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 // Use relative import instead of TS path alias for Worker/Edge runtime compatibility
 import manifest from '../../../data/media-manifest.json';
 
-export const runtime = 'edge'; // Required for Cloudflare Pages Edge Runtime
+// Use the Node.js runtime for OpenNext Cloudflare Worker compatibility
+export const runtime = 'nodejs';
 
 export async function GET() {
   try {

@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: { unoptimized: true },
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "img.youtube.com" },
+    ],
+    unoptimized: false,
+  },
   reactStrictMode: true,
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
