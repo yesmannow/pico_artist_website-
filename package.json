@@ -24,6 +24,7 @@
     "react-dom": "18.3.1",
     "react-globe.gl": "^2.37.0",
     "react-lite-youtube-embed": "^3.3.3",
+    "react-parallax-tilt": "^1.7.245",
     "sharp": "^0.34.5",
     "wavesurfer.js": "^7.12.1",
     "zustand": "^5.0.9"
