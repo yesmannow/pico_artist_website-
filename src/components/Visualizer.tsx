@@ -9,6 +9,8 @@ type VisualizerProps = {
   className?: string;
 };
 
+const MAX_DEVICE_PIXEL_RATIO = 1.5;
+
 export default function Visualizer({
   analyser,
   bars = 32,
@@ -23,16 +25,25 @@ export default function Visualizer({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const resize = () => {
-      const dpr = Math.min(typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1, 1.5);
+    let resizeFrame: number | undefined;
+
+    const applyResize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, MAX_DEVICE_PIXEL_RATIO);
       const { width, height } = canvas.getBoundingClientRect();
       canvas.width = width * dpr;
       canvas.height = height * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
-    resize();
-    window.addEventListener("resize", resize);
+    const handleResize = () => {
+      if (resizeFrame) {
+        cancelAnimationFrame(resizeFrame);
+      }
+      resizeFrame = requestAnimationFrame(applyResize);
+    };
+
+    applyResize();
+    window.addEventListener("resize", handleResize);
 
     const bufferLength = Math.min(analyser.frequencyBinCount, bars * 2);
     const dataArray = new Uint8Array(bufferLength);
@@ -60,7 +71,10 @@ export default function Visualizer({
 
     return () => {
       cancelAnimationFrame(rafId);
-      window.removeEventListener("resize", resize);
+      if (resizeFrame) {
+        cancelAnimationFrame(resizeFrame);
+      }
+      window.removeEventListener("resize", handleResize);
     };
   }, [analyser, bars]);
 

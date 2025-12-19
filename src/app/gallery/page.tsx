@@ -8,6 +8,8 @@ import { MediaItem } from "@/lib/galleryUtils";
 export const runtime = "nodejs";
 export const revalidate = 900;
 
+const sanitizeMediaFile = (fileName: string) => fileName.replace(/(\.\.|\/|\\)/g, "");
+
 const buildGalleryFeed = unstable_cache(
   async (): Promise<MediaItem[]> => {
     const videoEntries: MediaItem[] =
@@ -20,13 +22,16 @@ const buildGalleryFeed = unstable_cache(
       })) ?? [];
 
     const imageEntries: MediaItem[] =
-      manifest.images?.map((image, index) => ({
-        id: `image-${index}`,
-        type: "image" as const,
-        filename: image,
-        url: `/gallery/${image}`,
-        title: image.replace(/\.(webp|jpg|png)$/i, "").replace(/_/g, " "),
-      })) ?? [];
+      manifest.images?.map((image, index) => {
+        const safeImage = sanitizeMediaFile(image);
+        return {
+          id: `image-${index}`,
+          type: "image" as const,
+          filename: safeImage,
+          url: `/gallery/${encodeURIComponent(safeImage)}`,
+          title: safeImage.replace(/\.(webp|jpg|png)$/i, "").replace(/_/g, " "),
+        };
+      }) ?? [];
 
     return [...videoEntries, ...imageEntries];
   },
@@ -34,24 +39,34 @@ const buildGalleryFeed = unstable_cache(
   { revalidate, tags: ["gallery"] }
 );
 
+const PREVIEW_TRACK_FILES = ["Te Prometo.mp3", "El Don.mp3", "Party.mp3"] as const;
+const PREVIEW_FILE_SET = new Set(PREVIEW_TRACK_FILES);
+
+const toPreviewSrc = (fileName: string) => {
+  if (!PREVIEW_FILE_SET.has(fileName as (typeof PREVIEW_TRACK_FILES)[number])) {
+    throw new Error("Unsupported preview audio file");
+  }
+  return `/assets/audio/previews/${encodeURIComponent(fileName)}`;
+};
+
 const previewTracks = [
   {
     id: "te-prometo",
     title: "Te Prometo (Preview)",
     artist: "Piko FG",
-    src: encodeURI("/assets/audio/previews/Te Prometo.mp3"),
+    src: toPreviewSrc("Te Prometo.mp3"),
   },
   {
     id: "el-don",
     title: "El Don (Preview)",
     artist: "Piko FG",
-    src: encodeURI("/assets/audio/previews/El Don.mp3"),
+    src: toPreviewSrc("El Don.mp3"),
   },
   {
     id: "party",
     title: "Party (Preview)",
     artist: "Piko FG",
-    src: encodeURI("/assets/audio/previews/Party.mp3"),
+    src: toPreviewSrc("Party.mp3"),
   },
 ];
 

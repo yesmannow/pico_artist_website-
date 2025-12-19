@@ -19,6 +19,7 @@ type AudioPlayerProps = {
 };
 
 const VISIBLE_WINDOW = 6;
+type ExtendedWindow = Window & { webkitAudioContext?: typeof AudioContext };
 
 export default function AudioPlayer({
   tracks,
@@ -34,18 +35,27 @@ export default function AudioPlayer({
   const contextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const rafRef = useRef<number>();
+  const resumeContext = () => contextRef.current?.resume().catch(() => undefined);
+  const cancelRaf = () => {
+    if (rafRef.current !== undefined) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = undefined;
+    }
+  };
 
   // Initialize audio graph once
   useEffect(() => {
-    if (!tracks.length || typeof window === "undefined") return;
+    if (typeof window === "undefined" || tracks.length === 0) return;
 
-    const audio = new Audio(tracks[initialIndex]?.src ?? tracks[0].src);
+    const initialTrack = tracks[initialIndex] ?? tracks[0];
+    if (!initialTrack) return;
+
+    const audio = new Audio(initialTrack.src);
     audio.crossOrigin = "anonymous";
     audio.preload = "metadata";
     audioRef.current = audio;
 
-    const AudioContextCtor = (window.AudioContext ||
-      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext);
+    const AudioContextCtor = window.AudioContext || (window as ExtendedWindow).webkitAudioContext;
 
     if (AudioContextCtor) {
       const ctx = new AudioContextCtor();
@@ -64,13 +74,24 @@ export default function AudioPlayer({
       setProgress(0);
     };
 
+    const handleAudioError = () => {
+      console.error(
+        "Failed to load audio:",
+        audio.error?.message ?? audio.error?.code ?? "unknown"
+      );
+      setIsPlaying(false);
+      setProgress(0);
+    };
+
     audio.addEventListener("ended", handleEnded);
+    audio.addEventListener("error", handleAudioError);
 
     return () => {
       audio.removeEventListener("ended", handleEnded);
+      audio.removeEventListener("error", handleAudioError);
       audio.pause();
       audio.src = "";
-      cancelAnimationFrame(rafRef.current ?? 0);
+      cancelRaf();
       analyserRef.current?.disconnect();
       analyserRef.current = null;
       contextRef.current?.close();
@@ -89,7 +110,7 @@ export default function AudioPlayer({
     setProgress(0);
 
     if (isPlaying) {
-      contextRef.current?.resume().catch(() => undefined);
+      resumeContext();
       audio
         .play()
         .catch(() => {
@@ -110,7 +131,7 @@ export default function AudioPlayer({
     };
 
     if (isPlaying) {
-      contextRef.current?.resume().catch(() => undefined);
+      resumeContext();
       audio
         .play()
         .then(() => {
@@ -118,11 +139,11 @@ export default function AudioPlayer({
         })
         .catch(() => setIsPlaying(false));
     } else {
-      cancelAnimationFrame(rafRef.current ?? 0);
+      cancelRaf();
       audio.pause();
     }
 
-    return () => cancelAnimationFrame(rafRef.current ?? 0);
+    return () => cancelRaf();
   }, [isPlaying]);
 
   const handleToggle = () => {
@@ -143,8 +164,9 @@ export default function AudioPlayer({
     const audio = audioRef.current;
     if (!audio) return;
     const duration = audio.duration || 0;
-    audio.currentTime = duration * value;
-    setProgress(value);
+    const nextValue = Math.max(0, Math.min(1, value));
+    audio.currentTime = duration * nextValue;
+    setProgress(nextValue);
   };
 
   const virtualTracks = useMemo(() => {
@@ -159,6 +181,7 @@ export default function AudioPlayer({
 
   const hiddenCount = Math.max(tracks.length - virtualTracks.length, 0);
   const activeTrack = tracks[currentIndex];
+  const clampedProgress = Math.max(0, Math.min(1, Number.isFinite(progress) ? progress : 0));
 
   return (
     <div
@@ -208,7 +231,7 @@ export default function AudioPlayer({
         <div className="relative h-2 overflow-hidden rounded-full bg-zinc-800/80">
           <motion.div
             className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-piko-teal to-piko-pink"
-            style={{ width: `${Math.min(progress, 1) * 100}%` }}
+            style={{ width: `${clampedProgress * 100}%` }}
             transition={{ duration: 0.15 }}
           />
         </div>
@@ -217,7 +240,7 @@ export default function AudioPlayer({
           min={0}
           max={1}
           step={0.01}
-          value={Number.isFinite(progress) ? progress : 0}
+          value={clampedProgress}
           onChange={(event) => handleScrub(Number(event.target.value))}
           className="w-full accent-piko-teal"
           aria-label="Scrub playback position"
