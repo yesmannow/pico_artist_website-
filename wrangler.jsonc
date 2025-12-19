@@ -7,7 +7,7 @@
   ],
   "pages_build_output_dir": ".open-next/output",
   "vars": {
-    "NODE_VERSION": "20.18.0",
+    "NODE_VERSION": "20.19.2",
     "NEXT_SKIP_TYPECHECK": "1",
     "NEXT_SKIP_LINT": "1"
   }

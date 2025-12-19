@@ -2,6 +2,9 @@
   "name": "pico_artist",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "20.19.2"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -14,7 +17,6 @@
   },
   "dependencies": {
     "@next/bundle-analyzer": "^14.2.18",
-    "eslint-config-next": "14.2.18",
     "ffmpeg-static": "^5.2.0",
     "framer-motion": "^12.23.26",
     "howler": "^2.2.4",
@@ -36,7 +38,8 @@
     "@types/node": "^25.0.3",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "eslint": "8.57.0",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "14.2.18",
     "rimraf": "^6.1.2",
     "tailwindcss": "^4",
     "typescript": "5.9.3",

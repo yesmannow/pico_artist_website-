@@ -4,7 +4,7 @@
  * Cloudflare Pages Post-Build Script
  * 
  * This script prepares the OpenNext output for Cloudflare Pages deployment by:
- * 1. Moving worker.js to _worker.js in the output directory
+ * 1. Moving index.mjs to _worker.js in the output directory
  * 2. Copying all necessary assets and server functions
  * 3. Generating _routes.json to exclude static assets from Worker routing
  * 4. Verifying all critical files are present
@@ -17,6 +17,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.join(__dirname, '..');
+// OpenNext v0.2.x produces output in .worker-next
+const WORKER_NEXT_DIR = path.join(ROOT_DIR, '.worker-next');
 const OPEN_NEXT_DIR = path.join(ROOT_DIR, '.open-next');
 const OUTPUT_DIR = path.join(OPEN_NEXT_DIR, 'output');
 
@@ -138,18 +140,34 @@ async function prepareOutputDirectory() {
   await fs.mkdir(OUTPUT_DIR, { recursive: true });
   logSuccess('Created output directory');
 
-  // Copy worker.js to _worker.js
-  const workerSrc = path.join(OPEN_NEXT_DIR, 'worker.js');
+  // OpenNext v0.2.x produces index.mjs in .worker-next
+  // We need to copy it to _worker.js in the output directory
+  const workerSrcMjs = path.join(WORKER_NEXT_DIR, 'index.mjs');
+  const workerSrcJs = path.join(OPEN_NEXT_DIR, 'worker.js');
   const workerDest = path.join(OUTPUT_DIR, '_worker.js');
   
-  if (!(await exists(workerSrc))) {
-    throw new Error('worker.js not found in .open-next directory');
+  let workerSrc;
+  if (await exists(workerSrcMjs)) {
+    workerSrc = workerSrcMjs;
+    logInfo('Found OpenNext v0.2.x output (index.mjs)');
+  } else if (await exists(workerSrcJs)) {
+    workerSrc = workerSrcJs;
+    logInfo('Found OpenNext legacy output (worker.js)');
+  } else {
+    throw new Error('Worker file not found in .worker-next/index.mjs or .open-next/worker.js');
   }
   
   await fs.copyFile(workerSrc, workerDest);
-  logSuccess('Moved worker.js → _worker.js');
+  logSuccess(`Moved ${path.basename(workerSrc)} → _worker.js`);
 
-  // Copy necessary directories
+  // Copy cache handler if present
+  const cacheHandlerSrc = path.join(WORKER_NEXT_DIR, 'cache-handler.mjs');
+  if (await exists(cacheHandlerSrc)) {
+    await fs.copyFile(cacheHandlerSrc, path.join(OUTPUT_DIR, 'cache-handler.mjs'));
+    logSuccess('Copied cache-handler.mjs');
+  }
+
+  // Copy necessary directories from .open-next (legacy) or .worker-next (v0.2.x)
   const dirsToCopy = [
     'cloudflare',
     'middleware',
@@ -158,7 +176,11 @@ async function prepareOutputDirectory() {
   ];
 
   for (const dir of dirsToCopy) {
-    const srcPath = path.join(OPEN_NEXT_DIR, dir);
+    // Try .open-next first, then .worker-next
+    let srcPath = path.join(OPEN_NEXT_DIR, dir);
+    if (!(await exists(srcPath))) {
+      srcPath = path.join(WORKER_NEXT_DIR, dir);
+    }
     if (await exists(srcPath)) {
       const destPath = path.join(OUTPUT_DIR, dir);
       await copyDir(srcPath, destPath);
@@ -168,8 +190,12 @@ async function prepareOutputDirectory() {
     }
   }
 
-  // Copy all assets from .open-next/assets/* to output root
-  const assetsSrc = path.join(OPEN_NEXT_DIR, 'assets');
+  // Copy all assets - try .worker-next first (v0.2.x), then .open-next (legacy)
+  let assetsSrc = path.join(WORKER_NEXT_DIR, 'assets');
+  if (!(await exists(assetsSrc))) {
+    assetsSrc = path.join(OPEN_NEXT_DIR, 'assets');
+  }
+  
   if (await exists(assetsSrc)) {
     const entries = await fs.readdir(assetsSrc, { withFileTypes: true });
     
@@ -185,7 +211,7 @@ async function prepareOutputDirectory() {
     }
     logSuccess('Copied all assets to output root');
   } else {
-    throw new Error('Assets directory not found');
+    throw new Error('Assets directory not found in .worker-next or .open-next');
   }
 
   // Generate _routes.json

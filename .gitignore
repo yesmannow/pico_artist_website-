@@ -49,3 +49,4 @@ downloads/
 
 # OpenNext build output
 .open-next/
+.worker-next/
