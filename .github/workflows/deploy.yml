@@ -9,6 +9,7 @@ on:
 env:
   NODE_VERSION: 20.19.2
   PROJECT_NAME: pico-artist-portfolio-website
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
 jobs:
   deploy:
